@@ -1,0 +1,23 @@
+OpenGL grid-based language.
+
+Completely point-free.  Only allowed variables are constants.  Because all values are technically stored on the grid, variables are unnecessary.  Despite this, lambda expressions exist under the hood.
+
+#(0,0) (var-ref div-times-plus)
+#(1,0) (eq #left #right)
+#(2,0) (lambda div)
+#(3,0) (lambda mul)
+#(4,0) (lambda add)
+
+(0,0): 'var-ref' references variable 'div-times-plus'.
+(1,0): active operator 'eq' called.  'eq' takes two evaluated arguments: the left and
+     : the right.  The left is already evaluated, so the right evaluation begins.
+(1,0) { 
+  (2,0): lambda 'div' is composed with evaluated 'mul'
+  (2,0) { 
+    (3,0): lambda 'mul' composed with evaluated 'add'
+    (3,0) {
+      (4,0): lambda 'add' composed with nothing; therefore its just 'add' }
+    (3,0): composition: (mul . add) }
+  (2,0): composition: (div . mul . add) }
+
+#END_PROGRAM
