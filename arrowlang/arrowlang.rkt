@@ -31,8 +31,13 @@
         [(char-numeric? (strcar s)) (string->number s)] ;[(equal? (strcar s) #\") (list s "String")] 
         [else s]))
 
-(define (into-list lst) (foldr (λ (x n)
+(define (into-list lst) (ret-pop (foldr (λ (x n)
   (cond [(equal? x "#") (append (ret-pop n) (list (cons "#" (pop n)) '(())))]
-        [else (push (ret-pop n) (cons x (pop n)))])) '(()) lst))
+        [else (push (ret-pop n) (cons x (pop n)))])) '(()) lst)))
 
-(define (parse l) (into-list (check-parens (map lex (string-split-spec l)))))
+(define (mk-exprs lst) (foldl (λ (x n) ; sparse list of coordinates and their values
+                                       ; ((sparse list) (active fns))
+  (if (member (car (third x)) (list "eq")) (list (car n) (push (second n) (list (second x) (third x))))
+      (list (push (car n) (list (second x) (third x))) (second n)))) '(() ()) lst))
+
+(define (parse l) (mk-exprs (into-list (check-parens (map lex (string-split-spec l))))))
