@@ -10,7 +10,7 @@
 
 (define (quoti lst) (append (list #\") (push lst #\")))
 
-(define funs '())
+(define funs (list (list "add" 2) (list "mul" 2) (list "div" 2)))
 
 (define (string-split-spec str) (map list->string (filter (λ (x) (not (empty? x))) (foldl (λ (s n)
   (cond [(equal? (car n) 'str) (if (equal? s #\") (push (push (ret-pop (second n)) (quoti (pop (second n)))) '()) 
@@ -31,13 +31,24 @@
         [(char-numeric? (strcar s)) (string->number s)] ;[(equal? (strcar s) #\") (list s "String")] 
         [else s]))
 
+(define (take-contiguous-x x lst) 
+  (takef (dropf (reverse lst) (λ (y) (not (equal? (caar y) x))))
+         (λ (y) (not (equal? (caadr y) "break")))))
+
+#;(define (call lst) 
+  (case (caadr (car lst)) ; name
+    [("lambda") (let ([x (cadar lst)]) ; (a b)
+                  ())]))
+
 (define (into-list lst) (ret-pop (foldr (λ (x n)
   (cond [(equal? x "#") (append (ret-pop n) (list (cons "#" (pop n)) '(())))]
         [else (push (ret-pop n) (cons x (pop n)))])) '(()) lst)))
-
 (define (mk-exprs lst) (foldl (λ (x n) ; sparse list of coordinates and their values
                                        ; ((sparse list) (active fns))
-  (if (member (car (third x)) (list "eq")) (list (car n) (push (second n) (list (second x) (third x))))
+  (if (member (car (third x)) (list "eq" "call")) (list (car n) (push (second n) (list (second x) (third x))))
       (list (push (car n) (list (second x) (third x))) (second n)))) '(() ()) lst))
+(define (parse-active lst) (map (λ (x) (displayln lst)
+  (case (caadr x) [("call") (take-contiguous-x (+ 1 (caar x)) (car lst))])) (second lst)))
 
-(define (parse l) (mk-exprs (into-list (check-parens (map lex (string-split-spec l))))))
+(define (parse l) (parse-active (mk-exprs (into-list 
+                  (check-parens (map lex (string-split-spec l)))))))
