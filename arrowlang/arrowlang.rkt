@@ -35,10 +35,12 @@
   (takef (dropf (reverse lst) (λ (y) (not (equal? (caar y) x))))
          (λ (y) (not (equal? (caadr y) "break")))))
 
-#;(define (call lst) 
-  (case (caadr (car lst)) ; name
-    [("lambda") (let ([x (cadar lst)]) ; (a b)
-                  ())]))
+(define args cdadr)
+
+(define (call lst) (displayln lst) 
+  (case (caadar lst) ; name
+    [("lambda") (let ([x (args (car lst))]) ; (a b)
+                  (displayln x))]))
 
 (define (into-list lst) (ret-pop (foldr (λ (x n)
   (cond [(equal? x "#") (append (ret-pop n) (list (cons "#" (pop n)) '(())))]
@@ -48,7 +50,7 @@
   (if (member (car (third x)) (list "eq" "call")) (list (car n) (push (second n) (list (second x) (third x))))
       (list (push (car n) (list (second x) (third x))) (second n)))) '(() ()) lst))
 (define (parse-active lst) (map (λ (x) (displayln lst)
-  (case (caadr x) [("call") (take-contiguous-x (+ 1 (caar x)) (car lst))])) (second lst)))
+  (case (caadr x) [("call") (call (take-contiguous-x (+ 1 (caar x)) (car lst)))])) (second lst)))
 
 (define (parse l) (parse-active (mk-exprs (into-list 
                   (check-parens (map lex (string-split-spec l)))))))
