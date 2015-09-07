@@ -3,13 +3,22 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-GLfloat ax_1[5] = { 0.0, 0.5, 1.0, 0.75, 0.25 };
-GLfloat ay_1[5] = { 0.0, 1.0, 0.0, 0.5, 0.5 };
+GLfloat Ax_1[5] = { 0.0, 0.5, 1.0, 0.75, 0.25 };
+GLfloat Ay_1[5] = { 0.0, 1.0, 0.0, 0.5, 0.5 };
+
+GLfloat Bx_1[14] = { 0, 0, -4.37114e-08, 0.587785, 0.951057, 0.951057,
+                     0.587785, -4.37114e-08, 0.587785, 0.9, 0.951057, 
+                     0.951057, 0.587785, -4.37114e-08 };
+GLfloat By_1[14] = { 0, 1, 1, 0.952254, 0.827254, 0.672746, 0.547746, 0.5, 
+                     0.5, 0.452254, 0.327254, 0.172746, 0.047746, 0.0 };
 
 void drawLetter(int c, GLfloat posx, GLfloat posy, GLfloat skew) {
-  if(c=='a') { glBegin(GL_LINE_STRIP);
-    for(int i=0; i<(sizeof(ax_1)/sizeof(GLfloat)); i++) { 
-      glVertex2f((ax_1[i]+posx)/skew,ay_1[i]+posy); } } glEnd(); }
+  if(c=='A') { glBegin(GL_LINE_STRIP);
+    for(int i=0; i<(sizeof(Ax_1)/sizeof(GLfloat)); i++) { 
+      glVertex2f((Ax_1[i]+posx)/skew,Ay_1[i]+posy); } }
+  if(c=='B') { glBegin(GL_LINE_STRIP);
+    for(int i=0; i<(sizeof(Bx_1)/sizeof(GLfloat)); i++) {
+      glVertex2f((Bx_1[i]+posx)/skew,By_1[i]+posy); } } glEnd(); }
 
 void paint(GLFWwindow *win) {
   glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
@@ -25,7 +34,8 @@ void paint(GLFWwindow *win) {
   glEnd();
  
   glColor3f(1.0, 1.0, 1.0);
-  drawLetter('a', 10, 10, 1.6);
+  drawLetter('A', 10, 10, 1.6);
+  drawLetter('B', 11.1, 10, 1.6);
   glFlush();
 }
  
@@ -44,11 +54,8 @@ void initGL(GLFWwindow *win) {
 
 int main(void) {
   GLFWwindow* win;
-
-  /* Initialize the library */
   if (!glfwInit()) { return -1; }
 
-  /* Create a windowed mode window and its OpenGL context */
   win = glfwCreateWindow(640, 480, "Hello World", NULL, NULL);
   if (!win) {
     glfwTerminate();
@@ -57,13 +64,9 @@ int main(void) {
   glfwMakeContextCurrent(win);
   glfwSetWindowRefreshCallback(win,paint);
   glfwSetFramebufferSizeCallback(win,reshape);
-
   initGL(win);
-
-  /* Loop until the user closes the window */
   while (!glfwWindowShouldClose(win)) {
     glfwSwapBuffers(win);
     paint(win); glfwPollEvents(); }
-
-    glfwTerminate();
-    return 0; }
+  glfwTerminate();
+  return 0; }
