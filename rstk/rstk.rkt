@@ -10,18 +10,20 @@
 
 (define wrds '(("num" (("str-numeric?") ("Num" "2" "n$") () "?"))))
 (define prims '("#STK" "n$" "!" "str-numeric?" "str-symbolic?"
-                "add" "sub" "div" "mul" "?"))
+                "add" "sub" "div" "mul" "?" "=" "cmp" "not"
+                "@" ":word"))
 
 (define test0 "1 2 3 2 n$")
 (define test1 "1 2 2 (n$) !")
 (define test2 "1 2 add 3 4 add add")
 (define test3 "1 num 2 num 2 n$")
+(define test4 "1 cmp") (define test5 "e (2.718) :word")
 
 (define (quoti lst) (append (list #\") (push lst #\")))
 (define (string-split-spec str) (map list->string (filter (λ (x) (not (empty? x))) (foldl (λ (s n)
   (cond [(equal? (car n) 'str) (if (equal? s #\") (push (push (ret-pop (second n)) (quoti (pop (second n)))) '()) 
                                    (list 'str (push (ret-pop (pop n)) (push (pop (pop n)) s))))]
-        [(equal? s #\") (list 'str n)] [(member s (list #\( #\) #\{ #\} #\[ #\] #\: #\')) (append n (list (list s)) (list '()))]
+        [(equal? s #\") (list 'str n)] [(member s (list #\( #\) #\{ #\} #\[ #\] #\')) (append n (list (list s)) (list '()))]
         [(char-whitespace? s) (push n '())] [else (push (ret-pop n) (push (pop n) s))])) '(()) (string->list str)))))
 
 (define (lex s)
@@ -48,7 +50,11 @@
    (push (take stk (- (length stk) 2)) (number->string
          ((case s [("add") +] [("sub") -] [("mul") *] [("div") /]) (string->number (pop (ret-pop stk))) (string->number (pop stk)))))]
   [("?") (let ([lst (take stk (- (length stk) 3))])
-           (if (call lst (caddr (reverse stk))) (call lst (cadr (reverse stk))) (call lst (pop stk))))]))
+           (if (call lst (caddr (reverse stk))) (call lst (cadr (reverse stk))) (call lst (pop stk))))]
+  [("=") (push (take stk (- (length stk) 2)) (equal? (cadr (reverse stk)) (pop stk)))] [("cmp") (push (ret-pop stk) (cond [(> (string->number (pop stk)) 0) "1"]
+                                                                                                     [(< (string->number (pop stk)) 0) "-1"]
+                                                                                                     [else "0"]))]
+  [(":word") (begin (set! wrds (push wrds (list (cadr (reverse stk)) (pop stk)))) (take stk (- (length stk) 2)))]))
           
 
 (define (parse-expr stk init) (foldl (λ (s n)
