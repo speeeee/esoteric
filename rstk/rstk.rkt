@@ -9,7 +9,13 @@
 (define (find-eq a ac-expr lst) (findf (λ (x) (equal? a (ac-expr x))) lst))
 
 (define words (list (list "+" "Fun")))
-(define ruls '())
+(define ruls '((("str-numeric?") ("Num" "2" "n$"))))
+(define prims '("#STK" "n$" "!" "str-numeric?" "str-symbolic?"
+                "add" "sub" "div" "mul"))
+
+(define test0 "1 2 3 2 n$")
+(define test1 "1 2 2 (n$) !")
+(define test2 "1 2 add 3 4 add add")
 
 (define (quoti lst) (append (list #\") (push lst #\")))
 (define (string-split-spec str) (map list->string (filter (λ (x) (not (empty? x))) (foldl (λ (s n)
@@ -30,7 +36,23 @@
                           [expr (λ (x) (not (equal? x c)))])
         (push (ret-pop (reverse (dropf (reverse n) expr))) (reverse (takef (reverse n) expr)))))) '() lst))
 
-#;(define (parse-expr stk) (foldl (λ (stk n)
-  (cond [()]))))
+(define (call stk c) (parse-expr c stk))
 
-(define (parse l) (check-parens (map lex (string-split-spec l))))
+; n$ ! str-numeric? str-symbolic? :rule
+(define (call-prim stk s) (case s 
+  [("#STK") (push stk (number->string (length stk)))]
+  [("n$") (push (take stk (- (length stk) (string->number (pop stk)) 1))
+                (ret-pop (drop stk (- (length stk) (string->number (pop stk)) 1))))] 
+  [("!") (parse-expr (pop stk) (ret-pop stk))] [("str-numeric?") (push (ret-pop stk) (char-numeric? (strcar (pop stk))))]
+  [("add" "sub" "div" "mul") 
+   (push (take stk (- (length stk) 2)) (number->string
+         ((case s [("add") +] [("sub") -] [("mul") *] [("div") /]) (string->number (pop (ret-pop stk))) (string->number (pop stk)))))]))
+          
+
+(define (parse-expr stk init) (displayln init) (foldl (λ (s n)
+  (cond [(member s prims) (call-prim n s)]
+        #;[(ormap (λ (x) (pop (call (push n s) x))) (map car ruls))
+         (call (push n s) (second (findf (λ (x) (pop (call (push n s) (car x)))) ruls)))]
+        [else (push n s)])) init stk))
+
+(define (parse l) (parse-expr (check-parens (map lex (string-split-spec l))) '()))
