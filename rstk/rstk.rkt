@@ -11,7 +11,7 @@
 (define wrds '(("num" (("str-numeric?") ("Num" "2" "n$") () "?"))))
 (define prims '("#STK" "n$" "!" "str-numeric?" "str-symbolic?"
                 "add" "sub" "div" "mul" "?" "=" "cmp" "not"
-                "@" ":word"))
+                "@" "push" "drop" ":word"))
 
 (define test0 "1 2 3 2 n$")
 (define test1 "1 2 2 (n$) !")
@@ -54,8 +54,10 @@
   [("=") (push (take stk (- (length stk) 2)) (equal? (cadr (reverse stk)) (pop stk)))] [("cmp") (push (ret-pop stk) (cond [(> (string->number (pop stk)) 0) "1"]
                                                                                                      [(< (string->number (pop stk)) 0) "-1"]
                                                                                                      [else "0"]))]
-  [(":word") (begin (set! wrds (push wrds (list (cadr (reverse stk)) (pop stk)))) (take stk (- (length stk) 2)))]))
-          
+  [(":word") (begin (set! wrds (push wrds (list (cadr (reverse stk)) (pop stk)))) (take stk (- (length stk) 2)))]
+  [("@") (push (take stk (- (length stk) 2)) (list-ref (cadr (reverse stk)) (string->number (pop stk))))]
+  [("push") (push (take stk (- (length stk) 2)) (push (cadr (reverse stk)) (pop stk)))]
+  [("drop") (ret-pop stk)]))
 
 (define (parse-expr stk init) (foldl (λ (s n)
   (cond [(member s prims) (call-prim n s)]
