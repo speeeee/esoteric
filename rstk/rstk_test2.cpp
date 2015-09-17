@@ -13,8 +13,8 @@ Lit pop();
 void RSTK_ADD(void); void RSTK_SUB(void); void RSTK_MUL(void); void RSTK_DIV(void);
 void RSTK_LIST_CONS(void); list<Lit> take(int);
 
-#define RSTK_LIST_CONS() list<Lit> a = take(stoi(pop().val)); \
-  stk.push((Lit) { "", &a });
+//#define RSTK_LIST_CONS() list<Lit> a = take(stoi(pop().val)); \
+//  stk.push((Lit) { "", &a });
 
 #define RSTK_LAMBDA_1 swap(); drop();
 
@@ -48,10 +48,10 @@ void RSTK_DIV(void) {
   string a = stk.top().val; stk.pop(); string b = stk.top().val; stk.pop();
   push_int(stoi(a)/stoi(b)); }
 
-/*void RSTK_LIST_CONS(void) { list<Lit> a = take(stoi(pop().val));
-  cout << a.size() << endl;
-  stk.push((Lit) { "\n", &a });
-  cout << stk.top().lst->size() << endl; }*/
+void RSTK_LIST_CONS(void) { list<Lit> a = take(stoi(pop().val));
+  stk.push((Lit) { "\n", new list<Lit> });
+  for(list<Lit>::iterator i=a.begin(); i!=a.end(); ++i) {
+    stk.top().lst->push_back(*i); } }
   
 
 
