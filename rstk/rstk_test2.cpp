@@ -11,7 +11,7 @@ typedef struct Lit { std::string val; list<struct Lit> *lst;
 void push_int(int); void push_str(string); void swap(void); void drop(void);
 Lit pop();
 void RSTK_ADD(void); void RSTK_SUB(void); void RSTK_MUL(void); void RSTK_DIV(void);
-void RSTK_LIST_CONS(void); list<Lit> take(int);
+void RSTK_LIST_CONS(void); void RSTK_GET_ELEM(void); list<Lit> take(int);
 
 //#define RSTK_LIST_CONS() list<Lit> a = take(stoi(pop().val)); \
 //  stk.push((Lit) { "", &a });
@@ -52,8 +52,10 @@ void RSTK_LIST_CONS(void) { list<Lit> a = take(stoi(pop().val));
   stk.push((Lit) { "\n", new list<Lit> });
   for(list<Lit>::iterator i=a.begin(); i!=a.end(); ++i) {
     stk.top().lst->push_back(*i); } }
-  
-
+void RSTK_GET_ELEM(void) { int pos = stoi(pop().val);
+  Lit l = pop(); list<Lit>::iterator i=l.lst->begin();
+  for(int q=0; q<pos; q++, ++i);
+  stk.push(*i); }
 
 int main(int argc, char **argv) {
   //Lit a = (Lit) { "1", NULL };
@@ -63,6 +65,6 @@ int main(int argc, char **argv) {
   push_str("hallo"); push_str("hello"); RSTK_CALL("RSTK_LAMBDA_1");
   cout << stk.top().val << endl; pop();
   push_int(1); push_int(2); push_int(2); RSTK_LIST_CONS();
-  cout << stk.top().lst->front().val << endl;
-  cout << stk.top().lst->back().val << endl; }
+  push_int(0); RSTK_GET_ELEM();
+  cout << stk.top().val << endl; }
 
