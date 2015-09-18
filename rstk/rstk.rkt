@@ -21,6 +21,8 @@
 (define test4 "1 cmp") (define test5 "e [2.718] :word")
 (define test6 "[1 cmp 1 =] [2] [3] ?")
 
+(define o (current-output-port))
+
 (define (quoti lst) (append (list #\") (push lst #\")))
 (define (string-split-spec str) (map list->string (filter (λ (x) (not (empty? x))) (foldl (λ (s n)
   (cond [(equal? (car n) 'str) (if (equal? s #\") (push (push (ret-pop (second n)) (quoti (pop (second n)))) '()) 
@@ -65,7 +67,11 @@
 
 (define (parse-expr stk init) (foldl (λ (s n)
   (cond [(member s prims) (call-prim n s)]
-        [(member s (map car wrds)) (call n (second (find-eq s car wrds)))]
+        [(member s (map car wrds)) (begin (map (λ (x) (fprintf o "push((Lit) { ~a });~n"
+                                                               (if (list? x) (format "\"\", ~a" x)
+                                                                   (format "\"~a\", NULL" x)))) n)
+                                          (fprintf o "~a();~n" s) '())]
+                                   #;(call n (second (find-eq s car wrds)))
         #;[(ormap (λ (x) (pop (call (push n s) x))) (map car ruls))
          (call (push n s) (second (findf (λ (x) (pop (call (push n s) (car x)))) ruls)))]
         [else (push n s)])) init stk))
