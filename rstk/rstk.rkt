@@ -65,10 +65,15 @@
   [("drop") (ret-pop stk)] [("dup") (append (ret-pop stk) (list (pop stk) (pop stk)))]
   [("swap") (append (take stk (- (length stk) 2)) (list (pop stk) (cadr (reverse stk))))]))
 
+(define (list->str lst) (foldl (λ (l s) (string-append s l)) "" lst))
+(define (lit x) (format "(Lit) { ~a }"
+  (if (list? x) (format "\"\", { ~a }" (list->str (map (λ (y) (format "~a," (lit y))) x)))
+      (format "\"~a\", NULL" x))))
+
 (define (parse-expr stk init) (foldl (λ (s n)
   (cond [(member s prims) (call-prim n s)]
-        [(member s (map car wrds)) (begin (map (λ (x) (fprintf o "push((Lit) { ~a });~n"
-                                                               (if (list? x) (format "\"\", ~a" x)
+        [(member s (map car wrds)) (begin (map (λ (x) (fprintf o "push(~a);~n"
+                                                               (lit x) #;(if (list? x) (format "\"\", ~a" x)
                                                                    (format "\"~a\", NULL" x)))) n)
                                           (fprintf o "~a();~n" s) '())]
                                    #;(call n (second (find-eq s car wrds)))
