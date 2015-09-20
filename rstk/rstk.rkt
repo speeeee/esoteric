@@ -66,15 +66,23 @@
   [("drop") (ret-pop stk)] [("dup") (append (ret-pop stk) (list (pop stk) (pop stk)))]
   [("swap") (append (take stk (- (length stk) 2)) (list (pop stk) (cadr (reverse stk))))]))
 
+; same as `call-prim', but outputs C++ instead.
+(define (call-prim-cpp stk s) (case s
+  [("#STK") (fprintf o "push_int(stk.size());~n")]
+  [("n$") (begin (map out stk) (fprintf o "RSTK_GET_ELEM();~n"))]))
+
 (define (list->str lst) (foldl (λ (l s) (string-append s l)) "" lst))
 (define (lit x) (format "(Lit) { ~a"
   (if (list? x) (format "\"\", new list<Lit> });~n~a" 
         (list->str (map (λ (y) (format "stk.top->lst.push_back(~a);~n" (lit y))) x)))
       (format "\"~a\", NULL }" x))))
+(define (out x) (fprintf o "stk.push(~a"
+                  (if (list? x) (lit x)
+                      (format "(Lit) { \"~a\", NULL });~n" x))))
 
 (define (parse-expr stk init) (foldl (λ (s n)
-  (cond [(member s prims) (call-prim n s)]
-        [(member s (map car wrds)) (begin (map (λ (x) (fprintf o "stk.push(~a"
+  (cond [(member s prims) (call-prim-cpp n s)]
+        [(member s (map car wrds)) (begin (map out #;(λ (x) (fprintf o "stk.push(~a"
                                                                (if (list? x) (lit x)
                                                                    (format "(Lit) { \"~a\", NULL });~n" x)))) n)
                                           (fprintf o "~a();~n" s) '())]
