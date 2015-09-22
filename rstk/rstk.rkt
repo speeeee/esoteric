@@ -69,7 +69,10 @@
 ; same as `call-prim', but outputs C++ instead.
 (define (call-prim-cpp stk s) (case s
   [("#STK") (fprintf o "push_int(stk.size());~n")]
-  [("n$") (begin (map out stk) (fprintf o "RSTK_GET_ELEM();~n"))]))
+  [("n$") (begin (map out stk) (fprintf o "RSTK_GET_ELEM();~n"))]
+  [("!") (if (not (list? (pop stk))) (fprintf o "RSTK_CALL(~a);~n" (pop stk)) 
+             (parse-expr (cdr (pop stk)) (ret-pop stk)))]
+  [(":word") (begin (set! wrds (push wrds (list (cadr (reverse stk)) '()))))]))
 
 (define (list->str lst) (foldl (λ (l s) (string-append s l)) "" lst))
 (define (lit x) (format "(Lit) { ~a"
