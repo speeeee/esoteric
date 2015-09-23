@@ -1,10 +1,11 @@
 USING: kernel math math.rectangles sequences accessors ui ui.gadgets ui.render
        ui.gadgets.worlds opengl.gl opengl.glu game.input.scancodes game.input
-       timers calendar ui.pixel-formats combinators staircase.map locals ;
+       timers calendar ui.pixel-formats combinators staircase.map locals ui.gestures 
+       arrays prettyprint ;
 IN: staircase
 
 TUPLE: stairs-gadget < gadget { cursor initial: T{ tile f 0 0 0 "cursor" } }
-  { map initial: { T{ tile f 0 0 0 "cons-cube" } } } timer ;
+  { map initial: { T{ tile f 0 0 0 "cons-cube" } } } { kdwn initial: f } timer ;
 
 : resize ( w h -- )
    [ 0 0 ] 2dip glViewport GL_PROJECTION glMatrixMode 
@@ -17,32 +18,54 @@ TUPLE: stairs-gadget < gadget { cursor initial: T{ tile f 0 0 0 "cursor" } }
 ! ++
 ! Only the two outer ones have sides blocked.
 
+stairs-gadget H{
+  { T{ key-down f f "UP" } [ cursor>> dup fetch 2drop nip 1 + >>y drop ] }
+  { T{ key-down f f "DOWN" } [ cursor>> dup fetch 2drop nip 1 - >>y drop ] } 
+  { T{ key-down f f "LEFT" } [ cursor>> dup fetch 3drop 1 - >>x drop ] } 
+  { T{ key-down f f "RIGHT" } [ cursor>> dup fetch 3drop 1 + >>x drop ] }
+  { T{ key-down f f "w" } [ cursor>> dup fetch drop [ 2drop ] dip 1 + >>z drop ] }
+  { T{ key-down f f "s" } [ cursor>> dup fetch drop [ 2drop ] dip 1 - >>z drop ] }
+  { T{ key-down f f "i" } 
+       [ dup dup [ map>> ] dip cursor>> coords "cons-cube" <cube> 
+         ! 1array append >>map drop 
+         ins-map >>map drop ] } }
+    ! [ dup map>> { T{ tile f 2 2 2 "cons-cube" } } append >>map drop ] } }
+  set-gestures
+
 : draw ( m -- )
   bgc glClearColor
   GL_COLOR_BUFFER_BIT GL_DEPTH_BUFFER_BIT bitor glClear
   glLoadIdentity
-  5 0 3 coords->iso cons-cube
-  0 1 0 coords->iso cons-cube
+  ! 5 0 3 coords->iso cons-cube
+  ! 0 1 0 coords->iso cons-cube
   ! first { [ x>> ] [ y>> ] [ z>> ] [ t>> ] } cleave draw-type 
-  dup map>> first draw-type
-  0 0 1 coords->iso cons-cube
+  dup map>> [ draw-type ] each
+  ! 0 0 1 coords->iso cons-cube
   cursor>> draw-type glFlush ;
   ! 1.0 0.0 0.0 glColor3f GL_QUADS glBegin
   ! -50.0 -50.0 0.0 glVertex3f 50.0 0.0 0.0 glVertex3f
   ! 50.0 50.0 0.0 glVertex3f -50.0 50.0 0.0 glVertex3f glEnd glFlush ;
 
-:: assess ( g -- )
-   read-keyboard keys>> :> k
-   key-up-arrow k nth [ g cursor>> dup fetch 2drop nip 1 + >>y drop ] when
-   key-down-arrow k nth [ g cursor>> dup fetch 2drop nip 1 - >>y drop ] when
-   key-left-arrow k nth [ g cursor>> dup fetch 3drop 1 - >>x drop ] when
-   key-right-arrow k nth [ g cursor>> dup fetch 3drop 1 + >>x drop ] when ;
+! : ak ( ka kb k -- ? ) [ dup [ = not ] dip ] dip nth and ;
+
+! :: assess ( g -- )
+!   read-keyboard keys>> :> k g kdwn>>
+!   { [ key-up-arrow k ak  
+!       [ g cursor>> dup fetch 2drop nip 1 + >>y g key-up-arrow >>kdwn 2drop ] when ]
+!     [ key-down-arrow k ak
+!       [ g cursor>> dup fetch 2drop nip 1 - >>y g key-down-arrow >>kdwn 2drop ] when ]
+!     [ key-left-arrow k ak
+!       [ g cursor>> dup fetch 3drop 1 - >>x g key-left-arrow >>kdwn 2drop ] when ]
+!     [ key-right-arrow k ak
+!       [ g cursor>> dup fetch 3drop 1 + >>x g key-right-arrow >>kdwn 2drop ] when ]
+!     [ drop k [ g kdwn>> = not ] all? [ g f kdwn<< ] ] }
+!   cleave 2drop ;
 
 : tick ( g -- ) relayout-1 ;
 
 M: stairs-gadget pref-dim* drop { 1280 800 } ;
 M: stairs-gadget draw-gadget*
-   dup dup rect-bounds nip first2 resize assess draw ;
+   dup rect-bounds nip first2 resize draw ;
 M: stairs-gadget graft* open-game-input [ [ tick ] curry 10 milliseconds every ] keep timer<< ;
 M: stairs-gadget ungraft* [ stop-timer f ] change-timer drop ;
 
