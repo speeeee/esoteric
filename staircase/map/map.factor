@@ -1,4 +1,5 @@
-USING: kernel opengl.gl sequences locals combinators accessors math ;
+USING: kernel opengl.gl sequences locals combinators accessors math math.order
+       arrays ;
 IN: staircase.map
 
 TUPLE: tile x y z t ;
@@ -29,7 +30,10 @@ TUPLE: tile x y z t ;
     [ drop 1 + 0 glVertex3f ] [ drop 1.5 + [ 1 + ] dip 0 glVertex3f ] } 3cleave glEnd 
   side-c glColor3f ;
 
+: <cube> ( x y z t -- cc ) tile boa ;
+
 : coords->iso ( x y z -- ix iy iz ) [ 2dup + 0.5 * ] dip + [ - ] dip 0 ;
+: coords ( t -- x y z ) { [ x>> ] [ y>> ] [ z>> ] } cleave ;
 
 ! ix = x-y
 ! iy = z+0.5(x+y)
@@ -38,3 +42,26 @@ TUPLE: tile x y z t ;
 : draw-type ( tile -- )
   fetch [ coords->iso ] dip
   { { "cons-cube" [ cons-cube ] } { "cursor" [ cursor ] } [ 4drop ] } case ;
+
+! greatest x first
+! then greatest y
+! least z
+
+! highest priority
+! z > y = x
+
+! :: interlope ( x y z a b c -- x a y b z c ) x a y b z c ;
+
+! triggers
+! tz > mz
+! ty > my
+! tx > mx
+
+: cmp ( e ti -- ? )
+  { [ [ x>> ] dip x>> ] [ [ y>> ] dip y>> ] [ [ z>> ] dip z>> ] } 2cleave
+  <=> [ <=> [ <=> ] dip ] dip dup +gt+ = 
+  [ [ 2array [ +lt+ = ] any? ] dip +eq+ = and ] dip or ;
+
+:: ins-map ( mp til -- mp' )
+   mp [ til cmp ] find drop dup [ til swap mp insert-nth ] curry
+   [ mp til suffix ] if ;
