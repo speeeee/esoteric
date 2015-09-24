@@ -12,8 +12,8 @@ TUPLE: tile x y z t ;
 
 ! This is a temporary function
 : cons-cube ( x y z -- )
-  GL_QUADS glBegin
-  { [ glVertex3f ] [ side-c glColor3f drop 0.5 + [ 1 - ] dip 0 glVertex3f ]
+  GL_QUADS glBegin side-c glColor3f
+  { [ glVertex3f ] [ drop 0.5 + [ 1 - ] dip 0 glVertex3f ]
     [ drop 1.5 + [ 1 - ] dip 0 glVertex3f ] [ drop 1 + 0 glVertex3f ]
     [ top-c glColor3f drop 1.5 + [ 1 - ] dip 0 glVertex3f ] 
     [ drop 1 + 0 glVertex3f ] [ drop 1.5 + [ 1 + ] dip 0 glVertex3f ] 
@@ -30,10 +30,23 @@ TUPLE: tile x y z t ;
     [ drop 1 + 0 glVertex3f ] [ drop 1.5 + [ 1 + ] dip 0 glVertex3f ] } 3cleave glEnd 
   side-c glColor3f ;
 
+: entry ( x y z -- ) side-c glColor3f GL_TRIANGLES glBegin
+  { [ glVertex3f ] [ drop 1.5 + [ 1 - ] dip 0 glVertex3f ] [ drop 1 + 0 glVertex3f ]
+    [ glVertex3f ] [ drop 1.5 + [ 1 + ] dip 0 glVertex3f ] [ drop 1 + 0 glVertex3f 
+      glEnd ] [ top-c glColor3f GL_QUADS glBegin drop 1 + 0 glVertex3f ] 
+    [ drop 1.5 + [ 1 - ] dip 0 glVertex3f ] [ drop 2 + 0 glVertex3f ]
+    [ drop 1.5 + [ 1 + ] dip 0 glVertex3f ] [ drop 1 + 0 glVertex3f ]
+    [ side-c glColor3f drop 1.2 + 0 glVertex3f ]
+    [ drop 1.5 + [ 0.3 - ] dip 0 glVertex3f ] [ drop 1.8 + 0 glVertex3f ]
+    [ drop 1.5 + [ 0.3 + ] dip 0 glVertex3f ] } 3cleave glEnd ;
+
 : <cube> ( x y z t -- cc ) tile boa ;
 
 : coords->iso ( x y z -- ix iy iz ) [ 2dup + 0.5 * ] dip + [ - ] dip 0 ;
 : coords ( t -- x y z ) { [ x>> ] [ y>> ] [ z>> ] } cleave ;
+: 2coords ( t t2 -- x a y b z c ) 
+  { [ [ x>> ] dip x>> ] [ [ y>> ] dip y>> ] [ [ z>> ] dip z>> ] } 2cleave ;
+
 
 ! ix = x-y
 ! iy = z+0.5(x+y)
@@ -41,7 +54,8 @@ TUPLE: tile x y z t ;
 
 : draw-type ( tile -- )
   fetch [ coords->iso ] dip
-  { { "cons-cube" [ cons-cube ] } { "cursor" [ cursor ] } [ 4drop ] } case ;
+  { { "cons-cube" [ cons-cube ] } { "cursor" [ cursor ] }
+    { "entry" [ entry ] } [ 4drop ] } case ;
 
 ! greatest x first
 ! then greatest y

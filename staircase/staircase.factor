@@ -1,11 +1,28 @@
 USING: kernel math math.rectangles sequences accessors ui ui.gadgets ui.render
        ui.gadgets.worlds opengl.gl opengl.glu game.input.scancodes game.input
        timers calendar ui.pixel-formats combinators staircase.map locals ui.gestures 
-       arrays prettyprint ;
+       arrays sequences.generalizations ;
 IN: staircase
 
 TUPLE: stairs-gadget < gadget { cursor initial: T{ tile f 0 0 0 "cursor" } }
-  { map initial: { T{ tile f 0 0 0 "cons-cube" } } } { kdwn initial: f } timer ;
+  { map initial: { T{ tile f 0 0 0 "entry" } } } { iter initial: 0 } 
+  { cbs initial: { "cons-cube" } } { curr initial: { 0 } } timer ;
+
+! Parsing data
+! Invoke the interpreter by pressing 'r'.
+
+! : find-pt ( m p -- ) [ 2coords [ [ = ] dip = ] = and and ] curry foldl ;
+! :: find-adj ( m l t -- ) p coords 3array
+!   ! this cleave sequence will be better optimized better later.
+!   { [ { 1 0 0 } [ v+ ] [ v- ] bi ] [ { 0 1 0 } [ v+ ] [ v- ] bi ]
+!     [ { 1 0 1 } [ v+ ] [ v- ] bi ] [ { -1 0 1 } [ v+ ] [ v- ] bi ]
+!     [ { 0 1 1 } [ v+ ] [ v- ] bi ] [ { 0 -1 1 } [ v+ ] [ v- ] bi ] } cleave
+!   12 narray [ l = not ] filter [ = ] [ [ coords 3array ] dip any? ] [ curry ] bi@ find ;
+
+! :: parse ( l t g -- ) ! g map>> d find-pt :> q
+!   g map>> l t find-adj
+
+! Graphical representation of data
 
 : resize ( w h -- )
    [ 0 0 ] 2dip glViewport GL_PROJECTION glMatrixMode 
