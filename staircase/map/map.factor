@@ -47,6 +47,8 @@ TUPLE: tile x y z t ;
 : 2coords ( t t2 -- x a y b z c ) 
   { [ [ x>> ] dip x>> ] [ [ y>> ] dip y>> ] [ [ z>> ] dip z>> ] } 2cleave ;
 
+: t->v ( t -- v ) coords 3array ;
+: v->t ( v -- t ) { [ first ] [ second ] [ third ] } cleave "filler" <cube> ;
 
 ! ix = x-y
 ! iy = z+0.5(x+y)

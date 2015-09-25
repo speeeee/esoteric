@@ -1,8 +1,11 @@
 USING: kernel math math.rectangles sequences accessors ui ui.gadgets ui.render
        ui.gadgets.worlds opengl.gl opengl.glu game.input.scancodes game.input
        timers calendar ui.pixel-formats combinators staircase.map locals ui.gestures 
-       arrays sequences.generalizations ;
+       arrays sequences.generalizations io io.files io.encodings.utf8 math.vectors
+       lists math.parser ;
 IN: staircase
+
+CONSTANT: repl-path "/Users/ssallay/Desktop/factor/work/staircase/target.txt"
 
 TUPLE: stairs-gadget < gadget { cursor initial: T{ tile f 0 0 0 "cursor" } }
   { map initial: { T{ tile f 0 0 0 "entry" } } } { iter initial: 0 } 
@@ -11,16 +14,21 @@ TUPLE: stairs-gadget < gadget { cursor initial: T{ tile f 0 0 0 "cursor" } }
 ! Parsing data
 ! Invoke the interpreter by pressing 'r'.
 
-! : find-pt ( m p -- ) [ 2coords [ [ = ] dip = ] = and and ] curry foldl ;
-! :: find-adj ( m l t -- ) p coords 3array
-!   ! this cleave sequence will be better optimized better later.
-!   { [ { 1 0 0 } [ v+ ] [ v- ] bi ] [ { 0 1 0 } [ v+ ] [ v- ] bi ]
-!     [ { 1 0 1 } [ v+ ] [ v- ] bi ] [ { -1 0 1 } [ v+ ] [ v- ] bi ]
-!     [ { 0 1 1 } [ v+ ] [ v- ] bi ] [ { 0 -1 1 } [ v+ ] [ v- ] bi ] } cleave
-!   12 narray [ l = not ] filter [ = ] [ [ coords 3array ] dip any? ] [ curry ] bi@ find ;
+! : find-pt ( m gp -- p ) [ 2coords = [ = [ = ] dip ] dip and and ] curry find nip ;
 
-! :: parse ( l t g -- ) ! g map>> d find-pt :> q
-!   g map>> l t find-adj
+: find-pt ( m gp -- p ) [ 2coords 2drop = [ = ] dip and ] curry find nip ;
+
+: eval ( g -- ) ! t>> 
+  curr>> [ first number>string print ] curry [ repl-path utf8 ] dip
+  with-file-appender ; 
+
+: find-next ( m l t -- n ) swap [ dup ] dip swap 
+  [ t->v ] bi@ v- -1 v*n swap t->v v+ v->t find-pt ;
+
+:: parse ( l t g -- ) ! g map>> d find-pt :> q
+   ! g map>> l t [ t->v ] bi@ v- -1 v*n t t->v v+ v->t find-pt eval ;
+   ! g map>> l t find-next dup t [ z>> ] bi@ - g curr<< eval ;
+   g eval ;
 
 ! Graphical representation of data
 
@@ -45,8 +53,10 @@ stairs-gadget H{
   { T{ key-down f f "i" } 
        [ dup dup [ map>> ] dip cursor>> coords "cons-cube" <cube> 
          ! 1array append >>map drop 
-         ins-map >>map drop ] } }
-    ! [ dup map>> { T{ tile f 2 2 2 "cons-cube" } } append >>map drop ] } }
+         ins-map >>map drop ] }
+    ! [ dup map>> { T{ tile f 2 2 2 "cons-cube" } } append >>map drop ] }
+  { T{ key-down f f "r" } 
+    [ [ T{ tile f -1 0 0 "filler" } T{ tile f 0 0 0 "filler" } ] dip parse ] } }
   set-gestures
 
 : draw ( m -- )
