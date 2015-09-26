@@ -9,6 +9,7 @@ TUPLE: tile x y z t ;
 : bgc ( -- a b c d ) 0.9725 0.9216 1.0 0 ;
 : side-c ( -- a b c ) 1 0.7098 0.7333 ;
 : top-c ( -- a b c ) 1 0.8196 0.9294 ;
+: ob-c ( -- a b c ) 1 0.7647 0.83135 ;
 
 ! This is a temporary function
 : cons-cube ( x y z -- )
@@ -40,6 +41,16 @@ TUPLE: tile x y z t ;
     [ drop 1.5 + [ 0.3 - ] dip 0 glVertex3f ] [ drop 1.8 + 0 glVertex3f ]
     [ drop 1.5 + [ 0.3 + ] dip 0 glVertex3f ] } 3cleave glEnd ;
 
+: end ( x y z -- ) side-c glColor3f 
+  { [ cons-cube ] [ GL_QUADS glBegin side-c glColor3f drop 1.2 + 0 glVertex3f ]
+    [ drop 1.5 + [ 0.8 - ] dip 0 glVertex3f ] [ drop 1.8 + 0 glVertex3f ]
+    [ drop 1.5 + [ 0.8 + ] dip 0 glVertex3f ] } 3cleave glEnd ;
+
+: out ( x y z -- ) 
+  { [ cons-cube ] [ GL_QUADS glBegin ob-c glColor3f drop 1 + 0 glVertex3f ]
+    [ drop 1.5 + [ 1 - ] dip 0 glVertex3f ] [ drop 2.5 + 0 glVertex3f ]
+    [ drop 1.5 + [ 1 + ] dip 0 glVertex3f ] } 3cleave glEnd ;
+
 : <cube> ( x y z t -- cc ) tile boa ;
 
 : coords->iso ( x y z -- ix iy iz ) [ 2dup + 0.5 * ] dip + [ - ] dip 0 ;
@@ -57,7 +68,8 @@ TUPLE: tile x y z t ;
 : draw-type ( tile -- )
   fetch [ coords->iso ] dip
   { { "cons-cube" [ cons-cube ] } { "cursor" [ cursor ] }
-    { "entry" [ entry ] } [ 4drop ] } case ;
+    { "entry" [ entry ] } { "out" [ out ] } 
+    { "end" [ end ] } [ 4drop ] } case ;
 
 ! greatest x first
 ! then greatest y
