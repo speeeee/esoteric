@@ -2,15 +2,16 @@ USING: kernel math math.rectangles sequences accessors ui ui.gadgets ui.render
        ui.gadgets.worlds opengl.gl opengl.glu game.input.scancodes game.input
        timers calendar ui.pixel-formats combinators staircase.map locals ui.gestures 
        arrays sequences.generalizations io io.files io.encodings.utf8 math.vectors
-       lists math.parser ;
+       lists math.parser ui.text fonts ;
 IN: staircase
 
 CONSTANT: repl-path "/Users/ssallay/Desktop/factor/work/staircase/target.txt"
-CONSTANT: sz 3
+CONSTANT: sz 4
 
 TUPLE: stairs-gadget < gadget { cursor initial: T{ tile f 0 0 0 "cursor" } }
   { map initial: { T{ tile f 0 0 0 "entry" } } } { iter initial: 0 } 
-  { cbs initial: { "cons-cube" "out" "end" } } { curr initial: { 0 } } timer ;
+  { cbs initial: { "cons-cube" "support" "out" "end" } } 
+  { curr initial: { 0 } } timer ;
 
 ! Parsing data
 ! Invoke the interpreter by pressing 'r'.
@@ -32,7 +33,7 @@ DEFER: parse
 
 :: parse ( l t g -- ) ! g map>> d find-pt :> q
    ! g map>> l t [ t->v ] bi@ v- -1 v*n t t->v v+ v->t find-pt eval ;
-   g t g map>> l t find-next dup t [ z>> ] bi@ - g 
+   g t g map>> [ t>> "support" = not ] filter l t find-next dup t [ z>> ] bi@ - g 
    curr>> first + 1array g curr<< eval ;
    ! g eval ;
 
@@ -75,8 +76,11 @@ stairs-gadget H{
   bgc glClearColor
   GL_COLOR_BUFFER_BIT GL_DEPTH_BUFFER_BIT bitor glClear
   glLoadIdentity
+  dup cursor>> coords coords->iso [ neg ] tri@ glTranslatef
   dup map>> [ draw-type ] each
-  cursor>> draw-type glFlush ;
+  dup cursor>> dup draw-type
+  swap [ iter>> sz mod abs ] [ cbs>> ] bi nth
+  [ coords [ [ 43 - ] [ 15 - ] bi* ] dip ] dip <cube> draw-type glFlush ;
 
 ! : ak ( ka kb k -- ? ) [ dup [ = not ] dip ] dip nth and ;
 
