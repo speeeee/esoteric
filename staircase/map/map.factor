@@ -75,6 +75,21 @@ TUPLE: tile x y z t ;
     [ drop 1.5 + [ 0.7 - ] dip 0 glVertex3f ] [ drop 1.35 + [ 0.4 + ] dip 0 glVertex3f ]
   } 3cleave glEnd ;
 
+: eq ( x y z -- )
+  { [ cons-cube ] [ side-c glColor3f GL_QUADS glBegin
+                    drop 1.25 + [ 0.5 - ] dip 0 glVertex3f ]
+    [ drop 1.75 + [ 0.5 - ] dip 0 glVertex3f ] [ drop 1.75 + [ 0.5 + ] dip 0 glVertex3f ]
+    [ drop 1.25 + [ 0.5 + ] dip 0 glVertex3f ] } 3cleave glEnd ;
+: ne ( x y z -- )
+  { [ cons-cube ] [ side-c glColor3f GL_QUADS glBegin
+                    drop 1.73 + [ 0.7 - ] dip 0 glVertex3f ]
+    [ drop 1.77 + [ 0.3 - ] dip 0 glVertex3f ] [ drop 1.27 + [ 0.7 + ] dip 0 glVertex3f ]
+    [ drop 1.23 + [ 0.3 + ] dip 0 glVertex3f ] } 3cleave glEnd ;
+: pos ( x y z -- )
+  { [ cons-cube ] [ side-c glColor3f GL_QUADS glBegin
+                    drop 1.27 + [ 0.7 - ] dip 0 glVertex3f ]
+    [ drop 1.23 + [ 0.3 - ] dip 0 glVertex3f ] [ drop 1.73 + [ 0.7 + ] dip 0 glVertex3f ]
+    [ drop 1.77 + [ 0.3 + ] dip 0 glVertex3f ] } 3cleave glEnd ;
 
 : <cube> ( x y z t -- cc ) tile boa ;
 
@@ -95,7 +110,8 @@ TUPLE: tile x y z t ;
   { { "cons-cube" [ cons-cube ] } { "cursor" [ cursor ] }
     { "entry" [ entry ] } { "out" [ out ] } 
     { "end" [ end ] } { "support" [ support ] } 
-    { "x+" [ x+ ] } { "x-" [ x- ] } { "y+" [ y+ ] } { "y-" [ y- ] } [ 4drop ] } case ;
+    { "x+" [ x+ ] } { "x-" [ x- ] } { "y+" [ y+ ] } { "y-" [ y- ] }
+    { "pos" [ pos ] } { "ne" [ ne ] } { "eq" [ eq ] } [ 4drop ] } case ;
 
 ! greatest x first
 ! then greatest y
