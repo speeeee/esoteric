@@ -57,6 +57,25 @@ TUPLE: tile x y z t ;
     [ glVertex3f ] [ drop 0.5 + [ 1 + ] dip 0 glVertex3f ]
     [ drop 1.5 + [ 1 + ] dip 0 glVertex3f ] [ drop 1 + 0 glVertex3f ] } 3cleave glEnd ;
 
+: x+ ( x y z -- ) 
+  { [ cons-cube ] [ GL_TRIANGLES glBegin side-c glColor3f drop 1.2 + 0 glVertex3f ] 
+    [ drop 1.5 + [ 0.7 - ] dip 0 glVertex3f ] [ drop 1.75 + [ 0.3 + ] dip 0 glVertex3f ]
+  } 3cleave glEnd ;
+: x- ( x y z -- ) 
+  { [ cons-cube ] [ GL_TRIANGLES glBegin side-c glColor3f 
+                    drop 1.5 + [ 0.6 + ] dip 0 glVertex3f ] 
+    [ drop 1.8 + 0 glVertex3f ] [ drop 1.25 + [ 0.3 - ] dip 0 glVertex3f ]
+  } 3cleave glEnd ;
+: y+ ( x y z -- ) 
+  { [ cons-cube ] [ GL_TRIANGLES glBegin side-c glColor3f drop 1.2 + 0 glVertex3f ] 
+    [ drop 1.5 + [ 0.8 + ] dip 0 glVertex3f ] [ drop 1.65 + [ 0.4 - ] dip 0 glVertex3f ]
+  } 3cleave glEnd ;
+: y- ( x y z -- ) 
+  { [ cons-cube ] [ GL_TRIANGLES glBegin side-c glColor3f drop 1.8 + 0 glVertex3f ] 
+    [ drop 1.5 + [ 0.7 - ] dip 0 glVertex3f ] [ drop 1.35 + [ 0.4 + ] dip 0 glVertex3f ]
+  } 3cleave glEnd ;
+
+
 : <cube> ( x y z t -- cc ) tile boa ;
 
 : coords->iso ( x y z -- ix iy iz ) [ 2dup + 0.5 * ] dip + [ - ] dip 0 ;
@@ -75,7 +94,8 @@ TUPLE: tile x y z t ;
   fetch [ coords->iso ] dip
   { { "cons-cube" [ cons-cube ] } { "cursor" [ cursor ] }
     { "entry" [ entry ] } { "out" [ out ] } 
-    { "end" [ end ] } { "support" [ support ] } [ 4drop ] } case ;
+    { "end" [ end ] } { "support" [ support ] } 
+    { "x+" [ x+ ] } { "x-" [ x- ] } { "y+" [ y+ ] } { "y-" [ y- ] } [ 4drop ] } case ;
 
 ! greatest x first
 ! then greatest y
