@@ -6,11 +6,12 @@ USING: kernel math math.rectangles sequences accessors ui ui.gadgets ui.render
 IN: staircase
 
 CONSTANT: repl-path "/Users/ssallay/Desktop/factor/work/staircase/target.txt"
-CONSTANT: sz 8
+CONSTANT: sz 11
 
 TUPLE: stairs-gadget < gadget { cursor initial: T{ tile f 0 0 0 "cursor" } }
   { map initial: { T{ tile f 0 0 0 "entry" } } } { iter initial: 0 } 
-  { cbs initial: { "cons-cube" "support" "out" "end" "x+" "x-" "y+" "y-" } } 
+  { cbs initial: { "cons-cube" "support" "out" "end" "pos" "ne" "eq"
+                   "x+" "x-" "y+" "y-" } } 
   { curr initial: { 0 } } timer ;
 
 ! Parsing data
@@ -28,7 +29,13 @@ DEFER: parse
     { "x+" [ nip dup t->v { 1 0 0 } v- v->t swap pick parse drop ] }
     { "x-" [ nip dup t->v { 1 0 0 } v+ v->t swap pick parse drop ] }
     { "y+" [ nip dup t->v { 0 1 0 } v- v->t swap pick parse drop ] }
-    { "y-" [ nip dup t->v { 0 1 0 } v+ v->t swap pick parse drop ] } } case ;
+    { "y-" [ nip dup t->v { 0 1 0 } v+ v->t swap pick parse drop ] }
+    { "pos" [ pick [ nip dup t->v { 0 1 0 } ] dip curr>> first 0 > [ v- ] [ v+ ] if
+              v->t swap pick parse drop ] }
+    { "ne" [ pick [ nip dup t->v { 0 1 0 } ] dip curr>> first 0 < [ v- ] [ v+ ] if
+              v->t swap pick parse drop ] }
+    { "eq" [ pick [ nip dup t->v { 0 1 0 } ] dip curr>> first 0 = [ v- ] [ v+ ] if
+              v->t swap pick parse drop ] } } case ;
   ! curr>> [ first number>string print ] curry [ repl-path utf8 ] dip
   ! with-file-appender ; 
 
