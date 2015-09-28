@@ -2,15 +2,15 @@ USING: kernel math math.rectangles sequences accessors ui ui.gadgets ui.render
        ui.gadgets.worlds opengl.gl opengl.glu game.input.scancodes game.input
        timers calendar ui.pixel-formats combinators staircase.map locals ui.gestures 
        arrays sequences.generalizations io io.files io.encodings.utf8 math.vectors
-       lists math.parser ui.text fonts ;
+       lists math.parser ui.text fonts io.encodings.string byte-arrays ;
 IN: staircase
 
 CONSTANT: repl-path "/Users/ssallay/Desktop/factor/work/staircase/target.txt"
-CONSTANT: sz 11
+CONSTANT: sz 12
 
 TUPLE: stairs-gadget < gadget { cursor initial: T{ tile f 0 0 0 "cursor" } }
   { map initial: { T{ tile f 0 0 0 "entry" } } } { iter initial: 0 } 
-  { cbs initial: { "cons-cube" "support" "out" "end" "pos" "ne" "eq"
+  { cbs initial: { "cons-cube" "support" "out" "outc" "end" "pos" "ne" "eq"
                    "x+" "x-" "y+" "y-" } } 
   { curr initial: { 0 } } timer ;
 
@@ -23,7 +23,7 @@ TUPLE: stairs-gadget < gadget { cursor initial: T{ tile f 0 0 0 "cursor" } }
 
 DEFER: parse
 : eval ( g l t -- ) dup t>> 
-  { { "out" [ pick curr>> [ first number>string print ] curry [ repl-path utf8 ] dip
+  { { "out" [ pick curr>> [ first number>string write ] curry [ repl-path utf8 ] dip
               with-file-appender pick parse drop ] }
     { "cons-cube" [ pick parse drop ] } { "end" [ 3drop ] }
     { "x+" [ nip dup t->v { 1 0 0 } v- v->t swap pick parse drop ] }
@@ -35,7 +35,9 @@ DEFER: parse
     { "ne" [ pick [ nip dup t->v { 0 1 0 } ] dip curr>> first 0 < [ v- ] [ v+ ] if
               v->t swap pick parse drop ] }
     { "eq" [ pick [ nip dup t->v { 0 1 0 } ] dip curr>> first 0 = [ v- ] [ v+ ] if
-              v->t swap pick parse drop ] } } case ;
+              v->t swap pick parse drop ] }
+    { "outc" [ pick curr>> [ first 1byte-array utf8 decode write ] curry 
+               [ repl-path utf8 ] dip with-file-appender pick parse drop ] } } case ;
   ! curr>> [ first number>string print ] curry [ repl-path utf8 ] dip
   ! with-file-appender ; 
 

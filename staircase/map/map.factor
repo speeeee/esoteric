@@ -91,6 +91,11 @@ TUPLE: tile x y z t ;
     [ drop 1.23 + [ 0.3 - ] dip 0 glVertex3f ] [ drop 1.73 + [ 0.7 + ] dip 0 glVertex3f ]
     [ drop 1.77 + [ 0.3 + ] dip 0 glVertex3f ] } 3cleave glEnd ;
 
+: outc ( x y z -- ) 
+  { [ cons-cube ] [ GL_QUADS glBegin top-c glColor3f drop 1 + 0 glVertex3f ]
+    [ drop 1.5 + [ 1 - ] dip 0 glVertex3f ] [ drop 2.5 + 0 glVertex3f ]
+    [ drop 1.5 + [ 1 + ] dip 0 glVertex3f ] } 3cleave glEnd ;
+
 : <cube> ( x y z t -- cc ) tile boa ;
 
 : coords->iso ( x y z -- ix iy iz ) [ 2dup + 0.5 * ] dip + [ - ] dip 0 ;
@@ -111,7 +116,8 @@ TUPLE: tile x y z t ;
     { "entry" [ entry ] } { "out" [ out ] } 
     { "end" [ end ] } { "support" [ support ] } 
     { "x+" [ x+ ] } { "x-" [ x- ] } { "y+" [ y+ ] } { "y-" [ y- ] }
-    { "pos" [ pos ] } { "ne" [ ne ] } { "eq" [ eq ] } [ 4drop ] } case ;
+    { "pos" [ pos ] } { "ne" [ ne ] } { "eq" [ eq ] }
+    { "outc" [ outc ] } [ 4drop ] } case ;
 
 ! greatest x first
 ! then greatest y
