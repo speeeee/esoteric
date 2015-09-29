@@ -6,13 +6,13 @@ USING: kernel math math.rectangles sequences accessors ui ui.gadgets ui.render
 IN: staircase
 
 CONSTANT: repl-path "/Users/ssallay/Desktop/factor/work/staircase/target.txt"
-CONSTANT: sz 12
+CONSTANT: sz 15
 
 TUPLE: stairs-gadget < gadget { cursor initial: T{ tile f 0 0 0 "cursor" } }
   { map initial: { T{ tile f 0 0 0 "entry" } } } { iter initial: 0 } 
-  { cbs initial: { "cons-cube" "support" "out" "outc" "end" "pos" "ne" "eq"
-                   "x+" "x-" "y+" "y-" } } 
-  { curr initial: { 0 } } timer ;
+  { cbs initial: { "cons-cube" "support" "out" "outc" "end" "pos" "ne" "eq" "sto" "cal"
+                   "x+" "x-" "y+" "y-" "sub1" } } 
+  { curr initial: { 0 0 } } timer ;
 
 ! Parsing data
 ! Invoke the interpreter by pressing 'r'.
@@ -37,7 +37,11 @@ DEFER: parse
     { "eq" [ pick [ nip dup t->v { 0 1 0 } ] dip curr>> first 0 = [ v- ] [ v+ ] if
               v->t swap pick parse drop ] }
     { "outc" [ pick curr>> [ first 1byte-array utf8 decode write ] curry 
-               [ repl-path utf8 ] dip with-file-appender pick parse drop ] } } case ;
+               [ repl-path utf8 ] dip with-file-appender pick parse drop ] } 
+   { "sto" [ pick dup curr>> first dup 2array
+             >>curr parse drop ] }
+   { "cal" [ pick dup curr>> reverse >>curr parse drop ] }
+   { "sub1" [ pick dup curr>> { 1 0 } v- >>curr parse drop ] } } case ;
   ! curr>> [ first number>string print ] curry [ repl-path utf8 ] dip
   ! with-file-appender ; 
 
@@ -47,7 +51,7 @@ DEFER: parse
 :: parse ( l t g -- ) ! g map>> d find-pt :> q
    ! g map>> l t [ t->v ] bi@ v- -1 v*n t t->v v+ v->t find-pt eval ;
    g t g map>> [ t>> "support" = not ] filter l t find-next dup t [ z>> ] bi@ - g 
-   curr>> first + 1array g curr<< eval ;
+   curr>> first + g curr>> second 2array g curr<< eval ;
    ! g eval ;
 
 ! Graphical representation of data
@@ -82,7 +86,8 @@ stairs-gadget H{
   { T{ key-down f f "u" } [ dup iter>> 1 - >>iter drop ] }
   { T{ key-down f f "o" } [ dup iter>> 1 + >>iter drop ] }
   { T{ key-down f f "r" } 
-    [ [ T{ tile f -1 0 0 "filler" } T{ tile f 0 0 0 "filler" } ] dip parse ] } }
+    [ dup [ T{ tile f -1 0 0 "filler" } T{ tile f 0 0 0 "filler" } ] dip parse
+      { 0 0 } >>curr drop ] } }
   set-gestures
 
 : draw ( m -- )
