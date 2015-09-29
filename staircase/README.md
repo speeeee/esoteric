@@ -14,18 +14,27 @@ This is documentation of the controls of the program itself.
 ### Cursor movement
 
 **↑**: move cursor in a positive direction on the y-axis; move up.
+
 **→**: move cursor in a positive direction on the x-axis; move right.
+
 **↓**: move cursor in a negative direction on the y-axis; move down.
+
 **←**: move cursor in a negative direction on the x-axis; move left.
+
 **w**: move cursor in a positive direction on the z-axis.
+
 **s**: move cursor in a negative direction on the z-axis.
 
 ### Program modification controls
 
 **i**: place block at current position.
+
 **t**: remove block at current position.
+
 **u**: switch selected block left.
+
 **o**: switch selected block right.
+
 **r**: run current program.
 
 ## Managing errors
