@@ -5,6 +5,8 @@ staircase is an esoteric visual programming language.  The language is represent
 
 The building program itself works in three dimensions.  The purpose of each dimension is explained later.
 
+The output of a staircase program is recorded in a file called `target.txt` in the user's home directory (e.g. `/usr/name/target.txt`).
+
 # UI reference
 
 This is documentation of the controls of the program itself.
@@ -109,4 +111,88 @@ Here, each block in the path is 1 higher than the last in the z-axis.  The final
 
 So far, the active integer has been referenced, but the passive has been ignored.  The passive integer is not explained here though.  It is rather explained in the "store" and "call" sections in the language reference.  This is because the passive integer is only used by them.  However, the passive integer is very important.
 
-# Docs will be continued later...
+## Reference
+
+This is a reference of all of the 15 (+1 including entry-point) blocks in staircase.
+
+### Path block
+
+A block used as a buffer between two more important blocks.  More info and use in "Creating paths and the end-point".
+
+### Support
+
+![support]()
+
+This block is used purely for cosmetic purposes.  All support blocks are removed from the list of blocks during run-time.
+
+### Numeric output
+
+![output]()
+
+This block prints the current active integer *n* (`{ n _ }`) to the file, `target.txt`.  This does not modify the program state.
+
+### Character output
+
+![outc]()
+
+This has the same function as output, but instead prints the UTF-8 character corresponding to the current active integer instead.  This does not modify the program state.
+
+### End
+
+This is explained in detail in "Creating paths and the end-point".
+
+### Check-positive
+
+![check]()
+
+*In order: positive, negative, equal."
+
+If the active integer is positive, the path is changed to the y+ direction.  If negative, the y- direction.
+
+### Check-negative
+
+Inverse of check-positive.
+
+### Check-equal
+
+If the active integer is equal to 0, the path is changed to the y+ direction.  If not, the y- direction.
+
+### x direction
+
+Change the path to the x direction.
+
+### y direction
+
+Change the path to the y direction.
+
+### -x direction
+
+Change the path to the -x direction.
+
+### -y direction
+
+Change the path to the -y direction.
+
+All of the direction blocks are represented as a normal block with an arrow on it in the direction specified.
+
+None of these blocks modify the program state.
+
+### -1 block
+
+![sub1-block]()
+
+Without changing the depth, this block will subtract 1 from the current active integer.  It is advised against using this outside of looping, since it skews the measurement of depth.  Another way of thinking of it is that it shifts the depth of the horizontal plane by 1.
+
+### Storage block
+
+![sto-cal]()
+
+*In order: store, call.*
+
+This block (and the corresponding "call" block) are the only two blocks in the language that modify both the active and passive integers.  The storage block, however, only modifies the passive integer.  This block assigns to the passive integer the current active integer. For example, if '{ 1 0 }' were given, then the result after the storage block is found would be `{ 1 1 }`; the passive integer was set to the active integer.
+
+### Call block
+
+This block (and the storage block) are very important to making indexed loops.  What the call block does is that given a program state, it will swap the current active integer and the current passive integer.  For example, given the program state, `{ 2 1 }`, the resulting state after the call block is `{ 1 2 }`.  This means that any two adjacent call blocks ultimately does nothing, since they are only swapped back on the second call.  
+
+What this does is that it allows for storing values for when they are needed later.  The most notable use case is when there is an indexed loop, where one integer acts as the iterator and the other acts as the subject being iterated through.
