@@ -2,10 +2,10 @@ USING: kernel math math.rectangles sequences accessors ui ui.gadgets ui.render
        ui.gadgets.worlds opengl.gl opengl.glu game.input.scancodes game.input
        timers calendar ui.pixel-formats combinators staircase.map locals ui.gestures 
        arrays sequences.generalizations io io.files io.encodings.utf8 math.vectors
-       lists math.parser ui.text fonts io.encodings.string byte-arrays ;
+       lists math.parser ui.text fonts io.encodings.string byte-arrays io.pathnames
+       unicode.normalize ;
 IN: staircase
 
-CONSTANT: repl-path "/Users/ssallay/Desktop/factor/work/staircase/target.txt"
 CONSTANT: sz 15
 
 TUPLE: stairs-gadget < gadget { cursor initial: T{ tile f 0 0 0 "cursor" } }
@@ -23,7 +23,8 @@ TUPLE: stairs-gadget < gadget { cursor initial: T{ tile f 0 0 0 "cursor" } }
 
 DEFER: parse
 : eval ( g l t -- ) dup t>> 
-  { { "out" [ pick curr>> [ first number>string write ] curry [ repl-path utf8 ] dip
+  { { "out" [ pick curr>> [ first number>string write ] curry
+              [ home "/target.txt" string-append utf8 ] dip
               with-file-appender pick parse drop ] }
     { "cons-cube" [ pick parse drop ] } { "end" [ 3drop ] }
     { "x+" [ nip dup t->v { 1 0 0 } v- v->t swap pick parse drop ] }
@@ -37,7 +38,8 @@ DEFER: parse
     { "eq" [ pick [ nip dup t->v { 0 1 0 } ] dip curr>> first 0 = [ v- ] [ v+ ] if
               v->t swap pick parse drop ] }
     { "outc" [ pick curr>> [ first 1byte-array utf8 decode write ] curry 
-               [ repl-path utf8 ] dip with-file-appender pick parse drop ] } 
+               [ home "/target.txt" string-append utf8 ] 
+               dip with-file-appender pick parse drop ] } 
    { "sto" [ pick dup curr>> first dup 2array
              >>curr parse drop ] }
    { "cal" [ pick dup curr>> reverse >>curr parse drop ] }
