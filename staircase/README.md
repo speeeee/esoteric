@@ -85,7 +85,7 @@ Another block will be introduced here, and that is the end-point block.  This bl
 
 End-point blocks look like this:
 
-![end-point]()
+![end-point](http://i.imgur.com/TM2vpve.png)
 
 With these blocks, a valid program can be written (really, only the end-point block is needed, but for this, both are used).  Before beginning, it should be noted the direction the program will first start in.  The entry-point of a program will *always* open to the positive *x* direction.  Because of this, the direction that any program begins in is the positive *x* direction.  With this in mind, the following is a valid staircase program:
 
