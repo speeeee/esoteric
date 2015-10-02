@@ -67,10 +67,6 @@ This is where the program begins when it is run (remember, *r*).  However, this 
 
 Before creating paths is introduced, it should be noted what the axes themselves mean.  As mentioned before, staircase works on a three dimensional grid.  The x- and y-axis together represent position, while the z-axis represents the depth.  There is a reason why this distinction is made, and this is explained when the program state is introduced.
 
-This is a graphical representation of the axes
-
-![axes]()
-
 ### Creating paths and the end-point
 
 Paths act as the most basic building block of staircase.  They technically do nothing on their own and only act as a transition between more important blocks (i.e. IO blocks and program state modifiers).
@@ -99,11 +95,7 @@ Before the z-axis is introduced, there is an important concept to discuss first.
 
 Unlike the x- and y-axis, the z-axis has a slightly different meaning.  Really, only the x- and y-axis matter to the program as far as positioning goes.  The z-axis actually modifies the program state.  Unless a few certain blocks are used, the depth of a block is also equal to the program state's active integer.  The z-axis essentially acts as an incrementer, where a step up acts as +1 and a step down acts as -1.  The program, when searching for the next block in the path, ignores the z-axis, meaning that as long as the point is next in the path in terms of the x- and y-axis, it is selected.  As a side-effect, the program state is also changed according to this new depth.
 
-Here is an example of using the z-axis:
-
-![z-axis]()
-
-Here, each block in the path is 1 higher than the last in the z-axis.  The final program state in this case is `{ 3 0 }`.  While not shown here, the steps can also be downward, and into the negatives.  Finally, the difference between two depths in a path can be anything, not just 1 or -1.
+Given a program that resembles a staircsase with a total of 3 steps and each block in the path is 1 higher than the last in the z-axis, the final program state in this case is `{ 3 0 }`.  While not shown here, the steps can also be downward, and into the negatives.  Finally, the difference between two depths in a path can be anything, not just 1 or -1.
 
 ### The passive integer
 
