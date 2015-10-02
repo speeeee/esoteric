@@ -77,7 +77,7 @@ Paths act as the most basic building block of staircase.  They technically do no
 
 Path blocks look like this:
 
-![path-block]()
+![path-block](http://i.imgur.com/MhMe8ec.png)
 
 **WARNING:** There is another block that looks *very* similar to this one.  However, it has a gradient on the surface, while the path block is a single solid color.
 
@@ -87,11 +87,9 @@ End-point blocks look like this:
 
 ![end-point](http://i.imgur.com/TM2vpve.png)
 
-With these blocks, a valid program can be written (really, only the end-point block is needed, but for this, both are used).  Before beginning, it should be noted the direction the program will first start in.  The entry-point of a program will *always* open to the positive *x* direction.  Because of this, the direction that any program begins in is the positive *x* direction.  With this in mind, the following is a valid staircase program:
+With these blocks, a valid program can be written (really, only the end-point block is needed, but for this, both are used).  Before beginning, it should be noted the direction the program will first start in.  The entry-point of a program will *always* open to the positive *x* direction.  Because of this, the direction that any program begins in is the positive *x* direction.
 
-![valid-prgm]()
-
-Of course, all this program does is begin and end, and there aren't very many useful cases where only the x-axis is available.  Luckily, the next section introduces the z-axis, and later sections explain blocks that change the direction of the path, allowing interaction with the y-axis.
+Of course, all a program with only paths does is begin and end, and there aren't very many useful cases where only the x-axis is available.  Luckily, the next section introduces the z-axis, and later sections explain blocks that change the direction of the path, allowing interaction with the y-axis.
 
 ### Program state
 
@@ -121,19 +119,19 @@ A block used as a buffer between two more important blocks.  More info and use i
 
 ### Support
 
-![support]()
+![support](http://i.imgur.com/nd2CiVq.png)
 
 This block is used purely for cosmetic purposes.  All support blocks are removed from the list of blocks during run-time.
 
 ### Numeric output
 
-![output]()
+![output](http://i.imgur.com/GJYrfPK.png)
 
 This block prints the current active integer *n* (`{ n _ }`) to the file, `target.txt`.  This does not modify the program state.
 
 ### Character output
 
-![outc]()
+![outc](http://i.imgur.com/93OJ1d6.png)
 
 This has the same function as output, but instead prints the UTF-8 character corresponding to the current active integer instead.  This does not modify the program state.
 
@@ -143,7 +141,7 @@ This is explained in detail in "Creating paths and the end-point".
 
 ### Check-positive
 
-![check]()
+![check](http://i.imgur.com/weYZGAj.png)
 
 *In order: positive, negative, equal."
 
@@ -179,13 +177,13 @@ None of these blocks modify the program state.
 
 ### -1 block
 
-![sub1-block]()
+![sub1-block](http://i.imgur.com/r5h6APP.png)
 
 Without changing the depth, this block will subtract 1 from the current active integer.  It is advised against using this outside of looping, since it skews the measurement of depth.  Another way of thinking of it is that it shifts the depth of the horizontal plane by 1.
 
 ### Storage block
 
-![sto-cal]()
+![sto-cal](http://i.imgur.com/u1vizMB.png)
 
 *In order: store, call.*
 
@@ -196,3 +194,8 @@ This block (and the corresponding "call" block) are the only two blocks in the l
 This block (and the storage block) are very important to making indexed loops.  What the call block does is that given a program state, it will swap the current active integer and the current passive integer.  For example, given the program state, `{ 2 1 }`, the resulting state after the call block is `{ 1 2 }`.  This means that any two adjacent call blocks ultimately does nothing, since they are only swapped back on the second call.  
 
 What this does is that it allows for storing values for when they are needed later.  The most notable use case is when there is an indexed loop, where one integer acts as the iterator and the other acts as the subject being iterated through.
+
+### Examples
+
+![a](http://i.imgur.com/nsGjEtV.png)
+![b](http://i.imgur.com/g7Ff7wc.png)
