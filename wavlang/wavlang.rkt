@@ -34,8 +34,8 @@
 
 (define (call-a s n) (case s 
   [("+" "-" "/" "*") 
-   (push (take stk (- (length stk) 2)) (number->string
-         ((case s [("+") +] [("-") -] [("*") *] [("/") /]) (string->number (pop (ret-pop stk))) (string->number (pop stk)))))]
+   (push (take n (- (length n) 2)) (number->string
+         ((case s [("+") +] [("-") -] [("*") *] [("/") /]) (string->number (pop (ret-pop n))) (string->number (pop n)))))]
   [("dup") (push n (pop n))] [("swap") (append (ret-pop (ret-pop n)) (list (pop n) (pop (ret-pop n))))]
   [("drop") (ret-pop n)]))
 
