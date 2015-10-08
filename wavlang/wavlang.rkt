@@ -31,13 +31,23 @@
 (define afuns '("+" "-" "*" "/" "dup" "swap" "drop" "import" ":word"))
 (define pfuns '(#| w x y -- w' |# "sample" #| w1 w2 -- w1212.. |# "concur"
                 #| w sh -- w*sh |# "shift" #| f -- w |# "wav"))
-(define wrds* '())
+(define wrds* '()) (define wavs* '())
 
 (define (in-block s)
   (map (λ (x) (fprintf o x s)) '("FILE *~a;~n" "fopen(\"~a.wav\", \"rb\");~n" "fseek(~a,0,SEEK_END);~n" "long ~asz = " "ftell(~a);~n"
                                  "rewind(~a);~n" "fseek(~a,44,SEEK_SET);~n" "short *~abuf;~n" "~abuf = malloc(sizeof(short)*" 
                                  "(~asz-44)/2);~n" "size_t ~ar = fread" "(~abuf,2," "~asz," "~a);~n"
                                  "fclose(~a);~n")))
+
+(define (make-header)
+  (fprintf o "FILE *f = f = fopen(\"~a.wav\",\"w\");~n" new-wav)
+  (map (λ (x) (fprintf o x)) '("fwrite(\"RIFF\", 1, 4, f);~n" "write_little_endian(36 + 2*tsz, 4, f);~n"
+    "fwrite(\"WAVE\", 1, 4, f);~n" "fwrite(\"fmt \", 1, 4, f);~n" "write_little_endian(16, 4, f);~n"
+    "write_little_endian(1, 2, f);~n" "write_little_endian(1, 2, f);~n" "write_little_endian(44100, 4, f);~n"
+    "write_little_endian(88200, 4, f);~n" "write_little_endian(2, 2, f);~n" "write_little_endian(16, 2, f);~n"))) 
+(define (get-tsz) (fprintf o "long tsz = ")
+  (map (λ (x) (fprintf o "~asz*" x)) wavs*) (fprintf o "1;~n"))
+
 
 (define (call-a s n) (case s 
   [("+" "-" "/" "*") 
@@ -46,8 +56,7 @@
   [("dup") (push n (pop n))] [("swap") (append (ret-pop (ret-pop n)) (list (pop n) (pop (ret-pop n))))]
   [("drop") (ret-pop n)]))
 (define (call-p s n) (case s
-  [("wav") (begin (in-block (pop n)) #;(fprintf o "FILE *~a;~n fopen(\"~a.wav\", \"rb\");~n"
-                           (pop n) (pop n))
+  [("wav") (begin (set! wavs* (push wavs* (pop n)))
                   (push (ret-pop n) (list 'wav (pop n))))]
   [("sample") (push (take n (- (length n) 3)) (list 'sample (pop (ret-pop (ret-pop n))) (pop (ret-pop n)) (pop n)))]
   [("concur") (push (ret-pop (ret-pop n)) (list 'concur (pop (ret-pop n)) (pop n)))]
@@ -57,5 +66,27 @@
   (cond [(member s afuns) (call-a s n)]
         [(member s pfuns) (call-p s n)]
         [else (push n s)])) init lst))
+
+; make it so `in-block' is replaced with a function that checks for
+; embedded wording to catch different data changes (e.g. *sdat, *shdat, *cdat).
+
+; also add *sz.
+; TO BE REWRITTEN!
+(define (out-lst lst) (make-header) (get-tsz) (map (λ (x)
+  (cond [(not (list? x)) (displayln x)]
+        [(equal? (car x) 'wav) (in-block (second x))]
+        [(equal? (car x) 'sample) (let ([c (second x)])
+           (fprintf o "int *~asdat = malloc(sizeof(int)*(~a-~a))"
+                    c (fourth x) (third x))
+           (fprintf o "for(int i=~a; i<~a; i++) {~n~adat[i] = ~abuf[i]; }~n"
+                    (fourth x) (third x) c c))]
+        [(equal? (car x) 'shift) (let ([c (second x)])
+           (fprintf o "int ~ashdat = malloc(sizeof(int)*(~asz-44)*~a);~n" c c (/ 1 (number->string (third x))))
+           (fprintf o "for(int i=0; i<(~asz-44)*~a; i++) { ~adat[i] = ~abuf[i*~a]; }~n"
+                    c (/ 1 (number->string (third x))) c c (third x)))]
+        [(equal? (car x) 'concur) (let ([c (second x)] [d (third x)])
+           (fprintf o "int ~a_~adat = malloc(sizeof(int)*(~asz+~asz))~n" c d c d)
+           (fprintf o "for(int i=0; i<(~asz+~asz); i+=2) { ~a_~adat[i] = ~abuf[i]; ~a_~adat[i+1] = ~abuf[i]; }~n"
+                    c d c d c c d d))])) lst))
 
 (define (parse l) (parse-expr (check-parens (string-split-spec l)) '()))
