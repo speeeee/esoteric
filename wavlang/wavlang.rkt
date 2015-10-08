@@ -56,10 +56,12 @@
   [("dup") (push n (pop n))] [("swap") (append (ret-pop (ret-pop n)) (list (pop n) (pop (ret-pop n))))]
   [("drop") (ret-pop n)]))
 (define (call-p s n) (case s
-  [("wav") (begin (set! wavs* (push wavs* (pop n)))
+  [("wav") (begin (set! wavs* (push wavs* (pop n))) (in-block s) ; return pointer to sample.
                   (push (ret-pop n) (list 'wav (pop n))))]
-  [("sample") (push (take n (- (length n) 3)) (list 'sample (pop (ret-pop (ret-pop n))) (pop (ret-pop n)) (pop n)))]
-  [("concur") (push (ret-pop (ret-pop n)) (list 'concur (pop (ret-pop n)) (pop n)))]
+  [("sample") ; replace the three items on the stack with a pointer to the new sample.
+   (push (take n (- (length n) 3)) (list 'sample (pop (ret-pop (ret-pop n))) (pop (ret-pop n)) (pop n)))]
+  [("concur") ; replace the two chosen wavs and return a pointer with the two playing concurrently.
+   (push (ret-pop (ret-pop n)) (list 'concur (pop (ret-pop n)) (pop n)))]
   [else "oops"]))
 
 (define (parse-expr lst init) (foldl (λ (s n) 
