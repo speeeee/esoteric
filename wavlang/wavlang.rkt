@@ -14,6 +14,9 @@
 (define (strcar str) (car (string->list str)))
 (define (find-eq a ac-expr lst) (findf (λ (x) (equal? a (ac-expr x))) lst))
 
+(define (popp x) (pop (ret-pop x)))
+(define (poppp x) (pop (ret-pop (ret-pop x))))
+
 (define (quoti lst) (append (list #\") (push lst #\")))
 (define (string-split-spec str) (map list->string (filter (λ (x) (not (empty? x))) (foldl (λ (s n)
   (cond [(equal? (car n) 'str) (if (equal? s #\") (push (push (ret-pop (second n)) (pop (second n))) '()) 
@@ -34,9 +37,9 @@
 (define wrds* '()) (define wavs* '())
 
 (define (in-block s)
-  (map (λ (x) (fprintf o x s)) '("FILE *~a;~n" "fopen(\"~a.wav\", \"rb\");~n" "fseek(~a,0,SEEK_END);~n" "long ~asz = " "ftell(~a);~n"
-                                 "rewind(~a);~n" "fseek(~a,44,SEEK_SET);~n" "short *~abuf;~n" "~abuf = malloc(sizeof(short)*" 
-                                 "(~asz-44)/2);~n" "size_t ~ar = fread" "(~abuf,2," "~asz," "~a);~n"
+  (map (λ (x) (fprintf o x s)) '("FILE *~a;~n" "fopen(\"~a.wav\", \"rb\");~n" "fseek(~a,0,SEEK_END);~n" "long ~asz = " "(ftell(~a)-44)/2;~n"
+                                 "rewind(~a);~n" "fseek(~a,44,SEEK_SET);~n" "short *~adat;~n" "~adat = malloc(sizeof(short)*" 
+                                 "~asz);~n" "size_t ~ar = fread" "(~abuf,2," "~asz*2+44," "~a);~n"
                                  "fclose(~a);~n")))
 
 (define (make-header)
@@ -56,12 +59,26 @@
   [("dup") (push n (pop n))] [("swap") (append (ret-pop (ret-pop n)) (list (pop n) (pop (ret-pop n))))]
   [("drop") (ret-pop n)]))
 (define (call-p s n) (case s
-  [("wav") (begin (set! wavs* (push wavs* (pop n))) (in-block s) ; return pointer to sample.
+  [("wav") (begin (set! wavs* (push wavs* (pop n))) (in-block (pop n)) ; return pointer to sample.
                   (push (ret-pop n) (list 'wav (pop n))))]
   [("sample") ; replace the three items on the stack with a pointer to the new sample.
-   (push (take n (- (length n) 3)) (list 'sample (pop (ret-pop (ret-pop n))) (pop (ret-pop n)) (pop n)))]
+   (let ([d (pop n)] [c (popp n)] [name (second (poppp n))])
+     (fprintf o "long ~assz = ~a-~a;~n" name d c)
+     (fprintf o "int *~asdat = malloc(sizeof(int)*~assz)" name name)
+     (fprintf o "for(int i=~a; i<~a; i++) {~n~asdat[i-~a] = ~adat[i]; }~n" c d name c name)
+     (push (take n (- (length n) 3)) (list 'sample (format "~as" name))))]
+  [("shift") (let ([c (pop n)] [name (second (popp n))])
+     (fprintf o "long ~ashsz = ~asz*~a;~n" name name (/ 1 (string->number c)))
+     (fprintf o "int ~ashdat = malloc(sizeof(int)*~ashsz);~n" name name)
+     (fprintf o "for(int i=0; i<~ashsz; i++) { ~ashdat[i] = ~adat[i*~a]; }~n"
+              name name name c) (push (ret-pop (ret-pop n)) (list 'shift (format "~ash" name))))]
   [("concur") ; replace the two chosen wavs and return a pointer with the two playing concurrently.
-   (push (ret-pop (ret-pop n)) (list 'concur (pop (ret-pop n)) (pop n)))]
+   (let ([n2 (second (pop n))] [n1 (second (popp n))])
+     (fprintf o "long ~a_~asz = ~asz+~asz;~n" n1 n2 n1 n2)
+     (fprintf o "int ~a_~adat = malloc(sizeof(int)*~a_~asz)~n" n1 n2 n1 n2)
+     (fprintf o "for(int i=0; i<~a_~asz; i+=2) { ~a_~adat[i] = ~adat[i]; ~a_~adat[i+1] = ~adat[i]; }~n"
+              n1 n2 n1 n2 n1 n1 n2 n2)
+     (push (ret-pop (ret-pop n)) (list 'concur (format "~a_~a" n1 n2))))]
   [else "oops"]))
 
 (define (parse-expr lst init) (foldl (λ (s n) 
