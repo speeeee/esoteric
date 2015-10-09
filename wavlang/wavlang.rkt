@@ -81,16 +81,17 @@
      (push (ret-pop (ret-pop n)) (list 'concur (format "~a_~a" n1 n2))))]
   [else "oops"]))
 
+(define (out n)
+  (make-header) (fprintf o "fwrite(\"data\", 1, 4, f);~nwrite_little_endian(")
+  (map (λ (x) (fprintf o "~asz+" x)) n) (fprintf o "*1, 4, f);~n")
+  (map (λ (x) (fprintf o "for(int i=0; i<~asz; i++) { write_little_endian((unsigned int)(~adat[i]),2,f); }~n" x)) n)
+  (fprintf o "fclose(f);~n"))
+
 (define (parse-expr lst init) (foldl (λ (s n) 
   (cond [(member s afuns) (call-a s n)]
         [(member s pfuns) (call-p s n)]
         [else (push n s)])) init lst))
 
-; make it so `in-block' is replaced with a function that checks for
-; embedded wording to catch different data changes (e.g. *sdat, *shdat, *cdat).
-
-; also add *sz.
-; TO BE REWRITTEN!
 (define (out-lst lst) (make-header) (get-tsz) (map (λ (x)
   (cond [(not (list? x)) (displayln x)]
         [(equal? (car x) 'wav) (in-block (second x))]
@@ -109,3 +110,16 @@
                     c d c d c c d d))])) lst))
 
 (define (parse l) (parse-expr (check-parens (string-split-spec l)) '()))
+  
+(define (main) (fprintf o "#include <stdlib.h>~n#include <stdio.h>~n~n")
+  (fprintf o "void write_little_endian(unsigned int word, int num_bytes, FILE *wav_file) {~n
+unsigned buf;~nwhile(num_bytes>0)~n
+    { buf = word & 0xff;
+      fwrite(&buf, 1,1, wav_file);
+      num_bytes--;
+      word >>= 8;
+    } }~n~n")
+  (fprintf o "int main(int argc, char **argv) {~n")
+  (parse (read-line)) (main))
+
+(main)
