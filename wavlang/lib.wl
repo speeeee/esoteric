@@ -1,0 +1,1 @@
+1.5s&3/2sh (wav 0 66150 sample 3 2 / shift) :word
