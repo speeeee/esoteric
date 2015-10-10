@@ -4,7 +4,7 @@
          racket/function)
 
 (define o (current-output-port))
-(define new-wav "target.wav")
+(define new-wav "target")
 
 ; works on Mac OSX where the wav files loaded have the data at the 36th byte
 ; and beyond as well as use only one channel.
@@ -42,9 +42,9 @@
 (define wrds* '()) (define wavs* '())
 
 (define (in-block s)
-  (map (λ (x) (fprintf o x s)) '("FILE *~a;~n" "fopen(\"~a.wav\", \"rb\");~n" "fseek(~a,0,SEEK_END);~n" "long ~asz = " "(ftell(~a)-44)/2;~n"
+  (map (λ (x) (fprintf o x s)) '("FILE *~a;~n" "~a = " "fopen(\"~a.wav\", \"rb\");~n" "fseek(~a,0,SEEK_END);~n" "long ~asz = " "(ftell(~a)-44);~n"
                                  "rewind(~a);~n" "fseek(~a,44,SEEK_SET);~n" "short *~adat;~n" "~adat = malloc(sizeof(short)*" 
-                                 "~asz);~n" "size_t ~ar = fread" "(~abuf,2," "~asz*2+44," "~a);~n"
+                                 "~asz);~n" "size_t ~ar = fread" "(~adat,2," "~asz*2+44," "~a);~n"
                                  "fclose(~a);~n")))
 
 (define (make-header)
@@ -70,34 +70,38 @@
   [("?") (let ([cnd (poppp n)] [t (popp n)] [f (pop n)])
      (parse-expr (if cnd t f) (take n (- (length n) 3))))]
   [("dup") (push n (pop n))] [("swap") (append (ret-pop (ret-pop n)) (list (pop n) (pop (ret-pop n))))]
-  [("drop") (ret-pop n)]))
+  [("drop") (ret-pop n)]
+  [("import") (let ([e (open-input-file (pop n))])
+     (parse (list->string (readf e '()))))]))
 (define (call-p s n) (case s
   [("wav") (begin (set! wavs* (push wavs* (pop n))) (in-block (pop n)) ; return pointer to sample.
                   (push (ret-pop n) (list 'wav (pop n))))]
   [("sample") ; replace the three items on the stack with a pointer to the new sample.
    (let ([d (pop n)] [c (popp n)] [name (second (poppp n))])
      (fprintf o "long ~assz = ~a-~a;~n" name d c)
-     (fprintf o "int *~asdat = malloc(sizeof(int)*~assz)" name name)
+     (fprintf o "int *~asdat = malloc(sizeof(int)*~assz);~n" name name)
      (fprintf o "for(int i=~a; i<~a; i++) {~n~asdat[i-~a] = ~adat[i]; }~n" c d name c name)
      (push (take n (- (length n) 3)) (list 'sample (format "~as" name))))]
   [("shift") (let ([c (pop n)] [name (second (popp n))])
      (fprintf o "long ~ashsz = ~asz*~a;~n" name name (/ 1 (string->number c)))
-     (fprintf o "int ~ashdat = malloc(sizeof(int)*~ashsz);~n" name name)
+     (fprintf o "int *~ashdat = malloc(sizeof(int)*~ashsz);~n" name name)
      (fprintf o "for(int i=0; i<~ashsz; i++) { ~ashdat[i] = ~adat[i*~a]; }~n"
               name name name c) (push (ret-pop (ret-pop n)) (list 'shift (format "~ash" name))))]
   [("concur") ; replace the two chosen wavs and return a pointer with the two playing concurrently.
    (let ([n2 (second (pop n))] [n1 (second (popp n))])
      (fprintf o "long ~a_~asz = ~asz+~asz;~n" n1 n2 n1 n2)
-     (fprintf o "int ~a_~adat = malloc(sizeof(int)*~a_~asz)~n" n1 n2 n1 n2)
+     (fprintf o "int *~a_~adat = malloc(sizeof(int)*~a_~asz)~n" n1 n2 n1 n2)
      (fprintf o "for(int i=0; i<~a_~asz; i+=2) { ~a_~adat[i] = ~adat[i]; ~a_~adat[i+1] = ~adat[i]; }~n"
               n1 n2 n1 n2 n1 n1 n2 n2)
      (push (ret-pop (ret-pop n)) (list 'concur (format "~a_~a" n1 n2))))]
   [else "oops"]))
 
-(define (out n)
+(define (out n) (fprintf o "long tsz = ") 
+  (map (λ (x) (fprintf o "~asz+" x)) (map second n)) (fprintf o "(1*0);~n")
   (make-header) (fprintf o "fwrite(\"data\", 1, 4, f);~nwrite_little_endian(")
-  (map (λ (x) (fprintf o "~asz+" x)) n) (fprintf o "*1, 4, f);~n")
-  (map (λ (x) (fprintf o "for(int i=0; i<~asz; i++) { write_little_endian((unsigned int)(~adat[i]),2,f); }~n" x)) n)
+  ;(map (λ (x) (fprintf o "~asz+" x)) (map second n)) (fprintf o "*1, 4, f);~n")
+  (fprintf o "tsz, 4, f);~n")
+  (map (λ (x) (fprintf o "for(int i=0; i<~asz; i++) { write_little_endian((unsigned int)(~adat[i]),2,f); }~n" x x)) (map second n))
   (fprintf o "fclose(f);~n"))
 
 (define (mk-word n) (set! wrds* (push wrds* (list (popp n) (pop n)))))
@@ -144,9 +148,10 @@ unsigned buf;~nwhile(num_bytes>0)~n
 (define (main) (displayln wrds*)
   (displayln (parse (read-line))) (main))
 
-(define (main2) (out-top)
-  (let ([f (open-input-file (string-join (list (car (vector->list (current-command-line-arguments))) ".wl") ""))])
-    (set! o (open-output-file (string-join (list (second (vector->list (current-command-line-arguments))) ".c") ""))) 
-    (parse (list->string (readf f '())))) (fprintf o "return 0; }~n"))
+(define (main2) 
+  (let* ([c (vector->list (current-command-line-arguments))] [f (open-input-file (string-join (list (car c) ".wl") ""))])
+    (set! o (open-output-file (string-join (list (second c) ".c") "") #:exists 'replace))
+    (set! new-wav (second c))
+    (out-top) (out (parse (list->string (readf f '()))))) (fprintf o "return 0; }~n"))
 
-(main)
+(main2)
