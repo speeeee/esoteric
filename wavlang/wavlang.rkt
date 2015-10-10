@@ -36,7 +36,7 @@
         (push (ret-pop (reverse (dropf (reverse n) expr))) 
               ((λ (x) (if (equal? elt "]") (cons "quot:" x) x)) (reverse (takef (reverse n) expr))))))) '() lst))
 
-(define afuns '("+" "-" "*" "/" "=" ">" "<" "and" "or" "?" "dup" "swap" "drop" "import"))
+(define afuns '("+" "-" "*" "/" "=" ">" "<" "and" "or" "?" "dup" "swap" "drop" "$get-at-index" "import"))
 (define pfuns '(#| w x y -- w' |# "sample" #| w1 w2 -- w1212.. |# "concur"
                 #| w sh -- w*sh |# "shift" #| f -- w |# "wav"))
 (define wrds* '()) (define wavs* '())
@@ -70,7 +70,7 @@
   [("?") (let ([cnd (poppp n)] [t (popp n)] [f (pop n)])
      (parse-expr (if cnd t f) (take n (- (length n) 3))))]
   [("dup") (push n (pop n))] [("swap") (append (ret-pop (ret-pop n)) (list (pop n) (pop (ret-pop n))))]
-  [("drop") (ret-pop n)]
+  [("drop") (ret-pop n)] [("$get-at-index") (push (ret-pop n) (list-ref n (string->number (pop n))))]
   [("import") (let ([e (open-input-file (pop n))])
      (parse (list->string (readf e '()))))]))
 (define (call-p s n) (case s
