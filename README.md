@@ -6,7 +6,7 @@ esoteric
 # Projects
 
 ## staircase
-An esoteric visual language.  More info soon.
+An esoteric visual language.  More info in README.md of staircase.
 
 ## wavlang
 A very simple language used to modify *existing* WAV files.
