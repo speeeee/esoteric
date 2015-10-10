@@ -24,3 +24,5 @@ gcc -o [EXE] [OUTPUT].c
 ```
 
 More on wavlang is in DOCS.md.
+
+**NOTE:** GitHub recognizes `.wl` as Mathematica, and will color it as such.
