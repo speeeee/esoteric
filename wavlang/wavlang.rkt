@@ -67,6 +67,8 @@
   [("=" "and" "or")
    (push (take n (- (length n) 2))
          ((case s [("=") equal?] [("and") &&] [("or") ||]) (pop (ret-pop n)) (pop n)))]
+  [("?") (let ([cnd (poppp n)] [t (popp n)] [f (pop n)])
+     (parse-expr (if cnd t f) (take n (- (length n) 3))))]
   [("dup") (push n (pop n))] [("swap") (append (ret-pop (ret-pop n)) (list (pop n) (pop (ret-pop n))))]
   [("drop") (ret-pop n)]))
 (define (call-p s n) (case s
