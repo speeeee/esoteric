@@ -1,6 +1,7 @@
 #lang racket
 (require racket/list
-         racket/string)
+         racket/string
+         racket/function)
 
 (define o (current-output-port))
 (define new-wav "target.wav")
@@ -16,6 +17,10 @@
 
 (define (popp x) (pop (ret-pop x)))
 (define (poppp x) (pop (ret-pop (ret-pop x))))
+(define (&& a b) (and a b)) (define (|| a b) (or a b))
+
+(define test0 "hi (+) :word 1 2 hi")
+(define test1 "aa wav 3 2 / shift bb wav 1 120 sample cc wav concur concur")
 
 (define (quoti lst) (append (list #\") (push lst #\")))
 (define (string-split-spec str) (map list->string (filter (λ (x) (not (empty? x))) (foldl (λ (s n)
@@ -31,7 +36,7 @@
         (push (ret-pop (reverse (dropf (reverse n) expr))) 
               ((λ (x) (if (equal? elt "]") (cons "quot:" x) x)) (reverse (takef (reverse n) expr))))))) '() lst))
 
-(define afuns '("+" "-" "*" "/" "dup" "swap" "drop" "import" ":word"))
+(define afuns '("+" "-" "*" "/" "=" ">" "<" "and" "or" "?" "dup" "swap" "drop" "import"))
 (define pfuns '(#| w x y -- w' |# "sample" #| w1 w2 -- w1212.. |# "concur"
                 #| w sh -- w*sh |# "shift" #| f -- w |# "wav"))
 (define wrds* '()) (define wavs* '())
@@ -56,6 +61,12 @@
   [("+" "-" "/" "*") 
    (push (take n (- (length n) 2)) (number->string
          ((case s [("+") +] [("-") -] [("*") *] [("/") /]) (string->number (pop (ret-pop n))) (string->number (pop n)))))]
+  [(">" "<")
+   (push (take n (- (length n) 2))
+         ((case s [(">") >] [("<") <]) (string->number (pop (ret-pop n)) (string->number (pop n)))))]
+  [("=" "and" "or")
+   (push (take n (- (length n) 2))
+         ((case s [("=") equal?] [("and") &&] [("or") ||]) (pop (ret-pop n)) (pop n)))]
   [("dup") (push n (pop n))] [("swap") (append (ret-pop (ret-pop n)) (list (pop n) (pop (ret-pop n))))]
   [("drop") (ret-pop n)]))
 (define (call-p s n) (case s
@@ -87,9 +98,13 @@
   (map (λ (x) (fprintf o "for(int i=0; i<~asz; i++) { write_little_endian((unsigned int)(~adat[i]),2,f); }~n" x)) n)
   (fprintf o "fclose(f);~n"))
 
+(define (mk-word n) (set! wrds* (push wrds* (list (popp n) (pop n)))))
+
 (define (parse-expr lst init) (foldl (λ (s n) 
   (cond [(member s afuns) (call-a s n)]
         [(member s pfuns) (call-p s n)]
+        [(member s (map car wrds*)) (let ([e (findf (λ (x) (equal? (car x) s)) wrds*)]) (parse-expr (second e) n))]
+        [(equal? s ":word") (begin (mk-word n) '())]
         [else (push n s)])) init lst))
 
 (define (out-lst lst) (make-header) (get-tsz) (map (λ (x)
@@ -110,8 +125,8 @@
                     c d c d c c d d))])) lst))
 
 (define (parse l) (parse-expr (check-parens (string-split-spec l)) '()))
-  
-(define (main) (fprintf o "#include <stdlib.h>~n#include <stdio.h>~n~n")
+
+(define (out-top) (fprintf o "#include <stdlib.h>~n#include <stdio.h>~n~n")
   (fprintf o "void write_little_endian(unsigned int word, int num_bytes, FILE *wav_file) {~n
 unsigned buf;~nwhile(num_bytes>0)~n
     { buf = word & 0xff;
@@ -119,7 +134,17 @@ unsigned buf;~nwhile(num_bytes>0)~n
       num_bytes--;
       word >>= 8;
     } }~n~n")
-  (fprintf o "int main(int argc, char **argv) {~n")
-  (parse (read-line)) (main))
+  (fprintf o "int main(int argc, char **argv) {~n"))
+
+(define (readf f str) (let ([c (read-char f)])
+  (if (eof-object? c) str (readf f (push str c)))))
+  
+(define (main) (displayln wrds*)
+  (displayln (parse (read-line))) (main))
+
+(define (main2) (out-top)
+  (let ([f (open-input-file (string-join (list (car (vector->list (current-command-line-arguments))) ".wl") ""))])
+    (set! o (open-output-file (string-join (list (second (vector->list (current-command-line-arguments))) ".c") ""))) 
+    (parse (list->string (readf f '())))) (fprintf o "return 0; }~n"))
 
 (main)
