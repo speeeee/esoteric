@@ -31,8 +31,11 @@
   (let ([c (find-eq a car eqs)]) ; c = (Sum ($Sum First Second))
     (map (λ (x) (if (member x (map second lst)) (first (find-eq x second lst)) x)) (second c))))
 
-(define (populate stk lst eqs) (foldl (λ (s n) ; when `!' is used
-  (cond [(equal? s "(unify)") (
+(define (populate stk init) (foldl (λ (s n) ; when `!' is used
+  (cond [(equal? s "(unify)") (append (list (car n) (push (cadr n) (list (pop n) (popp n)))) (cddr n))]
+        [(equal? s "(assoc)") (append (list (push (car n) (list (pop n) (popp n))) (cadr n)) (cddr n))]
+        [else (push n s)])) init stk))
+        
 
 (define (quoti lst) (append (list #\") (push lst #\")))
 (define (string-split-spec str) (map list->string (filter (λ (x) (not (empty? x))) (foldl (λ (s n)
