@@ -1,6 +1,7 @@
 #lang racket/base
 (require racket/list
          racket/string)
+(provide populate apply-eq)
 
 ; model of the stack (bottom represents the top of the stack):
 ; () ~ List of typed literals (using :)
@@ -19,7 +20,10 @@
 (define assocs '())
 (define eqs '())
 
-(define test0 (apply-eq "Sum" '((1 "First") (2 "Second")) '(("Sum" ("$Sum" "First" "Second")))))
+;(define test0 '((1 "First") (2 "Second")))
+;(define test0-1 '(("Sum" ("$Sum" "First" "Second")))) ; (apply-eq "Sum"...)
+;(define test1 '(() () ("$Sum" "First" "Second") "Sum" "(unify)")) ; populate ... '()
+(define test0 '(1 2 3)) ; distribute ... test0
 
 (define (make-assoc! a b) (set! assocs (push assocs (list a b)))) ; : (For when the data is static)
 (define (equate! a b) (set! eqs (push eqs (list a b)))) ; = (For when the data is not necessarily static)
@@ -31,9 +35,17 @@
   (let ([c (find-eq a car eqs)]) ; c = (Sum ($Sum First Second))
     (map (λ (x) (if (member x (map second lst)) (first (find-eq x second lst)) x)) (second c))))
 
+(define (distribute a lst) (map (λ (x) (cons a (if (list? x) x (list x)))) lst))
+(define (factor a lst) (map (λ (x) (if (member a x) (filter (λ (y) (not (equal? a y))) x) "False")) lst))
+
 (define (populate stk init) (foldl (λ (s n) ; when `!' is used
   (cond [(equal? s "(unify)") (append (list (car n) (push (cadr n) (list (pop n) (popp n)))) (cddr n))]
         [(equal? s "(assoc)") (append (list (push (car n) (list (pop n) (popp n))) (cadr n)) (cddr n))]
+        [else (push n s)])) init stk))
+
+(define (parse-expr stk init) (foldl (λ (s n)
+  (cond [(equal? s "(distribute)") (push (ret-pop (ret-pop n)) (distribute (popp n) (pop n)))]
+        [(equal? s "(factor)") (push (ret-pop n) (map (λ (x) (filter (λ (y) (not (equal? (popp n)))) x)) (pop n)))]
         [else (push n s)])) init stk))
         
 
