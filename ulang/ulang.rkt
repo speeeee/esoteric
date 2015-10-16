@@ -35,7 +35,7 @@
   (let ([c (find-eq a car eqs)]) ; c = (Sum ($Sum First Second))
     (map (λ (x) (if (member x (map second lst)) (first (find-eq x second lst)) x)) (second c))))
 
-(define (distribute a lst) (map (λ (x) (cons a (if (list? x) x (list x)))) lst))
+(define (distribute a lst) (map (λ (x) ((if (list? a) append cons) a (if (list? x) x (list x)))) lst))
 (define (factor a lst) (map (λ (x) (if (member a x) (filter (λ (y) (not (equal? a y))) x) "False")) lst))
 
 (define (populate stk init) (foldl (λ (s n) ; when `!' is used
