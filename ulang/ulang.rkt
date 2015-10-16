@@ -23,8 +23,21 @@
 ;(define test0 '((1 "First") (2 "Second")))
 ;(define test0-1 '(("Sum" ("$Sum" "First" "Second")))) ; (apply-eq "Sum"...)
 ;(define test1 '(() () ("$Sum" "First" "Second") "Sum" "(unify)")) ; populate ... '()
-(define test0 '(1 2 3)) ; distribute ... test0
-(define test1 '((a b 1) (a c b 2) (b 3))) ; factor '(a b) test1
+;(define test0 '(1 2 3)) ; distribute ... test0
+;(define test1 '((a b 1) (a c b 2) (b 3))) ; factor '(a b) test1
+(define test0 "1 2 1 <@")
+(define test1 "1 2 [1 <@] 0 call@")
+(define test2 "True a b ?")
+(define test3 "swap [1 <@] :word 1 2 swap")
+
+(define wrds* '())
+(define o (current-output-port))
+
+(define (readf f lst) (let ([c (read-line f)])
+  (if (eof-object? c) (set! wrds* (append wrds* lst)) (readf f (push lst (check-parens (string-split-spec c)))))))
+
+(define (rem-at-index lst n)
+  (map second (filter-not (λ (x) (= (car x) n)) (map (λ (y z) (list y z)) (range (length lst)) lst))))
 
 (define (make-assoc! a b) (set! assocs (push assocs (list a b)))) ; : (For when the data is static)
 (define (equate! a b) (set! eqs (push eqs (list a b)))) ; = (For when the data is not necessarily static)
@@ -47,9 +60,21 @@
         [else (push n s)])) init stk))
 
 (define (parse-expr stk init) (foldl (λ (s n)
-  (cond [(equal? s "(distribute)") (push (ret-pop (ret-pop n)) (distribute (popp n) (pop n)))]
-        [(equal? s "(factor)") (push (ret-pop n) (map (λ (x) (filter (λ (y) (not (equal? (popp n)))) x)) (pop n)))]
-        [else (push (ret-pop n) (push (pop n) s))])) init stk))
+  (cond [(equal? s "@") (push (ret-pop (ret-pop n)) (list-ref (popp n) (string->number (pop n))))]
+        [(equal? s "<@") (let* ([b (- (length (ret-pop (ret-pop n))) (string->number (pop n)))]
+                                [c (list-ref (ret-pop n) b)])
+                           (push (rem-at-index (ret-pop n) b) c))]
+        [(equal? s "}") (push (ret-pop (ret-pop n)) (list (popp n) (pop n)))]
+        [(equal? s ":") (push (ret-pop (ret-pop n)) (append (list (popp n)) (pop n)))] [(equal? s "!") (append (ret-pop n) (pop n))]
+        [(equal? s "?") (push (ret-pop (ret-pop (ret-pop n))) (if (not (equal? (poppp n) "False")) (popp n) (pop n)))]
+        [(equal? s "=") (push (ret-pop (ret-pop n)) (if (equal? (pop n) (popp n)) "True" "False"))]
+        [(equal? s "call@") (let* ([m (- (length (ret-pop (ret-pop n))) (string->number (pop n)))]
+                                   [a (take n m)] [b (drop (ret-pop (ret-pop n)) m)])
+                              (append (parse-expr (cdr (popp n)) a) b))]
+        [(equal? s ":word") (begin (set! wrds* (push wrds* (list (popp n) (cdr (pop n))))) '())]
+        [(equal? s ":import") (begin (readf (string-append (list (pop n) ".ufns") "") '()) '())]
+        [(member s (map car wrds*)) (parse-expr (second (find-eq s car wrds*)) n)]
+        [else (push n s)])) init stk))
         
 
 (define (quoti lst) (append (list #\") (push lst #\")))
@@ -60,10 +85,10 @@
         [(char-whitespace? s) (push n '())] [else (push (ret-pop n) (push (pop n) s))])) '(()) (string->list str)))))
 
 (define (check-parens lst) (foldl (λ (elt n)
-  (if (or (empty? n) (not (member elt '(")" "]")))) (push n elt)
-      (let* ([c (case elt [("}") "{"] [("]") "["] [(")") "("] [else '()])]
+  (if (or (empty? n) (not (member elt '( "]")))) (push n elt)
+      (let* ([c (case elt [("}") "{"] [("]") "["] [else '()])]
                           [expr (λ (x) (not (equal? x c)))])
         (push (ret-pop (reverse (dropf (reverse n) expr))) 
               ((λ (x) (if (equal? elt "]") (cons "quot:" x) x)) (reverse (takef (reverse n) expr))))))) '() lst))
 
-(define (parse l) (check-parens (string-split-spec l)))
+(define (parse l) (parse-expr (check-parens (string-split-spec l)) '()))
