@@ -73,6 +73,7 @@
                               (append (parse-expr (cdr (popp n)) a) b))]
         [(equal? s ":word") (begin (set! wrds* (push wrds* (list (popp n) (cdr (pop n))))) '())]
         [(equal? s ":import") (begin (readf (string-append (list (pop n) ".ufns") "") '()) '())]
+        [(equal? s "out") (begin (fprintf o (pop n)) (ret-pop n))]
         [(member s (map car wrds*)) (parse-expr (second (find-eq s car wrds*)) n)]
         [else (push n s)])) init stk))
         
