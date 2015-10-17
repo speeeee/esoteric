@@ -31,6 +31,7 @@
 (define test3 "swap [1 <@ [dr] 2 call@] :word 1 2 swap")
 (define test4 "prelude :import 1 2 swap")
 (define test5 "abc >codes")
+(define test6 "prelude :import 1 2 over-unsafe")
 
 (define wrds* '())
 (define o (current-output-port))
@@ -81,7 +82,7 @@
           [(">codes") (push (ret-pop n) (append (list "List") (map (λ (x) (number->string (char->integer x))) (string->list (pop n)))))]
           [("add" "sub" "div" "mul") (push (take n (- (length n) 2)) (number->string
            ((case s [("add") +] [("sub") -] [("mul") *] [("div") /]) (string->number (pop (ret-pop n))) (string->number (pop n)))))]
-          [("#LEN") (push n (length n))]
+          [("#LEN") (push n (number->string (length n)))] [("out-rt") (begin (fprintf (current-output-port) (pop n)) (ret-pop n))]
           ;[(map car wrds*) (parse-expr (second (find-eq s car wrds*)) n)]
           [else (if (member s (map car wrds*)) (parse-expr (second (find-eq s car wrds*)) n) (push n s))])) init stk))
         

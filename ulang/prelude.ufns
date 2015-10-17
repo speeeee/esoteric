@@ -1,2 +1,6 @@
-swap [1 <@ [dr] 2 call@]
 dup [0 <@]
+over* [1 <@]
+swap* [over* [dr] 2 call@]
+and* [over ?]
+or* [[dup] 1 call@ ?]
+not [False =]
