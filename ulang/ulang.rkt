@@ -28,8 +28,9 @@
 (define test0 "1 2 1 <@")
 (define test1 "1 2 [1 <@] 0 call@")
 (define test2 "True a b ?")
-(define test3 "swap [1 <@] :word 1 2 swap")
+(define test3 "swap [1 <@ [dr] 2 call@] :word 1 2 swap")
 (define test4 "prelude :import 1 2 swap")
+(define test5 "abc >codes")
 
 (define wrds* '())
 (define o (current-output-port))
@@ -62,22 +63,27 @@
         [else (push n s)])) init stk))
 
 (define (parse-expr stk init) (foldl (λ (s n)
-  (cond [(equal? s "@") (push (ret-pop (ret-pop n)) (list-ref (popp n) (string->number (pop n))))]
-        [(equal? s "<@") (let* ([b (- (length (ret-pop (ret-pop n))) (string->number (pop n)))]
+  (case s [("@") (push (ret-pop (ret-pop n)) (list-ref (popp n) (string->number (pop n))))]
+          [("<@") (let* ([b (- (length (ret-pop (ret-pop n))) (string->number (pop n)))]
                                 [c (list-ref (ret-pop n) b)])
-                           (push (rem-at-index (ret-pop n) b) c))]
-        [(equal? s "}") (push (ret-pop (ret-pop n)) (list (popp n) (pop n)))]
-        [(equal? s ":") (push (ret-pop (ret-pop n)) (append (list (popp n)) (pop n)))] [(equal? s "!") (append (ret-pop n) (pop n))]
-        [(equal? s "?") (push (ret-pop (ret-pop (ret-pop n))) (if (not (equal? (poppp n) "False")) (popp n) (pop n)))]
-        [(equal? s "=") (push (ret-pop (ret-pop n)) (if (equal? (pop n) (popp n)) "True" "False"))]
-        [(equal? s "call@") (let* ([m (- (length (ret-pop (ret-pop n))) (string->number (pop n)))]
+                           (push #;(rem-at-index (ret-pop n) b) (ret-pop n) c))]
+          [("}") (push (ret-pop (ret-pop n)) (list (popp n) (pop n)))]
+          [(":") (push (ret-pop (ret-pop n)) (append (list (popp n)) (pop n)))] [(equal? s "!") (append (ret-pop n) (pop n))]
+          [("?") (push (ret-pop (ret-pop (ret-pop n))) (if (not (equal? (poppp n) "False")) (popp n) (pop n)))]
+          [("dr") (ret-pop n)]
+          [("=") (push (ret-pop (ret-pop n)) (if (equal? (pop n) (popp n)) "True" "False"))]
+          [("call@") (let* ([m (- (length (ret-pop (ret-pop n))) (string->number (pop n)))]
                                    [a (take n m)] [b (drop (ret-pop (ret-pop n)) m)])
                               (append (parse-expr (cdr (popp n)) a) b))]
-        [(equal? s ":word") (begin (set! wrds* (push wrds* (list (popp n) (cdr (pop n))))) '())]
-        [(equal? s ":import") (begin (readf (open-input-file (string-join (list (pop n) ".ufns") "")) '()) '())]
-        [(equal? s "out") (begin (fprintf o (pop n)) (ret-pop n))]
-        [(member s (map car wrds*)) (parse-expr (second (find-eq s car wrds*)) n)]
-        [else (push n s)])) init stk))
+          [(":word") (begin (set! wrds* (push wrds* (list (popp n) (cdr (pop n))))) '())]
+          [(":import") (begin (readf (open-input-file (string-join (list (pop n) ".ufns") "")) '()) '())]
+          [("out") (begin (fprintf o (pop n)) (ret-pop n))]
+          [(">codes") (push (ret-pop n) (append (list "List") (map (λ (x) (number->string (char->integer x))) (string->list (pop n)))))]
+          [("add" "sub" "div" "mul") (push (take n (- (length n) 2)) (number->string
+           ((case s [("add") +] [("sub") -] [("mul") *] [("div") /]) (string->number (pop (ret-pop n))) (string->number (pop n)))))]
+          [("#LEN") (push n (length n))]
+          ;[(map car wrds*) (parse-expr (second (find-eq s car wrds*)) n)]
+          [else (if (member s (map car wrds*)) (parse-expr (second (find-eq s car wrds*)) n) (push n s))])) init stk))
         
 
 (define (quoti lst) (append (list #\") (push lst #\")))
