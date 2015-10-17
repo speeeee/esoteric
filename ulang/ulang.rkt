@@ -32,6 +32,7 @@
 (define test4 "prelude :import 1 2 swap")
 (define test5 "abc >codes")
 (define test6 "prelude :import 1 2 over-unsafe")
+(define test7 "(1 2)") (define test8 "((1 2) 3)") ;both need prelude
 
 (define wrds* '())
 (define o (current-output-port))
@@ -70,6 +71,7 @@
                            (push #;(rem-at-index (ret-pop n) b) (ret-pop n) c))]
           [("}") (push (ret-pop (ret-pop n)) (list (popp n) (pop n)))]
           [(":") (push (ret-pop (ret-pop n)) (append (list (popp n)) (pop n)))] [(equal? s "!") (append (ret-pop n) (pop n))]
+          [("list?") (push (ret-pop n) (if (list? (pop n)) "True" "False"))]
           [("?") (push (ret-pop (ret-pop (ret-pop n))) (if (not (equal? (poppp n) "False")) (popp n) (pop n)))]
           [("dr") (ret-pop n)]
           [("=") (push (ret-pop (ret-pop n)) (if (equal? (pop n) (popp n)) "True" "False"))]
