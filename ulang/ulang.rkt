@@ -29,12 +29,14 @@
 (define test1 "1 2 [1 <@] 0 call@")
 (define test2 "True a b ?")
 (define test3 "swap [1 <@] :word 1 2 swap")
+(define test4 "prelude :import 1 2 swap")
 
 (define wrds* '())
 (define o (current-output-port))
 
 (define (readf f lst) (let ([c (read-line f)])
-  (if (eof-object? c) (set! wrds* (append wrds* lst)) (readf f (push lst (check-parens (string-split-spec c)))))))
+  (if (eof-object? c) (set! wrds* (append wrds* lst)) 
+      (readf f (push lst (let ([d (check-parens (string-split-spec c))]) (list (car d) (cdr (second d)))))))))
 
 (define (rem-at-index lst n)
   (map second (filter-not (λ (x) (= (car x) n)) (map (λ (y z) (list y z)) (range (length lst)) lst))))
@@ -72,7 +74,7 @@
                                    [a (take n m)] [b (drop (ret-pop (ret-pop n)) m)])
                               (append (parse-expr (cdr (popp n)) a) b))]
         [(equal? s ":word") (begin (set! wrds* (push wrds* (list (popp n) (cdr (pop n))))) '())]
-        [(equal? s ":import") (begin (readf (string-append (list (pop n) ".ufns") "") '()) '())]
+        [(equal? s ":import") (begin (readf (open-input-file (string-join (list (pop n) ".ufns") "")) '()) '())]
         [(equal? s "out") (begin (fprintf o (pop n)) (ret-pop n))]
         [(member s (map car wrds*)) (parse-expr (second (find-eq s car wrds*)) n)]
         [else (push n s)])) init stk))
@@ -87,7 +89,7 @@
 
 (define (check-parens lst) (foldl (λ (elt n)
   (if (or (empty? n) (not (member elt '( "]")))) (push n elt)
-      (let* ([c (case elt [("}") "{"] [("]") "["] [else '()])]
+      (let* ([c (case elt [("]") "["] [else '()])]
                           [expr (λ (x) (not (equal? x c)))])
         (push (ret-pop (reverse (dropf (reverse n) expr))) 
               ((λ (x) (if (equal? elt "]") (cons "quot:" x) x)) (reverse (takef (reverse n) expr))))))) '() lst))
