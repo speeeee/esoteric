@@ -1,1 +1,2 @@
 prelude :import test [swap* out out] :word 1 2 test
+~prelude :import (List 65 66 67) >chars out~
