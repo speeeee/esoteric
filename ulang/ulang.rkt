@@ -9,8 +9,8 @@
 ; the rest is just the stack itself.
 
 (define (push stk elt) (append stk (list elt)))
-(define (pop stk) (car (reverse stk)))
-(define (ret-pop stk) (reverse (cdr (reverse stk))))
+(define (pop stk) (if (> (length stk) 0) (car (reverse stk)) (begin (displayln "ERROR: stack underflow") (exit))))
+(define (ret-pop stk) (if (> (length stk) 0) (reverse (cdr (reverse stk))) (begin (displayln "ERROR: stack underflow") (exit))))
 (define (strcar str) (car (string->list str)))
 (define (find-eq a ac-expr lst) (findf (λ (x) (equal? a (ac-expr x))) lst))
 
@@ -91,7 +91,7 @@
           [("out") (begin (fprintf o (pop n)) (ret-pop n))]
           [(">codes") (push (ret-pop n) (append (list "List") (map (λ (x) (number->string (char->integer x))) (string->list (pop n)))))]
           [(">chars") (push (ret-pop n) (list->string (map (λ (x) (integer->char (string->number x))) (cdr (pop n)))))]
-          [("add" "sub" "div" "mul") (push (take n (- (length n) 2)) (number->string
+          [("add" "sub" "div" "mul") (push #;(take n (- (length n) 2)) (ret-pop (ret-pop n)) (number->string
            ((case s [("add") +] [("sub") -] [("mul") *] [("div") /]) (string->number (pop (ret-pop n))) (string->number (pop n)))))]
           [("#LEN") (push n (number->string (length n)))] [("out-rt") (begin (fprintf (current-output-port) (pop n)) (ret-pop n))]
           ;[(map car wrds*) (parse-expr (second (find-eq s car wrds*)) n)]
