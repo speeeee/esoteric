@@ -1,0 +1,1 @@
+prelude :import test [swap* out out] :word 1 2 test

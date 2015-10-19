@@ -20,6 +20,8 @@
 (define assocs '())
 (define eqs '())
 
+(define fout '())
+
 ;(define test0 '((1 "First") (2 "Second")))
 ;(define test0-1 '(("Sum" ("$Sum" "First" "Second")))) ; (apply-eq "Sum"...)
 ;(define test1 '(() () ("$Sum" "First" "Second") "Sum" "(unify)")) ; populate ... '()
@@ -40,6 +42,8 @@
 (define (readf f lst) (let ([c (read-line f)])
   (if (eof-object? c) (set! wrds* (append wrds* lst)) 
       (readf f (push lst (let ([d (check-parens (string-split-spec c))]) (list (car d) (cdr (second d)))))))))
+(define (readn f str) (let ([c (read-line f)])
+  (if (eof-object? c) str (readn f (string-join (list str c) " ")))))
 
 (define (rem-at-index lst n)
   (map second (filter-not (λ (x) (= (car x) n)) (map (λ (y z) (list y z)) (range (length lst)) lst))))
@@ -78,7 +82,8 @@
           [("call@") (let* ([m (- (length (ret-pop (ret-pop n))) (string->number (pop n)))]
                                    [a (take n m)] [b (drop (ret-pop (ret-pop n)) m)])
                               (append (parse-expr (cdr (popp n)) a) b))]
-          [(":word") (begin (set! wrds* (push wrds* (list (popp n) (cdr (pop n))))) '())]
+          [(":word") (begin (set! wrds* (push wrds* (list (popp n) (cdr (pop n)))))
+                            (fprintf fout "~a [~a]~n" (popp n) (string-join (cdr (pop n)) " ")) '())]
           [(":import") (begin (readf (open-input-file (string-join (list (pop n) ".ufns") "")) '()) '())]
           [("out") (begin (fprintf o (pop n)) (ret-pop n))]
           [(">codes") (push (ret-pop n) (append (list "List") (map (λ (x) (number->string (char->integer x))) (string->list (pop n)))))]
@@ -106,3 +111,9 @@
               ((λ (x) (if (equal? elt "]") (cons "quot:" x) x)) (reverse (takef (reverse n) expr))))))) '() lst))
 
 (define (parse l) (parse-expr (check-parens (string-split-spec l)) '()))
+
+(define (main)
+  (let* ([c (vector->list (current-command-line-arguments))] [f (open-input-file (string-join (list (car c) ".ul") ""))])
+    (set! fout (open-output-file (string-join (list (car c) ".ufns") "") #:exists 'replace)) (parse (readn f ""))))
+
+(main)
