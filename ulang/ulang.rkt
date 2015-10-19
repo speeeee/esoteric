@@ -87,6 +87,7 @@
           [(":import") (begin (readf (open-input-file (string-join (list (pop n) ".ufns") "")) '()) '())]
           [("out") (begin (fprintf o (pop n)) (ret-pop n))]
           [(">codes") (push (ret-pop n) (append (list "List") (map (λ (x) (number->string (char->integer x))) (string->list (pop n)))))]
+          [(">chars") (push (ret-pop n) (list->string (map (λ (x) (integer->char (string->number x))) (cdr (pop n)))))]
           [("add" "sub" "div" "mul") (push (take n (- (length n) 2)) (number->string
            ((case s [("add") +] [("sub") -] [("mul") *] [("div") /]) (string->number (pop (ret-pop n))) (string->number (pop n)))))]
           [("#LEN") (push n (number->string (length n)))] [("out-rt") (begin (fprintf (current-output-port) (pop n)) (ret-pop n))]
@@ -112,8 +113,12 @@
 
 (define (parse l) (parse-expr (check-parens (string-split-spec l)) '()))
 
-(define (main)
+(define (main) (if (= (length (vector->list (current-command-line-arguments))) 0)
+  (begin (fprintf o "Initiating ulang REPL...~nPress ENTER/RETURN once a command is entered.  Enter the command, `:q' to quit.~n")
+         (set! fout (open-output-file "repl-temp.ufns" #:exists 'replace))
+         (let main () (begin (fprintf o "~n> ") (let ([d (read-line)]) (if (or (equal? d ":q") (eof-object? d)) 
+                                                                           (begin (displayln "quitting") (exit)) (parse d))) (main))))
   (let* ([c (vector->list (current-command-line-arguments))] [f (open-input-file (string-join (list (car c) ".ul") ""))])
-    (set! fout (open-output-file (string-join (list (car c) ".ufns") "") #:exists 'replace)) (parse (readn f ""))))
+    (set! fout (open-output-file (string-join (list (car c) ".ufns") "") #:exists 'replace)) (parse (readn f "")))))
 
 (main)
