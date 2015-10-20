@@ -1,0 +1,3 @@
+prelude :import
+cons [dup list? [:] [}] ? 0 call@] :word
+) [swap dup ( = [dr] [swap cons )] ? 0 call@] :word

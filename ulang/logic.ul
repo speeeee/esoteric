@@ -1,0 +1,6 @@
+import :prelude
+and [over ?] :word
+or [[dup] 1 call@ ?] :word
+not [False =] :word
+positive? [dup [0 = not] 1 call@ >codes 1 @ 45 = not and] :word
+negative? [dup [0 = not] 1 call@ positive? not and] :word
