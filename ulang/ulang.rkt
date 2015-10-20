@@ -93,6 +93,7 @@
           [(">chars") (push (ret-pop n) (list->string (map (λ (x) (integer->char (string->number x))) (cdr (pop n)))))]
           [("add" "sub" "div" "mul") (push #;(take n (- (length n) 2)) (ret-pop (ret-pop n)) (number->string
            ((case s [("add") +] [("sub") -] [("mul") *] [("div") /]) (string->number (pop (ret-pop n))) (string->number (pop n)))))]
+          [("in>") (push n (read-line))]
           [("#LEN") (push n (number->string (length n)))] [("out-rt") (begin (fprintf (current-output-port) (pop n)) (ret-pop n))]
           ;[(map car wrds*) (parse-expr (second (find-eq s car wrds*)) n)]
           [else (if (member s (map car wrds*)) (parse-expr (second (find-eq s car wrds*)) n) (push n s))])) init stk))
