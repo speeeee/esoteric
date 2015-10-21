@@ -92,6 +92,18 @@ Takes two arguments and pushes the second argument to the stack.
 
 Takes two arguments and places them in reverse order onto the stack.
 
+##### call
+
+`(... quot -- ...)`
+
+Same as `0 call@`.
+
+##### if
+
+`(x qa qb -- qa|qb)`
+
+Same as `?`, the result of the conditions are quotes which are called.
+
 ### logic
 
 Contains words for manipulating booleans.
@@ -128,7 +140,7 @@ Checks if a number is negative.
 
 ### list
 
-Contains functions for creating and manipulating lists.  Also introduces the `List` type.
+Contains functions for creating and manipulating lists.  Also introduces the `List` type.  In general, the `List` type **must** be used as ulang does not allow untyped lists.
 
 ##### cons
 
@@ -145,6 +157,24 @@ Constructs a list by popping all elements up to the first occurence of `(`, and 
 ```
 (List 1 2 3)
 ```
+
+##### List?
+
+`(lst -- t|f)`
+
+Checks if the popped argument is of type `List`.
+
+##### length
+
+`(lst -- len)`
+
+Gets the length of a `List`.
+
+##### L@
+
+`(lst n -- x)`
+
+A more `List`-specific version of `@`.
 
 ### [BUILT-IN]
 
