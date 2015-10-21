@@ -1,3 +1,13 @@
 prelude :import
-cons [dup list? [:] [}] ? 0 call@] :word
+cons [dup list? [:] [}] ? 0 call@] :word 
+~ this word does not return a value of type List ~
 ) [swap dup ( = [dr] [swap cons )] ? 0 call@] :word
+
+List? [0 @ List =] :word
+length [dup List? [! 0 %length%] [dr "ERROR: exptected type, List." out] if] :word
+%length% [swap List = [] [1 add %length%] if] :word
+
+L@ [1 @] :word
+~member< [swap dup List? [swap [!] 1 call@ 0 %member%] 
+                        [dr dr "ERROR: expected type, List." out] if] :word
+%member% [~

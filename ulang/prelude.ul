@@ -1,10 +1,5 @@
 dup [0 <@] :word
 over [1 <@] :word
 swap [over [dr] 2 call@] :word
-and [over ?] :word
-or [[dup] 1 call@ ?] :word
-not [False =] :word
-positive? [dup [0 = not] 1 call@ >codes 1 @ 45 = not and] :word
-negative? [dup [0 = not] 1 call@ positive? not and] :word
-stack-safe? [#LEN swap sub positive?] :word
-cons [dup list? [:] [}] ? 0 call@] :word
+call [0 call@] :word
+if [? 0 call@] :word
