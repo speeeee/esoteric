@@ -1,0 +1,7 @@
+~ The usually not optional `types' module.  This module is a dependency for many others in
+  the standard library, so it is usually advised to import it. ~
+
+list :import
+logic :import
+
+typed? [dup list? [swap 0 @ Type =] [False] if]

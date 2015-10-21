@@ -138,6 +138,16 @@ Checks if a number is positive.
 
 Checks if a number is negative.
 
+### types
+
+The `types` module is usually necessary.  This module is where the static typing of ulang is emulated.  Types are represented in literals as `(Type type literal)`.
+
+##### typed?
+
+`(x -- x|f)`
+
+Tests whether or not the popped element is typed.  If so, the element is just pushed back onto the stack; if not, `False` is returned.
+
 ### list
 
 Contains functions for creating and manipulating lists.  Also introduces the `List` type.  In general, the `List` type **must** be used as ulang does not allow untyped lists.
