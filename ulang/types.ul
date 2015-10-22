@@ -1,7 +1,9 @@
 ~ The usually not optional `types' module.  This module is a dependency for many others in
   the standard library, so it is usually advised to import it. ~
 
-list :import
+list-unsafe :import
 logic :import
 
-typed? [dup list? [swap 0 @ Type =] [False] if]
+typed? [dup list? [List swap : length 2 =] [False] if] :word
+type [dup list? [0 @] [dr "Requested type of untyped literal" out False] if] :word
+lit [dup list? [1 @] [dr "Requested literal of untyped literal" out False] if] :word
