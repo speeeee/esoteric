@@ -14,6 +14,8 @@
 (define (popp x) (pop (ret-pop x)))
 (define (poppp x) (pop (ret-pop (ret-pop x))))
 
+(define test0 "std-add (car (cdr (1 2 3))) 2")
+
 (define (quoti lst) (append (list #\") (push lst #\")))
 (define (string-split-spec str) (map list->string (filter (λ (x) (not (empty? x))) (foldl (λ (s n)
   (cond [(equal? (car n) 'com) (if (equal? s #\~) (second n) n)]
@@ -35,6 +37,8 @@
    ((case (car s) [("std-add") +] [("std-sub") -] [("std-mul") *] [("std-div") /]) 
     (string->number (parse-expr (pop (ret-pop s)))) (string->number (parse-expr (pop s)))))
    (fprintf o "ERROR: required length: 3, given: ~a.~n" (length s)))]
+  [("car" "cdr") (if (length? s 2) ((case (car s) [("car") car] [("cdr") cdr]) (parse-expr (pop s))) 
+                     (fprintf o "ERROR: `car' required length: 2, given ~a; also possible that given argument is not a list.~n" (length s)))]
   [else s])))                                                                 
 
 (define (parse l) (parse-expr (check-parens (string-split-spec l))))
