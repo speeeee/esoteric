@@ -9,6 +9,9 @@
 (define (find-eq a ac-expr lst) (findf (λ (x) (equal? a (ac-expr x))) lst))
 (define (length? x y) (= (length x) y))
 
+(define (readn f str) (let ([c (read-line f)])
+  (if (eof-object? c) str (readn f (string-join (list str c) " ")))))
+
 (define o (current-output-port))
 
 (define (popp x) (pop (ret-pop x)))
@@ -16,6 +19,9 @@
 
 (define test0 "std-add (car (cdr (1 2 3))) 2")
 (define test1 ">chars (>codes hello)")
+(define test2 "lambda x (lambda y (std-add x y) 2) 3")
+
+(define ruls* '())
 
 (define (quoti lst) (append (list #\") (push lst #\")))
 (define (string-split-spec str) (map list->string (filter (λ (x) (not (empty? x))) (foldl (λ (s n)
@@ -33,6 +39,9 @@
         (push (ret-pop (reverse (dropf (reverse n) expr))) 
               ((λ (x) (if (equal? elt "]") (cons "quot:" x) x)) (reverse (takef (reverse n) expr))))))) '() lst))
 
+(define (distrib var val lst) (map (λ (x)
+  (cond [(list? x) (distrib var val x)] [(equal? x var) val] [else x])) lst))
+
 (define (parse-expr s) (if (not (list? s)) s (case (car s)
   [("std-add" "std-sub" "std-div" "std-mul") (if (length? s 3) (number->string
    ((case (car s) [("std-add") +] [("std-sub") -] [("std-mul") *] [("std-div") /]) 
@@ -43,8 +52,21 @@
   [("std-eq") (if (equal? (cadr s) (caddr s)) "True" "False")]
   [(">codes") (map (λ (x) (number->string (char->integer x))) (string->list (parse-expr (cadr s))))]
   [(">chars") (list->string (map (λ (x) (integer->char (string->number x))) (parse-expr (cadr s))))]
-  [("if") (if (length? s 3) (if (equal? (parse-expr (cadr s)) "False") (parse-expr (pop s)) (parse-expr (caddr s)))
-              (fprintf o "ERROR: `if' required length: 2, given ~a.~n" (length s)))]
-  [else s])))                                                                 
+  [("if") (if (length? s 4) (if (equal? (parse-expr (cadr s)) "False") (parse-expr (pop s)) (parse-expr (caddr s)))
+              (fprintf o "ERROR: `if' required length: 4, given ~a.~n" (length s)))]
+  [(">in") (read-line)] [(":") (if (length? s 3) (cons (cadr s) (caddr s))
+                                   (fprintf o "ERROR: `:' required length: 3, given ~a.~n" (length s)))]
+  [("rule:") (set! ruls* (push ruls* (cadr s)))]
+  [("lambda") #;(lambda var expr val) (if (length? s 4)
+   (parse-expr (distrib (second s) (fourth s) (third s)))
+   (fprintf o "ERROR: `lambda' required length: 4, given: ~a.~n" (length s)))]
+  [else s])))
 
 (define (parse l) (parse-expr (check-parens (string-split-spec l))))
+
+(define (main) (if (= (length (vector->list (current-command-line-arguments))) 0)
+  (begin (fprintf o "Initiating ulang REPL...~nPress ENTER/RETURN once a command is entered.  Enter the command, `:q', to quit.~n")
+         (let main () (begin (fprintf o "~n> ") (let ([d (read-line)]) (if (or (equal? d ":q") (eof-object? d)) 
+                                                                           (begin (displayln "quitting") (exit)) (parse d))) (main))))
+  (let* ([c (vector->list (current-command-line-arguments))] [f (open-input-file (string-join (list (car c) ".lm") ""))])
+    (parse (readn f "")))))
