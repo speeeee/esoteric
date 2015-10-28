@@ -57,7 +57,7 @@
               (fprintf o "ERROR: `if' required length: 4, given ~a.~n" (length s)))]
   [(">in") (read-line)] [(":") (if (length? s 3) (cons (cadr s) (caddr s))
                                    (fprintf o "ERROR: `:' required length: 3, given ~a.~n" (length s)))]
-  [("rule:") (set! ruls* (push ruls* (cadr s)))]
+  [("rule:") (set! ruls* (push ruls* (cadr s)))] [("γ:") (cons "γ" (cdr s))]
   [("lambda") #;(lambda var expr val) (if (length? s 4)
    (parse-expr (distrib (second s) (fourth s) (third s)))
    (fprintf o "ERROR: `lambda' required length: 4, given: ~a.~n" (length s)))] [("gamma" "γ") (cdr s)]
