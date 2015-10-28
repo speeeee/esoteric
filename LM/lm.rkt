@@ -20,6 +20,7 @@
 (define test0 "std-add (car (cdr (1 2 3))) 2")
 (define test1 ">chars (>codes hello)")
 (define test2 "lambda x (lambda y (std-add x y) 2) 3")
+(define test3 "rule: (lambda x (if (std-eq (car x) Hello) (std-add 1 (car (cdr x))) False))")
 
 (define ruls* '())
 
@@ -49,7 +50,7 @@
    (fprintf o "ERROR: `~a' required length: 3, given: ~a.~n" (car s) (length s)))]
   [("car" "cdr") (if (length? s 2) ((case (car s) [("car") car] [("cdr") cdr]) (parse-expr (pop s))) 
                      (fprintf o "ERROR: `car' required length: 2, given ~a; also possible that given argument is not a list.~n" (length s)))]
-  [("std-eq") (if (equal? (cadr s) (caddr s)) "True" "False")]
+  [("std-eq") (if (equal? (parse-expr (cadr s)) (parse-expr (caddr s))) "True" "False")]
   [(">codes") (map (λ (x) (number->string (char->integer x))) (string->list (parse-expr (cadr s))))]
   [(">chars") (list->string (map (λ (x) (integer->char (string->number x))) (parse-expr (cadr s))))]
   [("if") (if (length? s 4) (if (equal? (parse-expr (cadr s)) "False") (parse-expr (pop s)) (parse-expr (caddr s)))
@@ -59,8 +60,9 @@
   [("rule:") (set! ruls* (push ruls* (cadr s)))]
   [("lambda") #;(lambda var expr val) (if (length? s 4)
    (parse-expr (distrib (second s) (fourth s) (third s)))
-   (fprintf o "ERROR: `lambda' required length: 4, given: ~a.~n" (length s)))]
-  [else s])))
+   (fprintf o "ERROR: `lambda' required length: 4, given: ~a.~n" (length s)))] [("gamma" "γ") (cdr s)]
+  [else (let ([q (filter (λ (x) (not (equal? x "False"))) (map (λ (y) (begin (displayln (cons "γ" s)) (parse-expr (push y (cons "γ" s))))) ruls*))])
+          (if (not (empty? q)) (car q) s))])))
 
 (define (parse l) (parse-expr (check-parens (string-split-spec l))))
 
