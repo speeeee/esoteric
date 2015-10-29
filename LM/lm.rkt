@@ -23,6 +23,7 @@
 (define test3 "rule: (lambda x (if (std-eq (car x) Hello) (std-add 1 (car (cdr x))) False))")
 
 (define ruls* '())
+(define imports* '())
 
 (define (quoti lst) (append (list #\") (push lst #\")))
 (define (string-split-spec str) (map list->string (filter (λ (x) (not (empty? x))) (foldl (λ (s n)
@@ -57,10 +58,15 @@
               (fprintf o "ERROR: `if' required length: 4, given ~a.~n" (length s)))]
   [(">in") (read-line)] [(":") (if (length? s 3) (cons (cadr s) (caddr s))
                                    (fprintf o "ERROR: `:' required length: 3, given ~a.~n" (length s)))]
-  [("rule:") (set! ruls* (push ruls* (cadr s)))] [("γ:") (cons "γ" (cdr s))]
+  [("rule:") (begin (set! ruls* (push ruls* (cadr s))) "#DONE")] [("γ:" "y:") (cons "γ" (cdr s))]
+  [("std-out") (let ([s+ (parse-expr s)]) (fprintf o "~a" s+) s+)]
   [("lambda") #;(lambda var expr val) (if (length? s 4)
    (parse-expr (distrib (second s) (fourth s) (third s)))
-   (fprintf o "ERROR: `lambda' required length: 4, given: ~a.~n" (length s)))] [("gamma" "γ") (cdr s)]
+   (fprintf o "ERROR: `lambda' required length: 4, given: ~a.~n" (length s)))] [("gamma" "γ" "y.") (cdr s)]
+  [("p") (filter (λ (y) (not (equal? y "#DONE"))) (map (λ (x) (parse-expr x)) (cdr s)))]
+  [("import") (if (member (pop s) imports*) '()
+                  (begin (parse (readn (open-input-file (string-join (list (pop s) ".lm") "")) ""))
+                         (set! imports* (push imports* (pop s))) "#DONE"))]
   [else (let ([q (filter (λ (x) (not (equal? x "False"))) (map (λ (y) (begin (displayln (cons "γ" s)) (parse-expr (push y (cons "γ" s))))) ruls*))])
           (if (not (empty? q)) (car q) s))])))
 
