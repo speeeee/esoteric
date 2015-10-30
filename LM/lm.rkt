@@ -59,7 +59,7 @@
   [(">in") (read-line)] [(":") (if (length? s 3) (cons (cadr s) (caddr s))
                                    (fprintf o "ERROR: `:' required length: 3, given ~a.~n" (length s)))]
   [("rule:") (begin (set! ruls* (push ruls* (cadr s))) "#DONE")] [("γ:" "y:") (cons "γ" (cdr s))]
-  [("std-out") (begin (fprintf o "~a" (parse-expr (cadr s))) "#DONE")]
+  [("std-out") (begin (fprintf o "~a" (parse-expr (cadr s))) "#DONE")] [("!") (parse-expr (filter (λ (y) (not (equal? y "#DONE"))) (map (λ (x) (parse-expr x)) (cdr s))))]
   [("lambda") #;(lambda var expr val) (if (length? s 4)
    (parse-expr (distrib (second s) (fourth s) (third s)))
    (fprintf o "ERROR: `lambda' required length: 4, given: ~a.~n" (length s)))] [("gamma" "γ" "y.") (cdr s)]
