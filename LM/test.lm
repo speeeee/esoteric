@@ -1,1 +1,1 @@
-rule: (lambda x (if (std-eq (car x) Hello) (std-add 1 (car (cdr x))) False))
+std-out (car (p (import test-import) (Hello 1)))
