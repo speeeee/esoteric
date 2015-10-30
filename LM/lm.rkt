@@ -59,7 +59,7 @@
   [(">in") (read-line)] [(":") (if (length? s 3) (cons (cadr s) (caddr s))
                                    (fprintf o "ERROR: `:' required length: 3, given ~a.~n" (length s)))]
   [("rule:") (begin (set! ruls* (push ruls* (cadr s))) "#DONE")] [("γ:" "y:") (cons "γ" (cdr s))]
-  [("std-out") (let ([s+ (parse-expr s)]) (fprintf o "~a" s+) s+)]
+  [("std-out") (begin (fprintf o "~a" (parse-expr (cadr s))) "#DONE")]
   [("lambda") #;(lambda var expr val) (if (length? s 4)
    (parse-expr (distrib (second s) (fourth s) (third s)))
    (fprintf o "ERROR: `lambda' required length: 4, given: ~a.~n" (length s)))] [("gamma" "γ" "y.") (cdr s)]
@@ -73,8 +73,10 @@
 (define (parse l) (parse-expr (check-parens (string-split-spec l))))
 
 (define (main) (if (= (length (vector->list (current-command-line-arguments))) 0)
-  (begin (fprintf o "Initiating ulang REPL...~nPress ENTER/RETURN once a command is entered.  Enter the command, `:q', to quit.~n")
+  (begin (fprintf o "Initiating LM REPL...~nPress ENTER/RETURN once a command is entered.  Enter the command, `:q', to quit.~n")
          (let main () (begin (fprintf o "~n> ") (let ([d (read-line)]) (if (or (equal? d ":q") (eof-object? d)) 
                                                                            (begin (displayln "quitting") (exit)) (parse d))) (main))))
   (let* ([c (vector->list (current-command-line-arguments))] [f (open-input-file (string-join (list (car c) ".lm") ""))])
     (parse (readn f "")))))
+
+(main)
