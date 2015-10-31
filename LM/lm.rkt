@@ -62,7 +62,7 @@
   [("std-out") (begin (fprintf o "~a" (parse-expr (cadr s))) "#DONE")] [("!") (parse-expr (filter (λ (y) (not (equal? y "#DONE"))) (map (λ (x) (parse-expr x)) (cdr s))))]
   [("lambda") #;(lambda var expr val) (if (length? s 4)
    (parse-expr (distrib (second s) (fourth s) (third s)))
-   (fprintf o "ERROR: `lambda' required length: 4, given: ~a.~n" (length s)))] [("gamma" "γ" "y.") (cdr s)]
+   s #;(fprintf o "ERROR: `lambda' required length: 4, given: ~a.~n" (length s)))] [("gamma" "γ" "y.") (cdr s)]
   [("p") (filter (λ (y) (not (equal? y "#DONE"))) (map (λ (x) (parse-expr x)) (cdr s)))]
   [("import") (if (member (pop s) imports*) '()
                   (begin (parse (readn (open-input-file (string-join (list (pop s) ".lm") "")) ""))
