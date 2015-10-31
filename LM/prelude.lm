@@ -13,6 +13,7 @@ p
 ~ third element of a list ~
 (rule: (lambda x (if (std-eq (car x) thd) (car (cdr (cdr (car (cdr x))))) $False)))
 ~ retrieves the length of a list ~
+~ WARNING: do not try to use these rules, as they are not complete yet. ~
 (rule: (lambda x (if (std-eq (car x) length) ($length (snd x) 0) $False)))
 (rule: (lambda x (if (std-eq (car x) $length) 
   (if (empty? (snd x)) (thd x) ($length (cdr (snd x)) (std-add (thd x) 1))) $False)))
