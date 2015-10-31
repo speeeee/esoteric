@@ -82,7 +82,43 @@ The first thing to consider is that the new expression does not satisfy the cond
 
 ## Evaluation control
 
+One of the most important aspects of LM is the ability to control how and when LM evaluates each structure.  There are two major concepts concerning the control of evaluation: *gamma expressions* and *forced evaluation*.
 
+As mentioned before, rules have a certain input which is a pattern to be matched and if it is matched, then the result of the rule is output.  Consider this example:
+
+```
+std-add (std-add 1 2) (std-add 3 4)
+~ returns 10 ~
+```
+
+When a rule like `std-add` is matched, any arguments that have dimensions higher than 0 are automatically evaluated.  This is the same case with `car`, `cdr`, etc.  However, it is sometimes desirable for an expression to remain unevaluated.  This is the purpose of gamma expressions.  Gamma expressions are constructed by a certain rule:
+
+(γ ...) -> ...
+**NOTE:** See *Notation* in *Language Reference* for info on the notation of rules in the documentation.
+
+Gamma is a rule that simply takes a variable amount of arguments and once called, returns the arguments exactly as they were.  This allows for all information to be preserved despite having been called.  Gamma expressions can be seen as expressions that are purposefully delayed in evaluation.  There can be multiple degrees of delay depending on how many gammas there are in the expression.
+
+```
+γ std-add 1 2
+~ takes two evaluations to return 3 ~
+
+γ γ γ std-add 1 2
+~ takes four evaluations to return 3 ~
+```
+
+Usually, the degree of delay would rarely exceed one.
+
+This delay in execution allows for another writing style for the definition of the lambda, `lambda x (std-add x 1) 1`:
+
+```
+push (γ lambda x (std-add x 1)) 1
+~ returns (lambda x (std-add x 1) 1) ~
+```
+**NOTE:** `push` does not exist yet.
+
+This function does not actually do anything very different from the original, but it demonstrates the usage of gamma.  One way to think of it is that it allows for partial application in a rule-based setting.  Lists can be treated as lists until they are ready to be matched against the rule-set.
+
+In contrast to gamma, there are specific rules that decrease the degree of delay, like `!`.  However, nearly all of the rules in LM evaluate all lists by default.
 
 # Language Reference
 
