@@ -18,5 +18,9 @@ A stack-based language where all data are strings.
 
 # On hiatus
 
+## LM
+
+An experimental language based off of the idea of giving the user the ability to delay evaluation.  The project will probably be reworked into a new language later.
+
 ## Rstk
-A somewhat serious stack-based language targetting C++.  More info soon.
+A somewhat serious stack-based language targetting C++.  ulang acts as a successor to Rstk.  More info soon.
