@@ -1,0 +1,22 @@
+~ Prelude: a module containing rules essential to programming in LM.
+  31 October 2015
+-------------------------------------------------------------------~
+p
+~ logical AND ~
+(rule: (lambda x (if (std-eq (car x) and) (if (car (cdr x)) (car (cdr (cdr x))) False)
+                     $False)))
+
+~ basic list operations ~
+
+~ second element of a list ~
+(rule: (lambda x (if (std-eq (car x) snd) (car (cdr (car (cdr x)))) $False)))
+~ third element of a list ~
+(rule: (lambda x (if (std-eq (car x) thd) (car (cdr (cdr (car (cdr x))))) $False)))
+~ retrieves the length of a list ~
+(rule: (lambda x (if (std-eq (car x) length) ($length (snd x) 0) $False)))
+(rule: (lambda x (if (std-eq (car x) $length) 
+  (if (empty? (snd x)) (thd x) ($length (cdr (snd x)) (std-add (thd x) 1))) $False)))
+
+~ test ~
+(rule: (lambda x (if (std-eq (car x) recur) (! snd x) $False)))
+~(rule: (lambda x (if (std-eq (car x) recur) (! recur (std-add (snd x) 1)) $False)))~

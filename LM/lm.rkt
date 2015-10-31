@@ -51,6 +51,7 @@
    (fprintf o "ERROR: `~a' required length: 3, given: ~a.~n" (car s) (length s)))]
   [("car" "cdr") (if (length? s 2) ((case (car s) [("car") car] [("cdr") cdr]) (parse-expr (pop s))) 
                      (fprintf o "ERROR: `car' required length: 2, given ~a; also possible that given argument is not a list.~n" (length s)))]
+  [("empty?") (if (length? s 2) (if (empty? (parse-expr (cadr s))) "True" "False") (fprintf o "ERROR: `empty?' required length: 2, given ~a." (length s)))]
   [("std-eq") (if (equal? (parse-expr (cadr s)) (parse-expr (caddr s))) "True" "False")]
   [(">codes") (map (λ (x) (number->string (char->integer x))) (string->list (parse-expr (cadr s))))]
   [(">chars") (list->string (map (λ (x) (integer->char (string->number x))) (parse-expr (cadr s))))]
@@ -64,10 +65,11 @@
    (parse-expr (distrib (second s) (fourth s) (third s)))
    s #;(fprintf o "ERROR: `lambda' required length: 4, given: ~a.~n" (length s)))] [("gamma" "γ" "y.") (cdr s)]
   [("p") (filter (λ (y) (not (equal? y "#DONE"))) (map (λ (x) (parse-expr x)) (cdr s)))]
+  [("!.") (parse-expr (second s))]
   [("import") (if (member (pop s) imports*) '()
                   (begin (parse (readn (open-input-file (string-join (list (pop s) ".lm") "")) ""))
                          (set! imports* (push imports* (pop s))) "#DONE"))]
-  [else (let ([q (filter (λ (x) (not (equal? x "False"))) (map (λ (y) (begin (displayln (cons "γ" s)) (parse-expr (push y (cons "γ" s))))) ruls*))])
+  [else (let ([q (filter (λ (x) (not (equal? x "$False"))) (map (λ (y) (begin (displayln (cons "γ" s)) (parse-expr (push y (cons "γ" s))))) ruls*))])
           (if (not (empty? q)) (car q) s))])))
 
 (define (parse l) (parse-expr (check-parens (string-split-spec l))))
@@ -75,7 +77,8 @@
 (define (main) (if (= (length (vector->list (current-command-line-arguments))) 0)
   (begin (fprintf o "Initiating LM REPL...~nPress ENTER/RETURN once a command is entered.  Enter the command, `:q', to quit.~n")
          (let main () (begin (fprintf o "~n> ") (let ([d (read-line)]) (if (or (equal? d ":q") (eof-object? d)) 
-                                                                           (begin (displayln "quitting") (exit)) (parse d))) (main))))
+                                                                           (begin (displayln "quitting") (exit)) 
+                                                                           (if (empty? (string->list d)) '() (parse d)))) (main))))
   (let* ([c (vector->list (current-command-line-arguments))] [f (open-input-file (string-join (list (car c) ".lm") ""))])
     (parse (readn f "")))))
 
