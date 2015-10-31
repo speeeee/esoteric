@@ -94,6 +94,7 @@ std-add (std-add 1 2) (std-add 3 4)
 When a rule like `std-add` is matched, any arguments that have dimensions higher than 0 are automatically evaluated.  This is the same case with `car`, `cdr`, etc.  However, it is sometimes desirable for an expression to remain unevaluated.  This is the purpose of gamma expressions.  Gamma expressions are constructed by a certain rule:
 
 (γ ...) -> ...
+
 **NOTE:** See *Notation* in *Language Reference* for info on the notation of rules in the documentation.
 
 Gamma is a rule that simply takes a variable amount of arguments and once called, returns the arguments exactly as they were.  This allows for all information to be preserved despite having been called.  Gamma expressions can be seen as expressions that are purposefully delayed in evaluation.  There can be multiple degrees of delay depending on how many gammas there are in the expression.
