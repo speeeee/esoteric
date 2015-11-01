@@ -1,0 +1,6 @@
+~ Prelude: a module containing rules essential to programming in LM.
+  1 November 2015
+-------------------------------------------------------------------~
+p
+~ logical AND ~
+(:: and (lambda x (if (car x) (car (cdr x)) False)))
