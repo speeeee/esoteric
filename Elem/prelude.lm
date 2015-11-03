@@ -4,3 +4,13 @@
 p
 ~ logical AND ~
 (:: and (lambda x (if (car x) (car (cdr x)) False)))
+
+~ basic list operations ~
+
+~ second element of a list ~
+(:: cadr (lambda x (car (cdr (car x)))))
+
+~ retrieves the length of a list ~
+(:: length (lambda x (if (list? (car x)) (! length$ (car x) 0) False)))
+(:: length$ (lambda x (if (empty? (car x)) (cadr x) 
+                          (! length$ (cdr (car x)) (std-add (cadr x) 1)))))
