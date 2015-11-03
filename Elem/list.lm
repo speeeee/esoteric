@@ -1,0 +1,11 @@
+~ list: A module that contains various list-based operations.  Module acts on 
+        typeless lists.
+  2 November 2015
+----------------------------------------------------------------------------~
+p
+(import prelude)
+~ functions for picking different elements of a list ~
+
+~ c_r for indexing lists ~
+(:: $ (lambda x (! $$ (cdr (>codes (car x))) (car (cdr x)))))
+~ (:: $$ (lambda x ( ~
