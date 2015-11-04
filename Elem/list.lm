@@ -13,7 +13,7 @@ p
 (:: :+ (lambda x (if (list? (cadr x)) (! : (car x) (cadr x)) (! (car x) (cadr x)))))
 
 ~ reverses a list ~
-(:: >< (lambda x (><$ () (car x))))
+(:: >< (lambda x (! ><$ () (car x))))
 (:: ><$ (lambda x (if (empty? (cadr x)) (car x) 
                       (! ><$ (: (car (cadr x)) (car x)) (cdr (cadr x))))))
 
