@@ -17,8 +17,12 @@ p
 (:: ><$ (lambda x (if (empty? (cadr x)) (car x) 
                       (! ><$ (: (car (cadr x)) (car x)) (cdr (cadr x))))))
 
-~ appends an element to the end of a list. ~
-~ (:: ><: (lambda x (><:$ (car x) (cadr x)))) ~
+~ appends elements to the end of a list. ~
+(:: ><: (lambda x (! >< (! ><:$ (car x) (cadr x) ()))))
+(:: ><:$ (lambda x (if (empty? (car x)) 
+                       (if (empty? (cadr x)) (caddr x)
+                           (! ><:$ (car x) (cdr (cadr x)) (: (car (cadr x)) (caddr x))))
+                       (! ><:$ (cdr (car x)) (cadr x) (: (car (car x)) (caddr x))))))
 
 ~ functions for picking different elements of a list ~
 
