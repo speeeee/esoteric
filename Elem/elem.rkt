@@ -16,6 +16,7 @@
 
 (define test0 ":: recur (lambda x (if (std-eq (car x) 10) \"DONE\" (! recur (std-add (car x) 1))))")
 (define test1 ":: and (lambda x (if (car x) (car (cdr x)) False))")
+(define test2 "std-out (p: (lambda x ((: (car (cadr x)) (car x)) (cdr (cadr x))) (() (1 2 3))))")
 
 (define (popp x) (pop (ret-pop x)))
 (define (poppp x) (pop (ret-pop (ret-pop x))))
@@ -42,7 +43,7 @@
 (define (distrib var val lst) (map (λ (x)
   (cond [(list? x) (distrib var val x)] [(equal? x var) val] [else x])) lst))
 
-(define (parse-expr s) (if (not (list? s)) s (case (car s)
+(define (parse-expr s) (if (or (not (list? s)) (empty? s)) s (case (car s)
   [("std-add" "std-sub" "std-div" "std-mul") (if (length? s 3) (number->string
    ((case (car s) [("std-add") +] [("std-sub") -] [("std-mul") *] [("std-div") /]) 
     (string->number (parse-expr (pop (ret-pop s)))) (string->number (parse-expr (pop s)))))
@@ -55,14 +56,15 @@
   [(">chars") (list->string (map (λ (x) (integer->char (string->number x))) (parse-expr (cadr s))))]
   [("if") (if (length? s 4) (if (equal? (parse-expr (cadr s)) "False") (parse-expr (pop s)) (parse-expr (caddr s)))
               (fprintf o "ERROR: `if' required length: 4, given ~a.~n" (length s)))]
-  [(">in") (read-line)] [(":") (if (length? s 3) (cons (cadr s) (caddr s))
+  [(">in") (read-line)] [(":") (if (length? s 3) (cons (parse-expr (cadr s)) (parse-expr (caddr s)))
                                    (fprintf o "ERROR: `:' required length: 3, given ~a.~n" (length s)))]
   [("p") (filter (λ (y) (not (equal? y "#DONE"))) (map (λ (x) (parse-expr x)) (cdr s)))]
   [("lambda") #;(lambda var expr val) (if (length? s 4)
    (parse-expr (distrib (second s) (fourth s) (third s))) s)]
-  [("::") (begin (set! funs* (push funs* (cdr s))) "#DONE")]
+  [("::") (begin (set! funs* (push funs* (cdr s))) "#DONE")] [("list?") (if (list? (cadr s)) "True" "False")]
   [("std-out") (begin (fprintf o "~a" (parse-expr (cadr s))) "#DONE")] [("gamma" "y." "γ") (cdr s)]
   [("!") (parse-expr (filter (λ (y) (not (equal? y "#DONE"))) (map (λ (x) (parse-expr x)) (cdr s))))]
+  [("p:") (filter (λ (y) (not (equal? y "#DONE"))) (map (λ (x) (parse-expr x)) (parse-expr (cadr s))))]
   [("import") (if (member (pop s) imports*) '()
                   (begin (parse (readn (open-input-file (string-join (list (pop s) ".lm") "")) ""))
                          (set! imports* (push imports* (pop s))) "#DONE"))]

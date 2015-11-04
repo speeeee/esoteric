@@ -4,8 +4,33 @@
 ----------------------------------------------------------------------------~
 p
 (import prelude)
+
+~ predicates for lists ~
+
+~ functions for constructing lists ~
+
+~ same as `:', but creates a list if necessary ~
+(:: :+ (lambda x (if (list? (cadr x)) (! : (car x) (cadr x)) (! (car x) (cadr x)))))
+
+~ reverses a list ~
+(:: >< (lambda x (><$ () (car x))))
+(:: ><$ (lambda x (if (empty? (cadr x)) (car x) 
+                      (! ><$ (: (car (cadr x)) (car x)) (cdr (cadr x))))))
+
+~ appends an element to the end of a list. ~
+~ (:: ><: (lambda x (><:$ (car x) (cadr x)))) ~
+
 ~ functions for picking different elements of a list ~
 
-~ c_r for indexing lists ~
-(:: $ (lambda x (! $$ (cdr (>codes (car x))) (car (cdr x)))))
-~ (:: $$ (lambda x ( ~
+~ very basic shorthands for certain elements of a list. ~
+(:: caddr (lambda x (car (cdr (cdr (car x))))))
+
+~ splits a list at the given index supplied into a list of two lists. ~
+~ |- list n ~
+~(:: -| (lambda x (-|$ () (car x) (cadr x))))
+(:: -|$ (lambda x (if (std-eq (caddr x) 0)
+  (p (car x) (car (cdr x))) 
+  (! -|$ (><: (car (cadr x)) (car x)) (cdr (cadr x)) 
+              (std-sub (caddr x)) 1))))))~
+
+~ make c_r ~
