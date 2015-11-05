@@ -4,6 +4,8 @@
 p
 ~ logical AND ~
 (:: and (lambda x (if (car x) (car (cdr x)) False)))
+~ logical OR ~
+(:: or (lambda x (if (car x) True (car (cdr x)))))
 
 ~ basic list operations ~
 
