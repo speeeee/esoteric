@@ -17,6 +17,7 @@
 (define test0 ":: recur (lambda x (if (std-eq (car x) 10) \"DONE\" (! recur (std-add (car x) 1))))")
 (define test1 ":: and (lambda x (if (car x) (car (cdr x)) False))")
 (define test2 "std-out (p: (lambda x ((: (car (cadr x)) (car x)) (cdr (cadr x))) (() (1 2 3))))")
+(define test3 "std-out (!!: (\\ (x y) (std-add x y) (1 2)))")
 
 (define (popp x) (pop (ret-pop x)))
 (define (poppp x) (pop (ret-pop (ret-pop x))))
@@ -65,6 +66,9 @@
   [("std-out") (begin (fprintf o "~a" (parse-expr (cadr s))) "#DONE")] [("gamma" "y." "γ") (cdr s)]
   [("!") (parse-expr (filter (λ (y) (not (equal? y "#DONE"))) (map (λ (x) (parse-expr x)) (cdr s))))]
   [("p:") (filter (λ (y) (not (equal? y "#DONE"))) (map (λ (x) (parse-expr x)) (parse-expr (cadr s))))]
+  ;[("!_") #;(parse-expr (parse-expr (cadr s)))
+  ; (let simp ([x ]
+  [("!!:") (parse-expr (parse-expr (cadr s)))]
   [("import") (if (member (pop s) imports*) '()
                   (begin (parse (readn (open-input-file (string-join (list (pop s) ".lm") "")) ""))
                          (set! imports* (push imports* (pop s))) "#DONE"))]
