@@ -10,3 +10,6 @@ p
 (:: \$ (lambda x (if (empty? (cadr x)) (caddr x)
                      (! \$ (cdr (car x)) (cdr (cadr x))
                            (p lambda (car (car x)) (caddr x) (car (cadr x)))))))
+
+~ call the lambda expression with the given list of arguments ~
+(:: >> (lambda x (!!: (!!: (! ><: (car x) (p (cadr x)))))))
