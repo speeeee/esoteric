@@ -16,6 +16,9 @@ A very simple language used to modify *existing* WAV files.
 ## ulang
 A stack-based language where all data are strings.
 
+## Elem
+A language with a LISP-style syntax where all data are strings.  The language allows the user to control when the interpreter evaluates expressions.
+
 # On hiatus
 
 ## LM
