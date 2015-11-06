@@ -18,6 +18,7 @@
 (define test1 ":: and (lambda x (if (car x) (car (cdr x)) False))")
 (define test2 "std-out (p: (lambda x ((: (car (cadr x)) (car x)) (cdr (cadr x))) (() (1 2 3))))")
 (define test3 "std-out (!!: (\\ (x y) (std-add x y) (1 2)))")
+(define test4 "std-out (!!: (!!: (><: (\\ (x y) (std-add x y)) ((1 2))))))")
 
 (define (popp x) (pop (ret-pop x)))
 (define (poppp x) (pop (ret-pop (ret-pop x))))
