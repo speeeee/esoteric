@@ -73,7 +73,7 @@ Essentially, the lambda expression defines two inputs: `x` and `y`, which are th
 
 This third argument, `(1 2)`, are the arguments for the lambda expression.  Therefore, the expression is simplified to `(+ 1 2)`, further simplified to `3` (*Note that if the user were to input this expression into the REPL, what would be returned is not the expression in simplest form, as in `3` would not actually be returned.  This is discussed in further detail in the next section*).
 
-At first, this doesn't seem very useful, since the lambda expression simplifies to `(+ 1 2)` anyway.  However, consider the previous lambda expression that lacked the third argument.  If this expression were input into the REPL, it would return an error, since it lacked the third argument it needed.  This is explained in further detail in the next section.  However, what can be explained now is the concept of function definition.
+At first, this doesn't seem very useful, since the lambda expression simplifies to `(+ 1 2)` anyway.  However, consider the previous lambda expression that lacked the third argument.  If this expression were input into the REPL, it would return an error, since it lacked the third argument it needed.  This is explained in further detail in the next section.  Essentially, the most major idea is that lambda expressions are also literals, meaning that they can be arguments to a function, etc.  However, what can be explained now is the concept of function definition.
 
 Another thing to note is that there is something odd about the arguments for the `\`.  The second argument, `(+ x y)` is *not* evaluated, since if it were, it would try to add the two symbols, `x` and `y`.  This is a lead in to another concept in Elem, which is the control on when Elem evaluates expressions.
 
@@ -119,3 +119,33 @@ Here, `+`, which is the name of the function, is called.  The single argument fo
 This is the basic idea of functions in Elem.
 
 ### Controlling evaluation
+
+One of the major concepts of Elem is the forced prolonging or evaluation of expressions.  The user is given the option to control evaluation of expressions.  Consider a function that adds `1` to two numbers:
+
+```
+:: 2inc (lambda x ((+ (car x) 1) (+ (cadr x) 1)))
+~ 'cadr' just returns the second element of a list; the head of the tail. ~
+```
+
+When something like `2inc 2 3` is given, what is returned is `((+ (car 2) 1) (+ (cadr 2) 1))`.  This is because by default, lists are not actually evaluated; the user must force evaluation to return the desired result.  This can be done with `p`, which takes an indefinite amount of arguments and evaluates all of them.
+
+```
+:: 2inc (lambda x (p (+ (car x) 1) (+ (cadr x) 1)))
+```
+
+This will return `(3 4)` when given `2inc 2 3`, as it is expected to.  At first, it may seem odd that the lists are not evaluated by default, but there are times when it is more desirable to stall evaluation.  One of these times would be when an argument is appended to an argument list of an unfinished function call:
+
+```
+><: (+ 1) (2)
+```
+(*`><:` means "append"*)
+
+If the first argument, `(+ 1)`, were to be evaluated, it would return an error.  However, instead, `2` is appended to `(+ 1)`, creating `(+ 1 2)`.  Of course, this is not fully evaluated yet.  This requires another function called `!!:`.  `!!:` forces its first argument to be evaluated.  Here is the completed expression:
+
+```
+!!: (><: (+ 1) (2))
+```
+
+This returns `3`, as expected.
+
+**NOTE:** Currently (7 November 2015), the actual concept of controlled evaluation is not fully explored yet, as the user is still forced to make a lot of calls to evaluate things.
