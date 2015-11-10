@@ -6,6 +6,8 @@ import Control.Concurrent (threadDelay)
 import Data.Bits ( (.|.) )
 import System.Exit (exitWith, ExitCode(..))
 
+drawRect x y w h = mapM_ (\(x,y) -> glVertex3f x y 0) [(x,y),(x+w,y),(x+w,y+h),(x,y+h)]
+
 initGL win = do
   glShadeModel gl_SMOOTH
   glClearColor 0 0 0 0
@@ -23,8 +25,15 @@ drawScene _ = do
   glClear $ fromIntegral $ gl_COLOR_BUFFER_BIT .|. gl_DEPTH_BUFFER_BIT
   glLoadIdentity
   glTranslatef (-1.0675) (-0.625) 0
+  glColor3f 1.0 0.5 0.5
+  glBegin gl_POLYGON
+  mapM_ (\(x,y) -> glVertex3f x y 0) [(0.4,0),(0.6,0),(1,0.4),(1,0.6),
+                                      (0.6,1),(0.4,1),(0,0.6),(0,0.4)]
+  glEnd
   glBegin gl_QUADS
-  mapM_ (\(x,y,z) -> glVertex3f x y z) [(0,0,0),(1,0,0),(1,1,0),(0,1,0)]
+  glColor3f 1 1 1
+  drawRect 0.2 0.45 0.6 0.1
+  drawRect 0.45 0.2 0.1 0.6
   glEnd
 
 shutdown :: K.Window -> IO ()
@@ -60,7 +69,7 @@ runGame' win acc = do
 
 main = do
   True <- K.init
-  Just win <- K.createWindow 1280 800 "%%%%%" Nothing Nothing
+  Just win <- K.createWindow 800 800 "%%%%%" Nothing Nothing
   K.makeContextCurrent (Just win)
   K.setWindowRefreshCallback win (Just drawScene)
   K.setFramebufferSizeCallback win (Just resizeScene)
