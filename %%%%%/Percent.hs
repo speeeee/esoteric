@@ -7,6 +7,7 @@ import Data.Bits ( (.|.) )
 import System.Exit (exitWith, ExitCode(..))
 
 import Util.Assets
+import Core.Nodes
 
 initGL win = do
   glShadeModel gl_SMOOTH
@@ -26,6 +27,7 @@ drawScene (x,y,s) _ = do
   glLoadIdentity
   glTranslatef (-1.0675) (-0.625) 0
   glTranslatef (x*s) (y*s) 0
+  let nodea = Node (0,0) Opener
   {-glColor3f 1.0 0.5 0.5
   glBegin gl_POLYGON
   mapM_ (\(x,y) -> glVertex3f (s*x) (s*y) 0) [(0.4,0),(0.6,0),(1,0.4),(1,0.6),
@@ -36,7 +38,7 @@ drawScene (x,y,s) _ = do
   drawRect (s*0.2) (s*0.45) (s*0.6) (s*0.1)
   drawRect (s*0.45) (s*0.2) (s*0.1) (s*0.6)
   glEnd-}
-  opener 0 0 s
+  drawN nodea s
 
 shutdown :: K.Window -> IO ()
 shutdown win = do
