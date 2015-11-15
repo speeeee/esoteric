@@ -35,9 +35,9 @@
   (if (member x '("!" "?")) (append (ret-pop n) (list (if (equal? x "!") (cons 'fact (pop n)) (pop n)) '()))
       (push (ret-pop n) (push (pop n) x)))) '(()) l)))
 
-(define (parse-prog l) (map (λ (x) (if (equal? (car x) 'fact)
-  (set! ruls* (push ruls* (let ([c (member "<-" (cdr x))])
-    (if c (list (cadr x) (cdr c)) (list (cdr x) '())))))
-  
+;(define (parse-prog l) (map (λ (x) (if (equal? (car x) 'fact)
+;  (set! ruls* (push ruls* (let ([c (member "<-" (cdr x))])
+;    (if c (list (cadr x) (cdr c)) (list (cdr x) '())))))
+;  (
 
 (define (parse x) (excl (check-parens (categorize (string-split-spec x)))))
