@@ -89,3 +89,5 @@
                                                                            (if (empty? (string->list d)) '() (fprintf o "~a" (parse d))))) (main))))
   (let* ([c (vector->list (current-command-line-arguments))] [f (open-input-file (string-join (list (car c) ".li") ""))])
     (parse (readn f "")))))
+
+(main)
