@@ -31,7 +31,11 @@ drawScene (x,y) _ = do
   mapM_ (\(x,y) -> glVertex3f (x) (y) 0) [(0.4,0),(0.6,0),(1,0.4),(1,0.6),
                                           (0.6,1),(0.4,1),(0,0.6),(0,0.4)]
   glEnd
-  switchPath (0,0) DownLeft 5
+  --switchPath (0,0) DownLeft 5
+
+  drawLetter (0,0) 'a' 5
+  drawLetter (25,0) 'b' 5
+  --drawLetter (40,0) 'c' 5
 
 shutdown :: K.Window -> IO ()
 shutdown win = do
