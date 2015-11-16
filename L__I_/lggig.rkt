@@ -65,7 +65,8 @@
   [("lambda") #;(lambda var expr val) (if (length? s 4)
    (parse-expr (distrib (second s) (fourth s) (third s))) s)]
   [(">in") (read-line)] [(">out") (begin (fprintf o "~a" (parse-expr (cadr s))) (parse-expr (cadr s)))]
-  [("$") (map (λ (x) (parse-expr x)) (cdr s))] [("eval") (parse-expr (cadr s))]
+  [("$") (map (λ (x) (parse-expr x)) (cdr s))] [("eval") (parse-expr (parse-expr (cadr s)))]
+  [("γ" "y." "gamma") (cdr s)]
   [("cons") (cons (parse-expr (cadr s)) (parse-expr (caddr s)))]
   [("import") (if (member (pop s) imports*) '()
                   (begin (parse (readn (open-input-file (string-join (list (pop s) ".li") "")) ""))
