@@ -20,6 +20,7 @@
 (define test0 "pos 'X <- (real&num:'X) (>:0 'X)!")
 (define test1 "std-add 1 2")
 (define test2 ":- add1 (lambda X (std-add (car X) 1))")
+(define test3 "\\ (x y) ($ std-add x y) (1 2)")
 
 (define (quoti lst) (append (list #\") (push lst #\")))
 (define (string-split-spec str) (map list->string (filter (λ (x) (not (empty? x))) (foldl (λ (s n)
@@ -57,6 +58,7 @@
   [("car" "cdr") (if (and (length? s 2) (list? (cadr s))) 
                      ((case (car s) [("car") car] [("cdr") cdr]) (parse-expr (pop s))) "False")]
   [("empty?") (if (length? s 2) (if (empty? (parse-expr (cadr s))) "True" "False") (fprintf o "ERROR: `empty?' required length: 2, given ~a." (length s)))]
+  [("list?") (if (list? (cadr s)) "True" "False")]
   [("std-eq") (if (equal? (parse-expr (cadr s)) (parse-expr (caddr s))) "True" "False")]
   [(">codes") (map (λ (x) (number->string (char->integer x))) (string->list (parse-expr (cadr s))))]
   [(">chars") (list->string (map (λ (x) (integer->char (string->number x))) (parse-expr (cadr s))))]
@@ -66,18 +68,19 @@
    (parse-expr (distrib (second s) (fourth s) (third s))) s)]
   [(">in") (read-line)] [(">out") (begin (fprintf o "~a" (parse-expr (cadr s))) (parse-expr (cadr s)))]
   [("$") (map (λ (x) (parse-expr x)) (cdr s))] [("eval") (parse-expr (parse-expr (cadr s)))]
-  [("γ" "y." "gamma") (cdr s)]
+  [("γ" "y." "gamma") (cdr s)] ;[("y:" "γ") (cons "y." (map (λ (x) (parse-expr x)) (cdr s)))]
   [("cons") (cons (parse-expr (cadr s)) (parse-expr (caddr s)))]
   [("import") (if (member (pop s) imports*) '()
                   (begin (parse (readn (open-input-file (string-join (list (pop s) ".li") "")) ""))
-                         (set! imports* (push imports* (pop s))) "#DONE"))]
+                         (set! imports* (push imports* (pop s))) "True"))]
   [(":-") (begin (set! ruls* (push ruls* (cdr s))) "True")] [else #f]))
 
 (define (app-expr s) (let ([c (find-eq (car s) car ruls*)])
   (if c (if (length? c 1) "True" (parse-expr (push (cadr c) (map parse-expr (cdr s))))) #f)))
 
-(define (parse-expr x) (if (not (list? x)) x (let* ([q (cons (parse-expr (car x)) (cdr x))]
-                                                    [qq (primitive q)])
+(define (parse-expr x) (if (or (not (list? x)) (empty? x)) x
+                           (let* ([q (cons (parse-expr (car x)) (cdr x))]
+                                  [qq (primitive q)])
   (if qq qq (let ([e (app-expr q)])
               (if e e q))))))
 
