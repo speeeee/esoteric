@@ -33,9 +33,10 @@ drawScene (x,y) _ = do
   glEnd
   --switchPath (0,0) DownLeft 5
 
-  drawLetter (0,0) 'a' 5
-  drawLetter (25,0) 'b' 5
+  --drawLetter (0,0) 'a' 5
+  --drawLetter (25,0) 'b' 5
   --drawLetter (40,0) 'c' 5
+  drawString (0,0) "hello" 2
 
 shutdown :: K.Window -> IO ()
 shutdown win = do

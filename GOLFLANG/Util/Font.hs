@@ -1,4 +1,4 @@
-module Util.Font (tinySquare, switchPath, drawLetter, Dir(..)) where
+module Util.Font (tinySquare, switchPath, drawLetter, drawString, Dir(..)) where
 
 import Graphics.Rendering.OpenGL.Raw
 
@@ -39,6 +39,10 @@ drawLetter (x,y) c s = do
                                      4 -> UpRight
                                      5 -> UpLeft) s)
         (zip [(0::Int)..] l)
+
+drawString :: (GLfloat,GLfloat) -> String -> GLfloat -> IO ()
+drawString (x,y) str s = do
+  mapM_ (\(n,c) -> drawLetter (x+5.2*n*s,y) c s) (zip [0..] str)
 
 -- ignore the ugly code...
 
@@ -90,7 +94,7 @@ letter c = case c of ' ' -> [0,0,0,0,0,
                              3,1,1,1,2]
                      'h' -> [4,5,0,0,0,
                              0,1,0,0,0,
-                             0,1,1,1,4,
+                             0,1,1,1,5,
                              0,1,0,0,1,
                              0,1,0,0,3]
                      'i' -> [0,0,1,0,0,
