@@ -1,0 +1,12 @@
+~ lambda: A module that features curried lambda expressions.
+  16 November 2015
+-----------------------------------------------------------~
+$
+(import list)
+
+~ lambda that takes more than a single argument (curried) ~
+(:- \ (lambda x (\$ (cdr (car x)) (cdr (caddr x)) 
+                    ($ lambda (car (car x)) (cadr x) (car (caddr x))))))
+(:- \$ (lambda x (if (empty? (cadr x)) (caddr x)
+                     (\$ (cdr (car x)) (cdr (cadr x))
+                         ($ lambda (car (car x)) (caddr x) (car (cadr x)))))))
