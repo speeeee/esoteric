@@ -36,7 +36,7 @@ drawScene (x,y) _ = do
   --drawLetter (0,0) 'a' 5
   --drawLetter (25,0) 'b' 5
   --drawLetter (40,0) 'c' 5
-  drawString (0,0) "hello" 2
+  drawString (0,0) "hello, world(s)." 0.25
 
 shutdown :: K.Window -> IO ()
 shutdown win = do
