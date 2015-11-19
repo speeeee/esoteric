@@ -1,0 +1,8 @@
+~ define: more advanced versions of ':-'.
+  16 November 2015
+----------------------------------------~
+$
+(import lambda)
+
+~ :: : simulates the taking of arguments rather than a list. ~
+(:- :: (lambda x (\ (cadr x) (cons $ (caddr x)) ~ implement (>> expr sz) ~
