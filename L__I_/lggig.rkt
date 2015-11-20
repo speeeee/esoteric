@@ -21,6 +21,7 @@
 (define test1 "std-add 1 2")
 (define test2 ":- add1 (lambda X (std-add (car X) 1))")
 (define test3 "\\ (x y) ($ std-add x y) (1 2)")
+(define test4 ":: add (x y) ($ std-add x y)")
 
 (define (quoti lst) (append (list #\") (push lst #\")))
 (define (string-split-spec str) (map list->string (filter (λ (x) (not (empty? x))) (foldl (λ (s n)
@@ -68,7 +69,7 @@
    (parse-expr (distrib (second s) (fourth s) (third s))) s)]
   [(">in") (read-line)] [(">out") (begin (fprintf o "~a" (parse-expr (cadr s))) (parse-expr (cadr s)))]
   [("$") (map (λ (x) (parse-expr x)) (cdr s))] [("eval") (parse-expr (parse-expr (cadr s)))]
-  [("γ" "y." "gamma") (cdr s)] ;[("y:" "γ") (cons "y." (map (λ (x) (parse-expr x)) (cdr s)))]
+  [("γ" "y." "gamma") (cdr s)] [("y:" "γ") (cons "y." (cdr s))]
   [("cons") (cons (parse-expr (cadr s)) (parse-expr (caddr s)))]
   [("import") (if (member (pop s) imports*) '()
                   (begin (parse (readn (open-input-file (string-join (list (pop s) ".li") "")) ""))
@@ -78,7 +79,7 @@
 (define (app-expr s) (let ([c (find-eq (car s) car ruls*)])
   (if c (if (length? c 1) "True" (parse-expr (push (cadr c) (map parse-expr (cdr s))))) #f)))
 
-(define (parse-expr x) (if (or (not (list? x)) (empty? x)) x
+(define (parse-expr x) (displayln x) (if (or (not (list? x)) (empty? x)) x
                            (let* ([q (cons (parse-expr (car x)) (cdr x))]
                                   [qq (primitive q)])
   (if qq qq (let ([e (app-expr q)])
