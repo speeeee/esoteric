@@ -7,6 +7,8 @@ import Data.Bits ( (.|.) )
 import System.Exit (exitWith, ExitCode(..))
 
 import Util.Font
+import Core.CodeFrame
+import Core.MouseInput
 
 initGL win = do
   glShadeModel gl_SMOOTH
@@ -21,22 +23,13 @@ resizeScene win w h = do
   glOrtho (-30) 30 (-30) 30 (-30) 30
   glMatrixMode gl_MODELVIEW
 
-drawScene (x,y) _ = do
+drawScene (x,y,_) _ = do
   glClear $ fromIntegral $ gl_COLOR_BUFFER_BIT .|. gl_DEPTH_BUFFER_BIT
   glLoadIdentity
   glTranslatef (-1.0675) (-0.625) 0
-  glTranslatef (-x) (-y) 0
-  glColor3f 1.0 0.5 0.5
-  glBegin gl_POLYGON
-  mapM_ (\(x,y) -> glVertex3f (x) (y) 0) [(0.4,0),(0.6,0),(1,0.4),(1,0.6),
-                                          (0.6,1),(0.4,1),(0,0.6),(0,0.4)]
-  glEnd
-  --switchPath (0,0) DownLeft 5
-
-  --drawLetter (0,0) 'a' 5
-  --drawLetter (25,0) 'b' 5
-  --drawLetter (40,0) 'c' 5
-  drawString (0,0) "hello, world(s)." 0.25
+  --glTranslatef (-x) (-y) 0
+  --drawString (x,-y) "hello, world(s)." 0.25
+  drawString (x*60-28,-(y*60-30)) ((show x) ++ "," ++ (show y)) 0.25
 
 shutdown :: K.Window -> IO ()
 shutdown win = do
@@ -45,12 +38,15 @@ shutdown win = do
   _ <- exitWith ExitSuccess
   return ()
 
+--inChar :: String -> K.Window -> Char -> IO ()
+--inChar s _ c = putStrLn (show c)
+
 isPressed :: K.KeyState -> Bool
 isPressed K.KeyState'Pressed = True
-isPressed K.KeyState'Repeating = True
+isPressed K.KeyState'Repeating = False
 isPressed _ = False
 
-getInput :: K.Window -> IO (GLfloat, GLfloat)
+{-getInput :: K.Window -> IO (GLfloat, GLfloat)
 getInput win = do
   x0 <- isPressed `fmap` K.getKey win K.Key'Left
   x1 <- isPressed `fmap` K.getKey win K.Key'Right
@@ -60,30 +56,48 @@ getInput win = do
       x1n = if x1 then 1 else 0
       y0n = if y0 then -1 else 0
       y1n = if y1 then 1 else 0
-  return (x0n + x1n, y0n + y1n)
+  return (x0n + x1n, y0n + y1n)-}
 
-parseInput :: (GLfloat,GLfloat) -> K.Window -> IO (GLfloat,GLfloat)
-parseInput (x,y) win = do
-  (x',y') <- liftIO $ getInput win
-  return (x+x'*0.5,y+y'*0.5)
+{-getInput :: K.Window -> CF -> IO (Mode,Bool,Bool)
+getInput win cf = do
+  x0 <- isPressed `fmap` K.getKey win K.Key'Tab
+  y0 <- isPressed `fmap` K.getKey win K.Key'Up
+  y1 <- isPressed `fmap` K.getKey win K.Key'Down
+  return (if x0 then WordSelect else Neutral,y0,y1)
+
+parseInput :: K.Window -> CF -> IO CF
+parseInput win (CF m p c) = do
+  (menu,u,d) <- liftIO $ getInput win (CF m p c)
+  return (CF menu (if u then p+1 else if d then p-1 else p) c)-}
+
+pressed = (==) K.MouseButtonState'Pressed
+
+parseInput :: K.Window -> IO (GLfloat,GLfloat,Click)
+parseInput win = do
+  (x,y) <- minput win
+  click <- K.getMouseButton win K.MouseButton'1
+  rclic <- K.getMouseButton win K.MouseButton'2
+  return (x,y,if pressed click then LeftC else if pressed rclic then RightC else None)
 
 --runGame win = runGame' win (0::Int)
-runGame nl win = do
-  nl' <- parseInput nl win
+runGame :: CF -> K.Window -> IO ()
+runGame cf win = do
+  q <- parseInput win
   K.pollEvents
-  drawScene nl' win
+  drawScene q win
   K.swapBuffers win
-  runGame nl' win
+  runGame cf win
 
 main = do
   True <- K.init
   Just win <- K.createWindow 800 800 "őőőőő" Nothing Nothing
-  let nl = (0,0)
+  let cf = CF Neutral 0 Useless
   K.makeContextCurrent (Just win)
-  K.setWindowRefreshCallback win (Just (drawScene nl))
+  K.setWindowRefreshCallback win (Just (drawScene (0,0,None)))
+  --K.setCharCallback win (Just (inChar ""))
   K.setFramebufferSizeCallback win (Just resizeScene)
   K.setWindowCloseCallback win (Just shutdown)
   initGL win
-  runGame nl win
+  runGame cf win
 
 
