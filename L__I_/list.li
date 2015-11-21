@@ -9,22 +9,26 @@ $
 
 ~ functions for constructing lists ~
 
-~ same as `:', but creates a list if necessary ~
+~ :+ : same as `:', but creates a list if necessary ~
 (:- :+ (lambda x (if (list? (cadr x)) (cons (car x) (cadr x)) ($ (car x) (cadr x)))))
 
-~ reverses a list ~
+~ pop: refers to the very last item in a list ~
+(:- pop (lambda x (if (list? (car x)) 
+  (if (empty? (cdr (car x))) (car (car x)) (pop (cdr (car x)))) False)))
+
+~ >< : reverses a list ~
 (:- >< (lambda x (><$ () (car x))))
 (:- ><$ (lambda x (if (empty? (cadr x)) (car x) 
                       (><$ (cons (car (cadr x)) (car x)) (cdr (cadr x))))))
 
-~ appends elements to the end of a list. ~
-(:- ><: (lambda x (! >< (! ><:$ (car x) (cadr x) ()))))
+~ ><: : appends elements to the end of a list. ~
+(:- ><: (lambda x (>< (><:$ (car x) (cadr x) ()))))
 (:- ><:$ (lambda x (if (empty? (car x)) 
                        (if (empty? (cadr x)) (caddr x)
-                           (! ><:$ (car x) (cdr (cadr x)) (cons (car (cadr x)) (caddr x))))
+                           (><:$ (car x) (cdr (cadr x)) (cons (car (cadr x)) (caddr x))))
                        (><:$ (cdr (car x)) (cadr x) (cons (car (car x)) (caddr x))))))
 
 ~ functions for picking different elements of a list ~
 
-~ very basic shorthands for certain elements of a list. ~
+~ caddr: very basic shorthands for certain elements of a list. ~
 (:- caddr (lambda x (car (cdr (cdr (car x))))))
