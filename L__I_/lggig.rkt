@@ -22,6 +22,7 @@
 (define test2 ":- add1 (lambda X (std-add (car X) 1))")
 (define test3 "\\ (x y) ($ std-add x y) (1 2)")
 (define test4 ":: add (x y) ($ std-add x y)")
+(define test5 "eval (><: (\\ (x y) (| std-add x y)) ((1 2)))")
 
 (define (quoti lst) (append (list #\") (push lst #\")))
 (define (string-split-spec str) (map list->string (filter (λ (x) (not (empty? x))) (foldl (λ (s n)
