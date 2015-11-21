@@ -16,7 +16,7 @@ $
                      (\$ (cdr (car x)) (cdr (cadr x))
                          ($ lambda (car (car x)) (caddr x) (car (cadr x)))))))
 
-(:- >> (\ (x l) (y. ><: x l)))
+(:- >> (\ (x l) (lambda ll (| ><: x ll) (l))))
 
 ~ (\ (x y) (std-add x y)) ~
 ~(:- \ (lambda x
