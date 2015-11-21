@@ -7,6 +7,7 @@ import Data.Bits ( (.|.) )
 import System.Exit (exitWith, ExitCode(..))
 
 import Util.Font
+import Util.Shapes
 import Core.CodeFrame
 import Core.MouseInput
 
@@ -23,13 +24,21 @@ resizeScene win w h = do
   glOrtho (-30) 30 (-30) 30 (-30) 30
   glMatrixMode gl_MODELVIEW
 
-drawScene (x,y,_) _ = do
+drawScene (x,y,_) (CF _ p c) _ = do
   glClear $ fromIntegral $ gl_COLOR_BUFFER_BIT .|. gl_DEPTH_BUFFER_BIT
   glLoadIdentity
   glTranslatef (-1.0675) (-0.625) 0
   --glTranslatef (-x) (-y) 0
   --drawString (x,-y) "hello, world(s)." 0.25
-  drawString (x*60-28,-(y*60-30)) ((show x) ++ "," ++ (show y)) 0.25
+  glColor3f 1 1 1
+  rect (-30) 28.5 (35/4) 2
+  rect (-30+35/4+0.1) 28.5 (35/4) 2
+  glColor3f 0 0 0
+  drawString (-27,29.75) "add" 0.25
+  drawString (-28+35/4+0.2,29.75) "sub" 0.25
+  glColor3f 1 1 1
+  drawCode c
+  drawString (x*60-28,-(y*60-30)) ((show $ x*60) ++ "," ++ (show $ y*60)) 0.25
 
 shutdown :: K.Window -> IO ()
 shutdown win = do
@@ -84,7 +93,7 @@ runGame :: CF -> K.Window -> IO ()
 runGame cf win = do
   q <- parseInput win
   K.pollEvents
-  drawScene q win
+  drawScene q cf win
   K.swapBuffers win
   runGame cf win
 
@@ -93,7 +102,7 @@ main = do
   Just win <- K.createWindow 800 800 "őőőőő" Nothing Nothing
   let cf = CF Neutral 0 Useless
   K.makeContextCurrent (Just win)
-  K.setWindowRefreshCallback win (Just (drawScene (0,0,None)))
+  K.setWindowRefreshCallback win (Just (drawScene (0,0,None) cf))
   --K.setCharCallback win (Just (inChar ""))
   K.setFramebufferSizeCallback win (Just resizeScene)
   K.setWindowCloseCallback win (Just shutdown)
