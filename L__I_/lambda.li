@@ -4,10 +4,10 @@
 $
 (import list)
 
-~ eval|: evaluates a list with '|' as the head. ~
+~ eval| expr : evaluates a list with '|' as the head. ~
 (:- eval| (lambda x (eval (cdr (car x)))))
 
-~ lambda that takes more than a single argument (curried) ~
+~ \ args body vals : lambda that takes more than a single argument (curried) ~
 (:- \ (lambda x (if (std-eq (length x) 3)
                 (eval| (\$ (cdr (car x)) (cdr (caddr x)) 
                           ($ lambda (car (car x)) (cadr x) (car (caddr x))))) 
@@ -16,6 +16,7 @@ $
                      (\$ (cdr (car x)) (cdr (cadr x))
                          ($ lambda (car (car x)) (caddr x) (car (cadr x)))))))
 
+~ >> lambda vals : apply the given lambda expression to the values given. ~
 (:- >> (\ (x l) (lambda ll (| ><: x ll) (l))))
 
 ~ (\ (x y) (std-add x y)) ~

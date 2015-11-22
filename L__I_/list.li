@@ -12,16 +12,16 @@ $
 ~ :+ : same as `:', but creates a list if necessary ~
 (:- :+ (lambda x (if (list? (cadr x)) (cons (car x) (cadr x)) ($ (car x) (cadr x)))))
 
-~ pop: refers to the very last item in a list ~
+~ pop x : refers to the very last item in a list ~
 (:- pop (lambda x (if (list? (car x)) 
   (if (empty? (cdr (car x))) (car (car x)) (pop (cdr (car x)))) False)))
 
-~ >< : reverses a list ~
+~ >< list : reverses a list ~
 (:- >< (lambda x (><$ () (car x))))
 (:- ><$ (lambda x (if (empty? (cadr x)) (car x) 
                       (><$ (cons (car (cadr x)) (car x)) (cdr (cadr x))))))
 
-~ ><: : appends elements to the end of a list. ~
+~ ><: a b : appends elements to the end of a list. ~
 (:- ><: (lambda x (>< (><:$ (car x) (cadr x) ()))))
 (:- ><:$ (lambda x (if (empty? (car x)) 
                        (if (empty? (cadr x)) (caddr x)
@@ -30,5 +30,5 @@ $
 
 ~ functions for picking different elements of a list ~
 
-~ caddr: very basic shorthands for certain elements of a list. ~
+~ caddr x : very basic shorthands for certain elements of a list. ~
 (:- caddr (lambda x (car (cdr (cdr (car x))))))
