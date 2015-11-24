@@ -30,12 +30,14 @@ drawScene (x,y,_) (CF Neutral p c) _ = do
   glTranslatef (-1.0675) (-0.625) 0
   --glTranslatef (-x) (-y) 0
   --drawString (x,-y) "hello, world(s)." 0.25
-  glColor3f 0.4 0 0.4
+  {-glColor3f 0.4 0 0.4
   rect (-30) 28.5 (35/4) 2
   rect (-30+35/4+0.1) 28.5 (35/4) 2
   glColor3f 0 0 0
   drawString (-27,29.75) "add" 0.25
-  drawString (-28+35/4+0.2,29.75) "sub" 0.25
+  drawString (-28+35/4+0.2,29.75) "sub" 0.25-}
+  glColor3f 0.8 0.8 0.8
+  rect (-28) (-28) 58 10
   glColor3f 1 1 1
   drawCode c
   drawString (x*60-28,-(y*60-30)) ((show $ x) ++ "," ++ (show $ y)) 0.25
@@ -46,6 +48,7 @@ drawScene (_,_,_) (CF WordSelect _ _) _ = do
   glTranslatef (-1.0675) (-0.625) 0
   glColor3f 0.4 0 0.4
   rect (-30) (-30) 61 61
+  --cover (0,0,20,20) (0.7,0.7,0.7) 0.1
   glColor3f 0 0 0
   drawString (-27,29.75) "add" 0.25
 
@@ -75,8 +78,7 @@ parseInput win = do
 
 useInput :: CF -> (GLfloat,GLfloat,Click) -> CF
 useInput (CF m p c) (x,y,cl) =
-  CF (if cl == LeftC && m == Neutral && inHB (x,y) (Hitbox 0 0 0.13 0.0394)
-      then WordSelect else m) p c
+  CF m p c
 
 --runGame win = runGame' win (0::Int)
 runGame :: CF -> K.Window -> IO ()
