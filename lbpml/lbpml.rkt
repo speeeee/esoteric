@@ -59,8 +59,21 @@
   [(":-") (begin (set! ruls* (push ruls* (cdr l))) "True")]
   [("Show") (begin (fprintf o "~a" (parse-expr (cadr l))) "True")]
   [("Show!") (begin (fprintf o "~a" (cadr l)) "True")]
+  [("Import") (if (member (pop l) imports*) '()
+                  (begin (parse (readn (open-input-file (string-join (list (pop l) ".li") "")) ""))
+                         (set! imports* (push imports* (pop l))) "True"))]
   [else #f]))
 (define (parse-expr l) (if (or (not (list? l)) (empty? l)) l (let* ([c (primitive l)])
   (if c c (let ([q (app-expr l)]) (if q q (begin (display "no such rule for expression: ") (displayln l) "False"))))))) 
 
 (define (parse x) (parse-expr (check-parens (string-split-spec x))))
+
+(define (main) (if (= (length (vector->list (current-command-line-arguments))) 0)
+  (begin (fprintf o "Initiating lbpml REPL...~nPress ENTER/RETURN once a command is entered.  Enter the command, `:q', to quit.~n")
+         (let main () (begin (fprintf o "~n> ") (let ([d (read-line)]) (if (or (equal? d ":q") (eof-object? d)) 
+                                                                           (begin (displayln "quitting") (exit)) 
+                                                                           (if (empty? (string->list d)) '() (fprintf o "~a" (parse d))))) (main))))
+  (let* ([c (vector->list (current-command-line-arguments))] [f (open-input-file (string-join (list (car c) ".lbpml") ""))])
+    (parse (readn f "")))))
+
+(main)
