@@ -47,7 +47,7 @@
 (define (expr-eq a b) (if (ormap (λ (x) (is-rest x)) b)
   (if (collect a b) (append (expr-eq (car (collect a b)) (ret-pop b)) (list (list (pop b) (cadr (collect a b)))) #;(get-vars (ret-pop b) (cadr (collect a b)))) #f)
   (if (= (length a) (length b)) (get-vars a b) #f)))
-(define (app-vars v a) (displayln v)
+(define (app-vars v a)
   (map (λ (x) (if (member x (map car v)) (cadr (find-eq x car v)) 
                   (if (list? x) (app-vars v x) x))) a))
 
@@ -57,8 +57,8 @@
 (define (primitive l) (case (car l)
   [(">>") (map (λ (x) (parse-expr x)) (cdr l))]
   [(":-") (begin (set! ruls* (push ruls* (cdr l))) "True")]
-  [("Show") (begin (fprintf o "~a" (parse-expr (cadr l))) "True")]
-  [("Show!") (begin (fprintf o "~a" (cadr l)) "True")]
+  [("Show") (begin (fprintf o (parse-expr (cadr l))) "True")]
+  [("Show!") (begin (fprintf o (cadr l)) "True")]
   [("Import") (if (member (pop l) imports*) '()
                   (begin (parse (readn (open-input-file (string-join (list (pop l) ".li") "")) ""))
                          (set! imports* (push imports* (pop l))) "True"))]
