@@ -33,10 +33,12 @@ drawScene (x,y,_) (CF Neutral p c) _ = do
   rect (-28) (-17) 28.5 47
   rect 1.5 (-17) 28.5 47
   glColor3f 0.9 0.9 0.9
-  rect (-27) (-16) 15.5 10
-  rect (-10.5) (-16) 10 10
+  rect (-27) (-16) 15.5 8
+  rect (-10.5) (-16) 10 8
   glColor3f 0.4 0.4 0.4
-  rect (-27) (-5) 26.5 14
+  rect (-27) (-7) 26.5 14
+  glColor3f 0.2 0.2 0.2
+  drawString (-25.5,-11.5) "velocity" 0.3
   glColor3f 1 1 1
   --drawCode c
   drawString (x*60-28,-(y*60-30)) ((show $ x) ++ "," ++ (show $ y)) 0.25
