@@ -28,18 +28,17 @@ drawScene (x,y,_) (CF Neutral p c) _ = do
   glClear $ fromIntegral $ gl_COLOR_BUFFER_BIT .|. gl_DEPTH_BUFFER_BIT
   glLoadIdentity
   glTranslatef (-1.0675) (-0.625) 0
-  --glTranslatef (-x) (-y) 0
-  --drawString (x,-y) "hello, world(s)." 0.25
-  {-glColor3f 0.4 0 0.4
-  rect (-30) 28.5 (35/4) 2
-  rect (-30+35/4+0.1) 28.5 (35/4) 2
-  glColor3f 0 0 0
-  drawString (-27,29.75) "add" 0.25
-  drawString (-28+35/4+0.2,29.75) "sub" 0.25-}
   glColor3f 0.8 0.8 0.8
   rect (-28) (-28) 58 10
+  rect (-28) (-17) 28.5 47
+  rect 1.5 (-17) 28.5 47
+  glColor3f 0.9 0.9 0.9
+  rect (-27) (-16) 15.5 10
+  rect (-10.5) (-16) 10 10
+  glColor3f 0.4 0.4 0.4
+  rect (-27) (-5) 26.5 14
   glColor3f 1 1 1
-  drawCode c
+  --drawCode c
   drawString (x*60-28,-(y*60-30)) ((show $ x) ++ "," ++ (show $ y)) 0.25
 
 drawScene (_,_,_) (CF WordSelect _ _) _ = do
