@@ -11,6 +11,7 @@ import Util.Font
 import Util.Shapes
 import Core.CodeFrame
 import Core.MouseInput
+import Core.Physics
 
 initGL win = do
   glShadeModel gl_SMOOTH
@@ -25,7 +26,7 @@ resizeScene win w h = do
   glOrtho (-30) 30 (-30) 30 (-30) 30
   glMatrixMode gl_MODELVIEW
 
-drawScene (x,y,_) (CF (Neutral v) p c) _ = do
+drawScene (x,y,_) (CF (Neutral) p c) (Ball (bx,by) v t) _ = do
   glClear $ fromIntegral $ gl_COLOR_BUFFER_BIT .|. gl_DEPTH_BUFFER_BIT
   glLoadIdentity
   glTranslatef (-1.0675) (-0.625) 0
@@ -40,7 +41,7 @@ drawScene (x,y,_) (CF (Neutral v) p c) _ = do
   --drawCode c
   drawString (x*60-28,-(y*60-30)) ((show $ x) ++ "," ++ (show $ y)) 0.25
 
-drawScene (_,_,_) (CF (WordSelect) _ _) _ = do
+drawScene (_,_,_) (CF (WordSelect) _ _) _ _ = do
   glClear $ fromIntegral $ gl_COLOR_BUFFER_BIT .|. gl_DEPTH_BUFFER_BIT
   glLoadIdentity
   glTranslatef (-1.0675) (-0.625) 0
@@ -79,25 +80,25 @@ useInput (CF m p c) (x,y,cl) =
   CF m p c
 
 --runGame win = runGame' win (0::Int)
-runGame :: CF -> K.Window -> IO ()
-runGame cf win = do
+runGame :: CF -> Ball -> K.Window -> IO ()
+runGame cf b win = do
   q <- parseInput win
   let cf' = useInput cf q
   K.pollEvents
-  drawScene q cf' win
+  drawScene q cf' b win
   K.swapBuffers win
-  runGame cf' win
+  runGame cf' b win
 
 main = do
   True <- K.init
   Just win <- K.createWindow 800 800 "őőőőő" Nothing Nothing
-  let cf = CF (Neutral 0) 0 Useless
+  let cf = CF (Neutral) 0 Useless
   K.makeContextCurrent (Just win)
-  K.setWindowRefreshCallback win (Just (drawScene (0,0,None) cf))
+  K.setWindowRefreshCallback win (Just (drawScene (0,0,None) cf (Ball (0,0) 0 0)))
   --K.setCharCallback win (Just (inChar ""))
   K.setFramebufferSizeCallback win (Just resizeScene)
   K.setWindowCloseCallback win (Just shutdown)
   initGL win
-  runGame cf win
+  runGame cf (Ball (0,0) 0 0) win
 
 
