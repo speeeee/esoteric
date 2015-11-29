@@ -26,7 +26,7 @@ resizeScene win w h = do
   glOrtho (-30) 30 (-30) 30 (-30) 30
   glMatrixMode gl_MODELVIEW
 
-drawScene (x,y,_) (CF (Neutral) p c) (Ball (bx,by) v t) _ = do
+drawScene (x,y,_) (CF (Neutral) p c) (Course (Ball (bx,by) v t 0) st par cse) _ = do
   glClear $ fromIntegral $ gl_COLOR_BUFFER_BIT .|. gl_DEPTH_BUFFER_BIT
   glLoadIdentity
   glTranslatef (-1.0675) (-0.625) 0
@@ -80,25 +80,26 @@ useInput (CF m p c) (x,y,cl) =
   CF m p c
 
 --runGame win = runGame' win (0::Int)
-runGame :: CF -> Ball -> K.Window -> IO ()
-runGame cf b win = do
+runGame :: CF -> Course -> K.Window -> IO ()
+runGame cf co win = do
   q <- parseInput win
   let cf' = useInput cf q
   K.pollEvents
-  drawScene q cf' b win
+  drawScene q cf' co win
   K.swapBuffers win
-  runGame cf' b win
+  runGame cf' co win
 
 main = do
   True <- K.init
   Just win <- K.createWindow 800 800 "őőőőő" Nothing Nothing
   let cf = CF (Neutral) 0 Useless
+      co = Course (Ball (0,0) 10 0 0) 1 3 []
   K.makeContextCurrent (Just win)
-  K.setWindowRefreshCallback win (Just (drawScene (0,0,None) cf (Ball (0,0) 0 0)))
+  K.setWindowRefreshCallback win (Just (drawScene (0,0,None) cf co))
   --K.setCharCallback win (Just (inChar ""))
   K.setFramebufferSizeCallback win (Just resizeScene)
   K.setWindowCloseCallback win (Just shutdown)
   initGL win
-  runGame cf (Ball (0,0) 0 0) win
+  runGame cf co win
 
 
