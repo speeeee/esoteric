@@ -74,7 +74,7 @@ drawScene _ (CF (Neutral True) _ _) (Course (Ball (bx,by) v t _ h _ _) st par cs
   drawString (-28+bx,-22+by) ("v: " ++ (show v)) 0.25
   drawString (-28+bx,-20+by) ("theta: " ++ (show t)) 0.25
 
-drawScene _ (CF (VelSel n _) _ _) (Course (Ball _ v _ _ _ _ _) _ _ _) _ = do
+drawScene _ (CF (VelSel n b) _ _) (Course (Ball _ v _ _ _ _ _) _ _ _) _ = do
   glClear $ fromIntegral $ gl_COLOR_BUFFER_BIT .|. gl_DEPTH_BUFFER_BIT
   glLoadIdentity
   glTranslatef (-1.0675) (-0.625) 0
@@ -83,13 +83,19 @@ drawScene _ (CF (VelSel n _) _ _) (Course (Ball _ v _ _ _ _ _) _ _ _) _ = do
   mapM_ (\(x,y) -> glVertex3f (x+1) (y*30-22) 0) (zip [-30..30] graph)
   glEnd
   glColor3f 1 1 1
-  drawString (-28,-22.5) ("velocity: " ++ (show v)) 0.25
+  drawString (-28,-22.5) ("velocity: " ++ (show (if b then (graph!!n) else v))) 0.25
   drawString (-28,-20.5) ("max: " ++ (show $ graph!!29)) 0.25
+  button (-9) (-29) 19 5 "stop" 0.3 (0.6,0.0,0.8)
+  button 10.5 (-29) 19 5 "back" 0.3 (0.6,0.0,0.8)
   glColor3f 0.6 0.6 0
   glBegin gl_LINES
   glVertex3f ((fromIntegral n)-29) (-22) 0
   glVertex3f ((fromIntegral n)-29) 30 0
   glEnd
+
+drawScene _ (CF (Transit _) _ _) _ _ = do
+  glClear $ fromIntegral $ gl_COLOR_BUFFER_BIT .|. gl_DEPTH_BUFFER_BIT
+  glLoadIdentity
 
 drawScene (_,_,_) (CF (WordSelect) _ _) _ _ = do
   glClear $ fromIntegral $ gl_COLOR_BUFFER_BIT .|. gl_DEPTH_BUFFER_BIT
@@ -136,6 +142,11 @@ parseInput win = do
 useInput :: CF -> (GLfloat,GLfloat,Click) -> CF
 useInput (CF (Neutral False) p c) (x,y,cl) =
   CF (if cl == LeftC then if inHB (x,y) (Hitbox 0 0.917 0.33 0.083) then VelSel 0 False else Neutral True else Neutral False) p c
+useInput (CF (VelSel n b) p c) (x,y,cl) =
+  CF (if cl == LeftC then if inHB (x,y) (Hitbox 0.33 0.917 0.33 0.083) then VelSel n True
+                          else if inHB (x,y) (Hitbox 0.67 0.917 0.33 0.083) then Transit False else VelSel n b else VelSel n b)
+  p c
+useInput (CF (Transit b) p c) (_,_,None) = CF (Neutral b) p c
 useInput cf _ = cf
 
 integrity :: Course -> CF -> CF
@@ -151,12 +162,14 @@ updateCourse (CF (Neutral True) _ _) (Course (Ball (x,y) v t ty h ti fn) st par 
   Course (Ball (x+v*cos ty*cos t,y+v*cos ty*sin t) v t ty
          (let q = h+sin (ty-degrade*ti) in if q<0 then 0 else q) (ti+1) fn)
          st par cse
+updateCourse (CF (VelSel n True) _ _) (Course (Ball (x,y) _ t ty _ ti fn) st par cse) =
+  Course (Ball (x,y) (graph!!n) t ty 0 ti fn) st par cse
 --updateCourse (CF (Neutral False) _ _) c = c
 updateCourse _ c = c
 
 genBall :: CF -> (GLfloat,GLfloat,Click) -> Course -> Course
 genBall (CF (Neutral False) _ _) (x,y,LeftC) (Course (Ball p v _ ty h _ fn) st par cse) =
-  Course (Ball p 1 (angle (x-0.5,1-y-0.5)) (pi/4) (h+1*sin (pi/4)) 1 fn) (st+1) par cse
+  Course (Ball p v (angle (x-0.5,1-y-0.5)) (pi/4) (h+v*sin (pi/4)) 1 fn) (st+1) par cse
 genBall _ _ co = co
 
 --runGame win = runGame' win (0::Int)
