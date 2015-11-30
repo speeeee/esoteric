@@ -3,7 +3,7 @@ module Core.CodeFrame (Mode(..),CF(..),Code(..),drawCode) where
 import Graphics.Rendering.OpenGL.Raw
 import Util.Font
 
-data Mode = WordSelect | Neutral Bool | VelSel Int Bool deriving (Show,Eq)
+data Mode = WordSelect | Neutral Bool | Transit Bool | VelSel Int Bool deriving (Show,Eq)
 data CF = CF { mode :: Mode,
                pos  :: Int,
                code :: Code }
