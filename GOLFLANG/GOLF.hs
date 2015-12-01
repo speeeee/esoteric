@@ -93,6 +93,24 @@ drawScene _ (CF (VelSel n b) _ _) (Course (Ball _ v _ _ _ _ _) _ _ _) _ = do
   glVertex3f ((fromIntegral n)-29) 30 0
   glEnd
 
+drawScene (x,y,_) (CF (TZSel _) _ _) (Course (Ball _ _ _ ty _ _ _) _ _ _) _ = do
+  glClear $ fromIntegral $ gl_COLOR_BUFFER_BIT .|. gl_DEPTH_BUFFER_BIT
+  glLoadIdentity
+  glTranslatef (-1.0675) (-0.625) 0
+  glColor3f 0.3 0 0.3
+  rect (-12) (-12) 5 5
+  let x' = angle (x-0.5,1-y-0.5)
+      --y' = asin $ (y-0.5)*2
+  glColor3f 0 0.7 0.7
+  glBegin gl_LINES
+  glVertex3f 0 0 0
+  glVertex3f ((cos x')*50) ((sin x')*50) 0
+  glColor3f 0.7 0.7 0.0
+  glVertex3f 0 0 0
+  glVertex3f ((cos ty)*50) ((sin ty)*50) 0
+  glEnd
+  button 10.5 (-29) 19 5 "back" 0.3 (0.6,0.0,0.8)
+
 drawScene _ (CF (Transit _) _ _) _ _ = do
   glClear $ fromIntegral $ gl_COLOR_BUFFER_BIT .|. gl_DEPTH_BUFFER_BIT
   glLoadIdentity
@@ -141,11 +159,14 @@ parseInput win = do
 
 useInput :: CF -> (GLfloat,GLfloat,Click) -> CF
 useInput (CF (Neutral False) p c) (x,y,cl) =
-  CF (if cl == LeftC then if inHB (x,y) (Hitbox 0 0.917 0.33 0.083) then VelSel 0 False else Neutral True else Neutral False) p c
+  CF (if cl == LeftC then if inHB (x,y) (Hitbox 0 0.917 0.33 0.083) then VelSel 0 False
+                          else if inHB (x,y) (Hitbox 0.33 0.917 0.33 0.083) then TZSel 0 else Neutral True else Neutral False) p c
 useInput (CF (VelSel n b) p c) (x,y,cl) =
   CF (if cl == LeftC then if inHB (x,y) (Hitbox 0.33 0.917 0.33 0.083) then VelSel n True
                           else if inHB (x,y) (Hitbox 0.67 0.917 0.33 0.083) then Transit False else VelSel n b else VelSel n b)
   p c
+useInput (CF (TZSel t) p c) (x,y,LeftC) = if inHB (x,y) (Hitbox 0.67 0.917 0.33 0.083)
+                                          then CF (Transit False) p c else CF (TZSel t) p c
 useInput (CF (Transit b) p c) (_,_,None) = CF (Neutral b) p c
 useInput cf _ = cf
 
@@ -164,13 +185,17 @@ updateCourse (CF (Neutral True) _ _) (Course (Ball (x,y) v t ty h ti fn) st par 
          st par cse
 updateCourse (CF (VelSel n True) _ _) (Course (Ball (x,y) _ t ty _ ti fn) st par cse) =
   Course (Ball (x,y) (graph!!n) t ty 0 ti fn) st par cse
---updateCourse (CF (Neutral False) _ _) c = c
 updateCourse _ c = c
 
 genBall :: CF -> (GLfloat,GLfloat,Click) -> Course -> Course
 genBall (CF (Neutral False) _ _) (x,y,LeftC) (Course (Ball p v _ ty h _ fn) st par cse) =
-  Course (Ball p v (angle (x-0.5,1-y-0.5)) (pi/4) (h+v*sin (pi/4)) 1 fn) (st+1) par cse
+  Course (Ball p v (angle (x-0.5,1-y-0.5)) ty (h+v*sin ty) 1 fn) (st+1) par cse
+genBall (CF (TZSel _) _ _) (x,y,LeftC) (Course (Ball p v t ty _ ti fn) st par cse) =
+  if inHB (x,y) (Hitbox 0.67 0.917 0.33 0.083) then Course (Ball p v t ty 0 ti fn) st par cse
+  else Course (Ball p v t (angle (x-0.5,1-y-0.5)) 0 ti fn) st par cse
 genBall _ _ co = co
+
+debugCF (CF x _ _) = x
 
 --runGame win = runGame' win (0::Int)
 runGame :: CF -> Course -> K.Window -> IO ()
