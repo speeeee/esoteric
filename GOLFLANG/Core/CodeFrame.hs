@@ -1,4 +1,4 @@
-module Core.CodeFrame (Mode(..),CF(..),Code(..),code) where
+module Core.CodeFrame (Mode(..),CF(..),Code(..),mkfn) where
 
 import Graphics.Rendering.OpenGL.Raw
 import Util.Font
@@ -12,13 +12,3 @@ data CF = CF { mode :: Mode,
 data Code = Sin Code | Cos Code | Square Code | Doub Code | Halve Code
           | Sqrt Code | X deriving (Show,Eq)
 
-code (Code x c) = (case x of Sin -> sin
-                             Cos -> cos
-                             Doub -> (* 2)
-                             Halve -> (/ 2)
-                             Square -> (** 2)
-                             Cube -> (** 3)
-                             Sqrt -> sqrt
-                             _ -> id) . c
-
---codeStr (Code x c) =
