@@ -1,4 +1,4 @@
-module Core.CodeFrame (Mode(..),CF(..),Code(..),drawCode) where
+module Core.CodeFrame (Mode(..),CF(..),Code(..),code) where
 
 import Graphics.Rendering.OpenGL.Raw
 import Util.Font
@@ -9,8 +9,16 @@ data CF = CF { mode :: Mode,
                pos  :: Int,
                code :: Code }
 
-data Code = FunCall String Code | List [Code] | Lit GLfloat | Useless deriving (Show,Eq)
+data Code = Sin Code | Cos Code | Square Code | Doub Code | Halve Code
+          | Sqrt Code | X deriving (Show,Eq)
 
-drawCode :: Code -> IO ()
-drawCode Useless = do
-  drawString (-28.75,27.75) "useless." 0.25
+code (Code x c) = (case x of Sin -> sin
+                             Cos -> cos
+                             Doub -> (* 2)
+                             Halve -> (/ 2)
+                             Square -> (** 2)
+                             Cube -> (** 3)
+                             Sqrt -> sqrt
+                             _ -> id) . c
+
+--codeStr (Code x c) =
