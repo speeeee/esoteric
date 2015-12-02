@@ -22,6 +22,9 @@ curve x = -- from -30 to 30
   exp ((-(x)^2)/(2*stddev^2))/(stddev*sqrt(2*pi))
 graph = map (((*) 30) . curve) [-30..30]
 
+fns :: [(GLfloat -> GLfloat)]
+fns = [sin,cos,(** 2),(* 2),(/ 2),sqrt]
+
 initGL win = do
   glShadeModel gl_SMOOTH
   glClearColor 0 0 0 0
@@ -115,7 +118,7 @@ drawScene _ (CF (Transit _) _ _) _ _ = do
   glClear $ fromIntegral $ gl_COLOR_BUFFER_BIT .|. gl_DEPTH_BUFFER_BIT
   glLoadIdentity
 
-drawScene (_,_,_) (CF (WordSelect) _ _) _ _ = do
+drawScene _ (CF (WordSelect) _ _) _ _ = do
   glClear $ fromIntegral $ gl_COLOR_BUFFER_BIT .|. gl_DEPTH_BUFFER_BIT
   glLoadIdentity
   glTranslatef (-1.0675) (-0.625) 0
@@ -160,7 +163,8 @@ parseInput win = do
 useInput :: CF -> (GLfloat,GLfloat,Click) -> CF
 useInput (CF (Neutral False) p c) (x,y,cl) =
   CF (if cl == LeftC then if inHB (x,y) (Hitbox 0 0.917 0.33 0.083) then VelSel 0 False
-                          else if inHB (x,y) (Hitbox 0.33 0.917 0.33 0.083) then TZSel 0 else Neutral True else Neutral False) p c
+                          else if inHB (x,y) (Hitbox 0.33 0.917 0.33 0.083) then TZSel 0
+                          else if inHB (x,y) (Hitbox 0.67 0.917 0.33 0.083) then WordSelect else Neutral True else Neutral False) p c
 useInput (CF (VelSel n b) p c) (x,y,cl) =
   CF (if cl == LeftC then if inHB (x,y) (Hitbox 0.33 0.917 0.33 0.083) then VelSel n True
                           else if inHB (x,y) (Hitbox 0.67 0.917 0.33 0.083) then Transit False else VelSel n b else VelSel n b)
@@ -211,7 +215,7 @@ runGame cf co win = do
 main = do
   True <- K.init
   Just win <- K.createWindow 800 800 "őőőőő" Nothing Nothing
-  let cf = CF (Neutral False) 0 Useless
+  let cf = CF (Neutral False) 0 X
       co = Course (Ball (0,0) 0.1 0 (pi/4) 0 1 (\x -> x)) 1 3 (Board 0 0 [])
   K.makeContextCurrent (Just win)
   K.setWindowRefreshCallback win (Just (drawScene (0,0,None) cf co))

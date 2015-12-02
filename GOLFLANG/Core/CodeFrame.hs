@@ -1,4 +1,4 @@
-module Core.CodeFrame (Mode(..),CF(..),Code(..),mkfn) where
+module Core.CodeFrame (Mode(..),CF(..),Code(..)) where
 
 import Graphics.Rendering.OpenGL.Raw
 import Util.Font
