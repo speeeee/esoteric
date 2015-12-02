@@ -122,11 +122,8 @@ drawScene _ (CF (WordSelect) _ _) _ _ = do
   glClear $ fromIntegral $ gl_COLOR_BUFFER_BIT .|. gl_DEPTH_BUFFER_BIT
   glLoadIdentity
   glTranslatef (-1.0675) (-0.625) 0
-  glColor3f 0.4 0 0.4
-  rect (-30) (-30) 61 61
-  --cover (0,0,20,20) (0.7,0.7,0.7) 0.1
-  glColor3f 0 0 0
-  drawString (-27,29.75) "add" 0.25
+  mapM_ (\(y,k) -> button (-29) y 20 5 k 0.3 (0.6,0.0,0.8))
+        $ zip [10,5..(-20)] ["sin","cos","square","double","halve","sqrt"]
 
 shutdown :: K.Window -> IO ()
 shutdown win = do
