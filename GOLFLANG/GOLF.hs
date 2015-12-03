@@ -186,7 +186,7 @@ updateCourse (CF (Neutral True) _ _) (Course (Ball p0 (x,y) v t ty 0.0 _ fn) st 
   Course (Ball p0 (x+v*cos ty*cos t,y+v*cos ty*sin t) (let q = v-degrade in if q<0 then 0 else q)
                t ty 0 0 fn) st par cse
 updateCourse (CF (Neutral True) _ _) (Course (Ball (x0,y0) (x,y) v t ty h ti fn) st par cse) =
-  Course (Ball (x0,y0) (x0+fn (ti/15)*sin t*cos ty+v*cos ty*cos t,y0-fn (ti/15)*cos t*cos ty+v*cos ty*sin t) v t ty
+  Course (Ball (x0,y0) (x0+fn (ti/15)*sin t*cos ty+v*cos ty*cos t*ti,y0-fn (ti/15)*cos t*cos ty+v*cos ty*sin t*ti) v t ty
          (let q = h+sin (ty-degrade*ti) in if q<0 then 0 else q) (ti+1) fn)
          st par cse
 updateCourse (CF (VelSel n True) _ _) (Course (Ball p0 (x,y) _ t ty _ ti fn) st par cse) =
@@ -197,7 +197,7 @@ genBall :: CF -> (GLfloat,GLfloat,Click) -> Course -> Course
 genBall (CF (Neutral False) _ _) (x,y,LeftC) (Course (Ball p0 p v _ ty h _ fn) st par cse) =
   Course (Ball p0 p v (angle (x-0.5,1-y-0.5)) ty (h+v*sin ty) 1 fn) (st+1) par cse
 genBall (CF (Neutral True) _ _) _ (Course (Ball _ p 0 t ty 0 ti fn) st par cse) =
-  Course (Ball p p 0 t ty 0 ti fn) st par cse
+  Course (Ball p p 0 t ty 0 ti id) st par cse
 genBall (CF (TZSel _) _ _) (x,y,LeftC) (Course (Ball p0 p v t ty _ ti fn) st par cse) =
   if inHB (x,y) (Hitbox 0.67 0.917 0.33 0.083) then Course (Ball p0 p v t ty 0 ti fn) st par cse
   else Course (Ball p0 p v t (angle (x-0.5,1-y-0.5)) 0 ti fn) st par cse
