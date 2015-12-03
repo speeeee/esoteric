@@ -42,7 +42,7 @@ resizeScene win w h = do
   glOrtho (-30) 30 (-30) 30 (-30) 30
   glMatrixMode gl_MODELVIEW
 
-drawScene (x,y,_) (CF (Neutral False) p c) (Course (Ball (bx,by) v t _ 0 _ fn) st par cse) _ = do
+drawScene (x,y,_) (CF (Neutral False) p c) (Course (Ball _ (bx,by) v t _ 0 _ fn) st par cse) _ = do
   glClear $ fromIntegral $ gl_COLOR_BUFFER_BIT .|. gl_DEPTH_BUFFER_BIT
   glLoadIdentity
   glTranslatef (-1.0675) (-0.625) 0
@@ -65,7 +65,7 @@ drawScene (x,y,_) (CF (Neutral False) p c) (Course (Ball (bx,by) v t _ 0 _ fn) s
   drawString (-28+bx,-22.5+by) ("stroke: " ++ (show st)) 0.25
   drawString (-28+bx,-20.5+by) ("par: " ++ (show par)) 0.25
 
-drawScene _ (CF (Neutral True) _ _) (Course (Ball (bx,by) v t _ h _ _) st par cse) _ = do
+drawScene _ (CF (Neutral True) _ _) (Course (Ball _ (bx,by) v t _ h _ _) st par cse) _ = do
   glClear $ fromIntegral $ gl_COLOR_BUFFER_BIT .|. gl_DEPTH_BUFFER_BIT
   glLoadIdentity
   glTranslatef (-1.0675) (-0.625) 0
@@ -81,7 +81,7 @@ drawScene _ (CF (Neutral True) _ _) (Course (Ball (bx,by) v t _ h _ _) st par cs
   drawString (-28+bx,-22+by) ("v: " ++ (show v)) 0.25
   drawString (-28+bx,-20+by) ("theta: " ++ (show t)) 0.25
 
-drawScene _ (CF (VelSel n b) _ _) (Course (Ball _ v _ _ _ _ _) _ _ _) _ = do
+drawScene _ (CF (VelSel n b) _ _) (Course (Ball _ _ v _ _ _ _ _) _ _ _) _ = do
   glClear $ fromIntegral $ gl_COLOR_BUFFER_BIT .|. gl_DEPTH_BUFFER_BIT
   glLoadIdentity
   glTranslatef (-1.0675) (-0.625) 0
@@ -100,7 +100,7 @@ drawScene _ (CF (VelSel n b) _ _) (Course (Ball _ v _ _ _ _ _) _ _ _) _ = do
   glVertex3f ((fromIntegral n)-29) 30 0
   glEnd
 
-drawScene (x,y,_) (CF (TZSel _) _ _) (Course (Ball _ _ _ ty _ _ _) _ _ _) _ = do
+drawScene (x,y,_) (CF (TZSel _) _ _) (Course (Ball _ _ _ _ ty _ _ _) _ _ _) _ = do
   glClear $ fromIntegral $ gl_COLOR_BUFFER_BIT .|. gl_DEPTH_BUFFER_BIT
   glLoadIdentity
   glTranslatef (-1.0675) (-0.625) 0
@@ -177,43 +177,45 @@ useInput (CF (Transit b) p c) (_,_,None) = CF (Neutral b) p c
 useInput cf _ = cf
 
 integrity :: Course -> CF -> CF
-integrity (Course (Ball _ 0 _ _ 0 _ _) _ _ _) (CF (Neutral True) p c) = CF (Neutral False) p c
+integrity (Course (Ball _ _ 0 _ _ 0 _ _) _ _ _) (CF (Neutral True) p c) = CF (Neutral False) p c
 integrity _ (CF (VelSel n False) p c) = CF (VelSel (mod (n+1) 60) False) p c
 integrity _ cf = cf
 
 updateCourse :: CF -> Course -> Course
-updateCourse (CF (Neutral True) _ _) (Course (Ball (x,y) v t ty 0.0 _ fn) st par cse) =
-  Course (Ball (x+v*cos ty*cos t,y+v*cos ty*sin t) (let q = v-degrade in if q<0 then 0 else q)
+updateCourse (CF (Neutral True) _ _) (Course (Ball p0 (x,y) v t ty 0.0 _ fn) st par cse) =
+  Course (Ball p0 (x+v*cos ty*cos t,y+v*cos ty*sin t) (let q = v-degrade in if q<0 then 0 else q)
                t ty 0 0 fn) st par cse
-updateCourse (CF (Neutral True) _ _) (Course (Ball (x,y) v t ty h ti fn) st par cse) =
-  Course (Ball (x+fn (ti/60)*sin t*cos ty+v*cos ty*cos t,y-fn (ti/60)*cos t*cos ty+v*cos ty*sin t) v t ty
+updateCourse (CF (Neutral True) _ _) (Course (Ball (x0,y0) (x,y) v t ty h ti fn) st par cse) =
+  Course (Ball (x0,y0) (x0+fn (ti/15)*sin t*cos ty+v*cos ty*cos t,y0-fn (ti/15)*cos t*cos ty+v*cos ty*sin t) v t ty
          (let q = h+sin (ty-degrade*ti) in if q<0 then 0 else q) (ti+1) fn)
          st par cse
-updateCourse (CF (VelSel n True) _ _) (Course (Ball (x,y) _ t ty _ ti fn) st par cse) =
-  Course (Ball (x,y) (graph!!n) t ty 0 ti fn) st par cse
+updateCourse (CF (VelSel n True) _ _) (Course (Ball p0 (x,y) _ t ty _ ti fn) st par cse) =
+  Course (Ball p0 (x,y) (graph!!n) t ty 0 ti fn) st par cse
 updateCourse _ c = c
 
 genBall :: CF -> (GLfloat,GLfloat,Click) -> Course -> Course
-genBall (CF (Neutral False) _ _) (x,y,LeftC) (Course (Ball p v _ ty h _ fn) st par cse) =
-  Course (Ball p v (angle (x-0.5,1-y-0.5)) ty (h+v*sin ty) 1 fn) (st+1) par cse
-genBall (CF (TZSel _) _ _) (x,y,LeftC) (Course (Ball p v t ty _ ti fn) st par cse) =
-  if inHB (x,y) (Hitbox 0.67 0.917 0.33 0.083) then Course (Ball p v t ty 0 ti fn) st par cse
-  else Course (Ball p v t (angle (x-0.5,1-y-0.5)) 0 ti fn) st par cse
-genBall (CF (WordSelect) _ _) (x,y,LeftC) (Course (Ball p v t ty _ ti fn) st par cse) =
+genBall (CF (Neutral False) _ _) (x,y,LeftC) (Course (Ball p0 p v _ ty h _ fn) st par cse) =
+  Course (Ball p0 p v (angle (x-0.5,1-y-0.5)) ty (h+v*sin ty) 1 fn) (st+1) par cse
+genBall (CF (Neutral True) _ _) _ (Course (Ball _ p 0 t ty 0 ti fn) st par cse) =
+  Course (Ball p p 0 t ty 0 ti fn) st par cse
+genBall (CF (TZSel _) _ _) (x,y,LeftC) (Course (Ball p0 p v t ty _ ti fn) st par cse) =
+  if inHB (x,y) (Hitbox 0.67 0.917 0.33 0.083) then Course (Ball p0 p v t ty 0 ti fn) st par cse
+  else Course (Ball p0 p v t (angle (x-0.5,1-y-0.5)) 0 ti fn) st par cse
+genBall (CF (WordSelect) _ _) (x,y,LeftC) (Course (Ball p0 p v t ty _ ti fn) st par cse) =
   -- .583
   if inHB (x,y) (Hitbox 0 0 0.33 0.583)
-  then Course (Ball p v t ty 0 ti
+  then Course (Ball p0 p v t ty 0 ti
         (cond [(y<0.097, sin . fn),
                (y<0.197, cos . fn),
                (y<0.292, (** 2) . fn),
                (y<0.389, (* 2) . fn),
                (y<0.486, (/ 2) . fn),
                (y<0.583, sqrt . fn)])) st par cse
-  else Course (Ball p v t ty 0 ti fn) st par cse
+  else Course (Ball p0 p v t ty 0 ti fn) st par cse
 genBall _ _ co = co
 
 debugCF (CF x _ _) = x
-debugCo (Course (Ball _ _ _ _ _ _ fn) _ _ _) = fn
+debugCo (Course (Ball _ _ _ _ _ _ _ fn) _ _ _) = fn
 
 --runGame win = runGame' win (0::Int)
 runGame :: CF -> Course -> K.Window -> IO ()
@@ -230,7 +232,7 @@ main = do
   True <- K.init
   Just win <- K.createWindow 800 800 "őőőőő" Nothing Nothing
   let cf = CF (Neutral False) 0 X
-      co = Course (Ball (0,0) 0.1 0 (pi/4) 0 1 id) 1 3 (Board 0 0 [])
+      co = Course (Ball (0,0) (0,0) 0.1 0 (pi/4) 0 1 id) 0 3 (Board 0 0 [])
   K.makeContextCurrent (Just win)
   K.setWindowRefreshCallback win (Just (drawScene (0,0,None) cf co))
   --K.setCharCallback win (Just (inChar ""))
