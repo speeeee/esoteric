@@ -25,6 +25,10 @@ graph = map (((*) 30) . curve) [-30..30]
 fns :: [(GLfloat -> GLfloat)]
 fns = [sin,cos,(** 2),(* 2),(/ 2),sqrt]
 
+cond :: [(Bool,a)] -> a
+cond [(q,x)] = x
+cond ((q,x):qs) = if q then x else cond qs
+
 initGL win = do
   glShadeModel gl_SMOOTH
   glClearColor 0 0 0 0
@@ -123,7 +127,7 @@ drawScene _ (CF (WordSelect) _ _) _ _ = do
   glLoadIdentity
   glTranslatef (-1.0675) (-0.625) 0
   mapM_ (\(y,k) -> button (-29) y 20 5 k 0.3 (0.6,0.0,0.8))
-        $ zip [10,5..(-20)] ["sin","cos","square","double","halve","sqrt"]
+        $ zip [25,20..(-5)] ["sin","cos","square","double","halve","sqrt"]
 
 shutdown :: K.Window -> IO ()
 shutdown win = do
@@ -168,6 +172,7 @@ useInput (CF (VelSel n b) p c) (x,y,cl) =
   p c
 useInput (CF (TZSel t) p c) (x,y,LeftC) = if inHB (x,y) (Hitbox 0.67 0.917 0.33 0.083)
                                           then CF (Transit False) p c else CF (TZSel t) p c
+useInput (CF (WordSelect) p c) (x,y,LeftC) = if inHB (x,y) (Hitbox 0 0 0.33 0.583) then CF (Transit False) p c else CF (WordSelect) p c
 useInput (CF (Transit b) p c) (_,_,None) = CF (Neutral b) p c
 useInput cf _ = cf
 
@@ -181,7 +186,7 @@ updateCourse (CF (Neutral True) _ _) (Course (Ball (x,y) v t ty 0.0 _ fn) st par
   Course (Ball (x+v*cos ty*cos t,y+v*cos ty*sin t) (let q = v-degrade in if q<0 then 0 else q)
                t ty 0 0 fn) st par cse
 updateCourse (CF (Neutral True) _ _) (Course (Ball (x,y) v t ty h ti fn) st par cse) =
-  Course (Ball (x+v*cos ty*cos t,y+v*cos ty*sin t) v t ty
+  Course (Ball (x+fn (ti/60)*sin t*cos ty+v*cos ty*cos t,y-fn (ti/60)*cos t*cos ty+v*cos ty*sin t) v t ty
          (let q = h+sin (ty-degrade*ti) in if q<0 then 0 else q) (ti+1) fn)
          st par cse
 updateCourse (CF (VelSel n True) _ _) (Course (Ball (x,y) _ t ty _ ti fn) st par cse) =
@@ -194,9 +199,21 @@ genBall (CF (Neutral False) _ _) (x,y,LeftC) (Course (Ball p v _ ty h _ fn) st p
 genBall (CF (TZSel _) _ _) (x,y,LeftC) (Course (Ball p v t ty _ ti fn) st par cse) =
   if inHB (x,y) (Hitbox 0.67 0.917 0.33 0.083) then Course (Ball p v t ty 0 ti fn) st par cse
   else Course (Ball p v t (angle (x-0.5,1-y-0.5)) 0 ti fn) st par cse
+genBall (CF (WordSelect) _ _) (x,y,LeftC) (Course (Ball p v t ty _ ti fn) st par cse) =
+  -- .583
+  if inHB (x,y) (Hitbox 0 0 0.33 0.583)
+  then Course (Ball p v t ty 0 ti
+        (cond [(y<0.097, sin . fn),
+               (y<0.197, cos . fn),
+               (y<0.292, (** 2) . fn),
+               (y<0.389, (* 2) . fn),
+               (y<0.486, (/ 2) . fn),
+               (y<0.583, sqrt . fn)])) st par cse
+  else Course (Ball p v t ty 0 ti fn) st par cse
 genBall _ _ co = co
 
 debugCF (CF x _ _) = x
+debugCo (Course (Ball _ _ _ _ _ _ fn) _ _ _) = fn
 
 --runGame win = runGame' win (0::Int)
 runGame :: CF -> Course -> K.Window -> IO ()
@@ -213,7 +230,7 @@ main = do
   True <- K.init
   Just win <- K.createWindow 800 800 "őőőőő" Nothing Nothing
   let cf = CF (Neutral False) 0 X
-      co = Course (Ball (0,0) 0.1 0 (pi/4) 0 1 (\x -> x)) 1 3 (Board 0 0 [])
+      co = Course (Ball (0,0) 0.1 0 (pi/4) 0 1 id) 1 3 (Board 0 0 [])
   K.makeContextCurrent (Just win)
   K.setWindowRefreshCallback win (Just (drawScene (0,0,None) cf co))
   --K.setCharCallback win (Just (inChar ""))
