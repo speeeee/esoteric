@@ -184,9 +184,20 @@ integrity (Course (Ball _ _ 0 _ _ 0 _ _) _ _ _) (CF (Neutral True) p c) = CF (Ne
 integrity _ (CF (VelSel n False) p c) = CF (VelSel (mod (n+1) 60) False) p c
 integrity _ cf = cf
 
+tsub v (x,y) [(Block (x',y') w h Fairway)] = v
+tsub v (x,y) ((Block (x',y') w h elt):xs) =
+  if inHB (x,y) (Hitbox x' y' w h)
+  then case elt of Rough -> v/10
+                   UnRough -> v*2
+                   Water -> 0
+                   _ -> v
+  else tsub v (x,y) xs
+tsub v _ _ = 0
+
 updateCourse :: CF -> Course -> Course
 updateCourse (CF (Neutral True) _ _) (Course (Ball p0 (x,y) v t ty 0.0 _ fn) st par cse) =
-  Course (Ball p0 (x+v*cos ty*cos t,y+v*cos ty*sin t) (let q = v-degrade in if q<0 then 0 else q)
+  Course (Ball p0 (x+v*cos ty*cos t,y+v*cos ty*sin t)
+               (let q = -degrade+tsub v (x,y) cse in if q<0 then 0 else q)
                t ty 0 0 fn) st par cse
 updateCourse (CF (Neutral True) _ _) (Course (Ball (x0,y0) (x,y) v t ty h ti fn) st par cse) =
   Course (Ball (x0,y0) (x0+fn (ti/15)*sin t*cos ty+v*cos ty*cos t*ti,y0-fn (ti/15)*cos t*cos ty+v*cos ty*sin t*ti) v t ty
