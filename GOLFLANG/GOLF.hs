@@ -9,6 +9,7 @@ import System.Random
 
 import Util.Font
 import Util.Shapes
+import Util.Course
 import Core.CodeFrame
 import Core.MouseInput
 import Core.Physics
@@ -47,6 +48,7 @@ drawScene (x,y,_) (CF (Neutral False) p c) (Course (Ball _ (bx,by) v t _ 0 _ fn)
   glLoadIdentity
   glTranslatef (-1.0675) (-0.625) 0
   glTranslatef (-bx) (-by) 0
+  drawBoard $ cse!!0
   glColor3f 0.3 0 0.3
   rect (-12) (-12) 5 5
   let x' = angle (x-0.5,1-y-0.5)
@@ -70,6 +72,7 @@ drawScene _ (CF (Neutral True) _ _) (Course (Ball _ (bx,by) v t _ h _ _) st par 
   glLoadIdentity
   glTranslatef (-1.0675) (-0.625) 0
   glTranslatef (-bx) (-by) 0
+  drawBoard $ cse!!0
   glColor3f 0.3 0 0.3
   rect (-12) (-12) 5 5
   rect (-208) (-208) 5 5
@@ -217,12 +220,19 @@ genBall _ _ co = co
 debugCF (CF x _ _) = x
 debugCo (Course (Ball _ _ _ _ _ _ _ fn) _ _ _) = fn
 
+getCse :: Course -> IO Course
+getCse (Course b st par []) = do
+  q <- baseboard
+  return (Course b st par q)
+getCse (Course b st par cse) = return (Course b st par cse)
+
 --runGame win = runGame' win (0::Int)
 runGame :: CF -> Course -> K.Window -> IO ()
 runGame cf co win = do
   q <- parseInput win
+  co2 <- getCse co
   let cf' = {-integrity co $ useInput cf q-} useInput (integrity co cf) q
-      co' = updateCourse cf' $ genBall cf q co
+      co' = updateCourse cf' $ genBall cf q co2
   K.pollEvents
   drawScene q cf' co' win
   K.swapBuffers win
@@ -232,7 +242,7 @@ main = do
   True <- K.init
   Just win <- K.createWindow 800 800 "őőőőő" Nothing Nothing
   let cf = CF (Neutral False) 0 X
-      co = Course (Ball (0,0) (0,0) 0.1 0 (pi/4) 0 1 id) 0 3 (Board 0 0 [])
+      co = Course (Ball (0,0) (0,0) 0.1 0 (pi/4) 0 1 id) 0 3 []
   K.makeContextCurrent (Just win)
   K.setWindowRefreshCallback win (Just (drawScene (0,0,None) cf co))
   --K.setCharCallback win (Just (inChar ""))
