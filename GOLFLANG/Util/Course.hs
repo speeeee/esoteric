@@ -26,10 +26,11 @@ genObjs' :: [CseArea] -> CseArea -> Int -> Int -> [CseArea]
 genObjs = genObjs' []
 genObjs' n _ _ 0 = n
 genObjs' n (Block (x,y) _ _ _) q amt =
-  let q'  = fromIntegral $ q `div` amt `mod` 360
-      q2' = fromIntegral $ (q `div` 20+amt) `mod` 40
-      q3' = fromIntegral $ q `div` amt `mod` 40 in
-  genObjs' ((Block (x+q',y+q')
+  let q'  = fromIntegral $ q `div` (amt^2) `mod` 320
+      q2' = fromIntegral $ (q `div` 20+amt) `mod` 80
+      q3' = fromIntegral $ q `div` amt `mod` 80
+      q4' = fromIntegral $ q `div` (amt^3) `mod` 320 in
+  genObjs' ((Block (x+q',y+q4')
                    q3' q2' (getElt $ q `div` amt `mod` 3)):n)
            (Block (x,y) 0 0 Fairway) q (amt-1)
 
