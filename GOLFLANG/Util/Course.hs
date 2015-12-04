@@ -19,7 +19,7 @@ baseboard = do
 drawBoard :: CseArea -> IO ()
 drawBoard (Block (x,y) w h Fairway) = do
   glBegin gl_LINES
-  mapM_ (\k -> do glColor3f (sin (k*0.25)*0.5) 0 (cos (k*0.25)*0.5)
+  mapM_ (\k -> do glColor3f (sin (k*0.125)*0.1725+0.5) 0 (sin (k*0.125)*0.1725+0.5) -- possible: (0.5,0.25) (0.5,0.5)
                   glVertex3f (x+k) y 0
-                  glVertex3f (x+k) (y+h) 0) [0,0.1..w]
+                  glVertex3f (x+k) (y+h) 0) [0,0.2..w]
   glEnd
