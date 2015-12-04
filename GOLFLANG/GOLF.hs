@@ -48,7 +48,7 @@ drawScene (x,y,_) (CF (Neutral False) p c) (Course (Ball _ (bx,by) v t _ 0 _ fn)
   glLoadIdentity
   glTranslatef (-1.0675) (-0.625) 0
   glTranslatef (-bx) (-by) 0
-  drawBoard $ cse!!0
+  mapM_ drawBoard cse
   glColor3f 0.3 0 0.3
   rect (-12) (-12) 5 5
   let x' = angle (x-0.5,1-y-0.5)
@@ -72,7 +72,7 @@ drawScene _ (CF (Neutral True) _ _) (Course (Ball _ (bx,by) v t _ h _ _) st par 
   glLoadIdentity
   glTranslatef (-1.0675) (-0.625) 0
   glTranslatef (-bx) (-by) 0
-  drawBoard $ cse!!0
+  mapM_ drawBoard cse
   glColor3f 0.3 0 0.3
   rect (-12) (-12) 5 5
   rect (-208) (-208) 5 5
@@ -222,7 +222,7 @@ debugCo (Course (Ball _ _ _ _ _ _ _ fn) _ _ _) = fn
 
 getCse :: Course -> IO Course
 getCse (Course b st par []) = do
-  q <- baseboard
+  q <- mkCourse
   return (Course b st par q)
 getCse (Course b st par cse) = return (Course b st par cse)
 
