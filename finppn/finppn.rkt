@@ -39,8 +39,8 @@
 
 ; all return string
 (define (prim-tdyad l d r) (case d
-  [(",") (string-join (list (parse-expr l) "&&" (parse-expr r)) "")]
-  [(";") (string-join (list (parse-expr l) "||" (parse-expr r)) "")]
+  [(",") (string-join (list "(" (parse-expr l) "&&" (parse-expr r) ")") "")]
+  [(";") (string-join (list "(" (parse-expr l) "||" (parse-expr r) ")") "")]
   [("=>") (set! dyads* (push dyads* (list l r)))]
   [("->") (set! monads* (push monads* (list l r)))]
   [else #f]))
