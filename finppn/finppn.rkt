@@ -19,15 +19,15 @@
 (define (if-do a b) (if (force a) (force a) (if (force b) (force b) #f)))
 
 (define o (current-output-port))
-(define preds* '()) (define dyads* '()) (define monads* '())
-(define punc* '("," ";" "=>" "->")) (define imports* '())
+(define preds* '()) (define dyads* '(("," ()) (";" ()) ("=>" ()) ("->" ()))) (define monads* '())
+#;(define punc* '("," ";" "=>" "->")) (define imports* '())
 
 (define (quoti lst) (append (list #\") (push lst #\")))
 (define (string-split-spec str) (map list->string (filter (λ (x) (not (empty? x))) (foldl (λ (s n)
   (cond [(equal? (car n) 'com) (if (equal? s #\~) (second n) n)]
         [(equal? (car n) 'str) (if (equal? s #\") (push (push (ret-pop (second n)) (pop (second n))) '()) 
                                    (list 'str (push (ret-pop (pop n)) (push (pop (pop n)) s))))]
-        [(equal? s #\") (list 'str n)] [(member s (list #\( #\) #\' #\, #\;)) (append n (list (list s)) (list '()))]
+        [(equal? s #\") (list 'str n)] [(member s (list #\( #\) #\' #\, #\; #\:)) (append n (list (list s)) (list '()))]
         [(equal? s #\~) (list 'com n)]
         [(char-whitespace? s) (push n '())] [else (push (ret-pop n) (push (pop n) s))])) '(()) (string->list str)))))
 
@@ -37,23 +37,43 @@
         (push (ret-pop (reverse (dropf (reverse n) expr)))
               (reverse (takef (reverse n) expr)))))) '() lst))
 
+; Cannot do arbitrarily placed dyads as finding 
+;  dyads would take a while since each item would
+;  need to be tested to see if it is a dyad.  It
+;  will be possible for select dyads however.
+(define (prim-dyad l d r) (case d
+  [(",") (string-join (list "(" (parse-expr l) "&&" (parse-expr r) ")") "")]
+  [(";") (string-join (list "(" (parse-expr l) "||" (parse-expr r) ")") "")]
+  [("=>") (begin (set! dyads* (push dyads* (list l r))) "True")]
+  [("->") (begin (set! monads* (push monads* (list l r))) "True")]
+  [(":") (monad (parse-expr l) r)]
+  [else #f]))
+(define (prim-monad d r) (case d
+  [("show") (begin (fprintf o "~a" (parse-expr r)) "True")]
+  [("#") (map parse-expr r)]
+  [("la" "λ") (
+(define (dyad l d r) (prim-dyad l d r))
+(define (monad d r) (prim-monad d r))
+(define (parse-expr x) (if (and (list? x) (> (length x) 2)) 
+  (dyad (car x) (parse-expr (cadr x)) (cddr x)) 
+  (if (and (list? x) (= (length x) 1)) (parse-expr (car x)) x)))
+
 ; all return string
-(define (prim-tdyad l d r) (case d
+#;(define (prim-tdyad l d r) (case d
   [(",") (string-join (list "(" (parse-expr l) "&&" (parse-expr r) ")") "")]
   [(";") (string-join (list "(" (parse-expr l) "||" (parse-expr r) ")") "")]
   [("=>") (set! dyads* (push dyads* (list l r)))]
   [("->") (set! monads* (push monads* (list l r)))]
   [else #f]))
-(define (prim-dyad l d r) (case d
+#;(define (prim-dyad l d r) (case d
   [(":") "hello"]
   [else #f]))
-(define (tdyad x) (let* ([c (filter (λ (z) z) (map (λ (q) (member q x)) punc*))]
+#;(define (tdyad x) (let* ([c (filter (λ (z) z) (map (λ (q) (member q x)) punc*))]
                          [d (findf (λ (q) (= (length q) (maxl (map length c)))) c)])
-  (displayln c) (displayln d)
   (if (and c d) (prim-tdyad (take x (- (length x) (length d))) (car d) (cdr d)) #f)))
-(define (dyad x) (prim-dyad (car x) (parse-expr (cadr x)) (cddr x))) 
-(define (fun x) (if (< (length x) 2) (parse-expr (car x)) (if-do (delay (tdyad x)) (delay (dyad (parse-expr (cadr x)))))))
+#|(define (dyad x) (prim-dyad (car x) (parse-expr (cadr x)) (cddr x))) 
+(define (fun x) (if (< (length x) 2) (parse-expr (car x)) (if-do (delay (tdyad x)) (delay (dyad x)))))
 (define (parse-expr x) ; (if-do (delay (fun x)) (delay (predicate x))))
-  (if (list? x) (fun x) x))
+  (if (list? x) (fun x) x)) |#
 
 (define (parse x) (parse-expr (check-parens (string-split-spec x))))
