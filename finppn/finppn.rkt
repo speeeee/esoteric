@@ -12,6 +12,7 @@
 (define (maxl l) (foldl max 0 l))
 
 (define test0 "1, (2; 3), 4")
+(define test1 "1(λ:(x y) (x, y))2")
 
 (define (readn f str) (let ([c (read-line f)])
   (if (eof-object? c) str (readn f (string-join (list str c) " ")))))
@@ -37,6 +38,8 @@
         (push (ret-pop (reverse (dropf (reverse n) expr)))
               (reverse (takef (reverse n) expr)))))) '() lst))
 
+(define (distrib v q) (map (λ (x) (let ([c (find-eq x car v)]) (if c (cadr c) x))) q))
+
 ; Cannot do arbitrarily placed dyads as finding 
 ;  dyads would take a while since each item would
 ;  need to be tested to see if it is a dyad.  It
@@ -51,8 +54,13 @@
 (define (prim-monad d r) (case d
   [("show") (begin (fprintf o "~a" (parse-expr r)) "True")]
   [("#") (map parse-expr r)]
-  [("la" "λ") (
-(define (dyad l d r) (prim-dyad l d r))
+  [("la" "λ") (list 'lambda (car r) (cadr r))]
+  [else #f]))
+(define (app-dyad l d r) 
+  (if (and (equal? (car d) 'lambda) (length? (cadr d) 2))
+      (parse-expr (distrib (list (list (caadr d) l) (list (cadadr d) (parse-expr r))) (caddr d)))
+      #f))
+(define (dyad l d r) (if-do (delay (prim-dyad l d r)) (delay (app-dyad l d r))))
 (define (monad d r) (prim-monad d r))
 (define (parse-expr x) (if (and (list? x) (> (length x) 2)) 
   (dyad (car x) (parse-expr (cadr x)) (cddr x)) 
