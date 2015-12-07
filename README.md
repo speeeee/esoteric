@@ -22,6 +22,9 @@ A language with a LISP-style syntax where all data are strings.  The language al
 ## L__I_
 A language in its beginning stages that is supposed to be loosely based off of logic programming.
 
+## GOLFLANG
+A "language" based somewhat off of golf.
+
 # On hiatus
 
 ## LM
