@@ -13,6 +13,7 @@
 
 (define test0 "1, (2; 3), 4")
 (define test1 "1(λ:(x y) (x, y))2")
+(define test2 "(λ:(x) (show:x)):1")
 
 (define (readn f str) (let ([c (read-line f)])
   (if (eof-object? c) str (readn f (string-join (list str c) " ")))))
@@ -60,8 +61,11 @@
   (if (and (equal? (car d) 'lambda) (length? (cadr d) 2))
       (parse-expr (distrib (list (list (caadr d) l) (list (cadadr d) (parse-expr r))) (caddr d)))
       #f))
+(define (app-monad d r)
+  (if (and (equal? (car d) 'lambda) (length? (cadr d) 1))
+      (parse-expr (distrib (list (list (caadr d) (parse-expr r))) (caddr d))) #f))
 (define (dyad l d r) (if-do (delay (prim-dyad l d r)) (delay (app-dyad l d r))))
-(define (monad d r) (prim-monad d r))
+(define (monad d r) (if-do (delay (prim-monad d r)) (delay (app-monad d r))))
 (define (parse-expr x) (if (and (list? x) (> (length x) 2)) 
   (dyad (car x) (parse-expr (cadr x)) (cddr x)) 
   (if (and (list? x) (= (length x) 1)) (parse-expr (car x)) x)))
