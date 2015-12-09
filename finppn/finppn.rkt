@@ -16,6 +16,7 @@
 (define test2 "(λ:(x) (show:x)):1")
 (define test3 "and => λ:(x y) (x, y)")
 (define test4 "and1 -> λ:(x) (1, x)")
+(define test5 "(#:1 2 3) $# 2")
 
 (define (readn f str) (let ([c (read-line f)])
   (if (eof-object? c) str (readn f (string-join (list str c) " ")))))
@@ -24,7 +25,7 @@
 
 (define o (current-output-port))
 (define preds* '()) (define dyads* '(("," ()) (";" ()) ("=>" ()) ("->" ()))) (define monads* '())
-#;(define punc* '("," ";" "=>" "->")) (define imports* '())
+(define punc* '("," ";" "=>" "->")) (define imports* '())
 
 (define (quoti lst) (append (list #\") (push lst #\")))
 (define (string-split-spec str) (map list->string (filter (λ (x) (not (empty? x))) (foldl (λ (s n)
@@ -42,6 +43,10 @@
               (reverse (takef (reverse n) expr)))))) '() lst))
 
 (define (distrib v q) (map (λ (x) (let ([c (find-eq x car v)]) (if c (cadr c) x))) q))
+(define (group x) (if (not (list? x)) x
+  (let* ([c (filter (λ (z) z) (map (λ (q) (member q x)) punc*))]
+         [d (findf (λ (q) (= (length q) (maxl (map length c)))) c)])
+    (if (and c d) (list (take x (- (length x) (length d))) (car d) (group (cdr d))) x))))
 
 ; Cannot do arbitrarily placed dyads as finding 
 ;  dyads would take a while since each item would
@@ -50,8 +55,9 @@
 (define (prim-dyad l d r) (case d
   [(",") (string-join (list "(" (parse-expr l) "&&" (parse-expr r) ")") "")]
   [(";") (string-join (list "(" (parse-expr l) "||" (parse-expr r) ")") "")]
-  [("=>") (begin (set! dyads* (push dyads* (list l r))) "True")]
-  [("->") (begin (set! monads* (push monads* (list l r))) "True")]
+  [("$#") (list-ref (parse-expr l) (string->number (parse-expr r)))]
+  [("=>") (begin (set! dyads* (push dyads* (list (car l) (car r)))) "True")]
+  [("->") (begin (set! monads* (push monads* (list (car l) (car r)))) "True")]
   [(":") (monad (parse-expr l) r)]
   [else #f]))
 (define (prim-monad d r) (case d
@@ -69,26 +75,8 @@
       (let ([c (find-eq d car monads*)]) (if c (parse-expr (list (cadr c) ":" r)) #f))))
 (define (dyad l d r) (if-do (delay (prim-dyad l d r)) (delay (app-dyad l d r))))
 (define (monad d r) (if-do (delay (prim-monad d r)) (delay (app-monad d r))))
-(define (parse-expr x) (if (and (list? x) (> (length x) 2)) 
+(define (parse-expr c) (let ([x (group c)]) (if (and (list? x) (> (length x) 2)) 
   (dyad (car x) (parse-expr (cadr x)) (cddr x)) 
-  (if (and (list? x) (= (length x) 1)) (parse-expr (car x)) x)))
-
-; all return string
-#;(define (prim-tdyad l d r) (case d
-  [(",") (string-join (list "(" (parse-expr l) "&&" (parse-expr r) ")") "")]
-  [(";") (string-join (list "(" (parse-expr l) "||" (parse-expr r) ")") "")]
-  [("=>") (set! dyads* (push dyads* (list l r)))]
-  [("->") (set! monads* (push monads* (list l r)))]
-  [else #f]))
-#;(define (prim-dyad l d r) (case d
-  [(":") "hello"]
-  [else #f]))
-#;(define (tdyad x) (let* ([c (filter (λ (z) z) (map (λ (q) (member q x)) punc*))]
-                         [d (findf (λ (q) (= (length q) (maxl (map length c)))) c)])
-  (if (and c d) (prim-tdyad (take x (- (length x) (length d))) (car d) (cdr d)) #f)))
-#|(define (dyad x) (prim-dyad (car x) (parse-expr (cadr x)) (cddr x))) 
-(define (fun x) (if (< (length x) 2) (parse-expr (car x)) (if-do (delay (tdyad x)) (delay (dyad x)))))
-(define (parse-expr x) ; (if-do (delay (fun x)) (delay (predicate x))))
-  (if (list? x) (fun x) x)) |#
+  (if (and (list? x) (= (length x) 1)) (parse-expr (car x)) x))))
 
 (define (parse x) (parse-expr (check-parens (string-split-spec x))))
