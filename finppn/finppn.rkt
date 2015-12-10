@@ -32,7 +32,7 @@
   (cond [(equal? (car n) 'com) (if (equal? s #\~) (second n) n)]
         [(equal? (car n) 'str) (if (equal? s #\") (push (push (ret-pop (second n)) (pop (second n))) '()) 
                                    (list 'str (push (ret-pop (pop n)) (push (pop (pop n)) s))))]
-        [(equal? s #\") (list 'str n)] [(member s (list #\( #\) #\' #\, #\; #\:)) (append n (list (list s)) (list '()))]
+        [(equal? s #\") (list 'str n)] [(member s (list #\( #\) #\' #\, #\; #\: #\λ)) (append n (list (list s)) (list '()))]
         [(equal? s #\~) (list 'com n)]
         [(char-whitespace? s) (push n '())] [else (push (ret-pop n) (push (pop n) s))])) '(()) (string->list str)))))
 
@@ -58,14 +58,17 @@
   [("$#") (list-ref (parse-expr l) (string->number (parse-expr r)))]
   [("=>") (begin (set! dyads* (push dyads* (list (car l) (car r)))) "True")]
   [("->") (begin (set! monads* (push monads* (list (car l) (car r)))) "True")]
-  [(":") (monad (parse-expr l) r)]
+  [(":") (monad (parse-expr l) r)] [("\\" "λ") (list 'lambda l (car r))]
   [else #f]))
 (define (prim-monad d r) (case d
   [("show") (begin (fprintf o "~a" (parse-expr r)) "True")]
-  [("#") (map parse-expr r)]
+  [("#") (map parse-expr r)] [("$str") (string-join (map parse-expr r) "")]
   [("la" "λ") (list 'lambda (car r) (cadr r))]
+  [("import") (if (member (car r) imports*) '()
+                  (begin (parse (readn (open-input-file (string-join (list (car r) ".li") "")) ""))
+                         (set! imports* (push imports* (car r))) "True"))]
   [else #f]))
-(define (app-dyad l d r) 
+(define (app-dyad l d r)
   (if (and (list? d) (equal? (car d) 'lambda) (length? (cadr d) 2))
       (parse-expr (distrib (list (list (caadr d) l) (list (cadadr d) (parse-expr r))) (caddr d)))
       (let ([c (find-eq d car dyads*)]) (if c (parse-expr (list l (cadr c) r)) #f))))
