@@ -17,6 +17,9 @@
 (define test3 "and => λ:(x y) (x, y)")
 (define test4 "and1 -> λ:(x) (1, x)")
 (define test5 "(#:1 2 3) $# 2")
+(define test6 "orand => (x y)λ($str:(x;y)(x,y))")
+(define test7 ">> $= (x y)λ((#:(show:x)(show:\"+\")(show:y)(x, y)) $# 3)")
+(define test8 "+ => (x y)λ($str:x + y)")
 
 (define (readn f str) (let ([c (read-line f)])
   (if (eof-object? c) str (readn f (string-join (list str c) " ")))))
@@ -42,7 +45,7 @@
         (push (ret-pop (reverse (dropf (reverse n) expr)))
               (reverse (takef (reverse n) expr)))))) '() lst))
 
-(define (distrib v q) (map (λ (x) (let ([c (find-eq x car v)]) (if c (cadr c) x))) q))
+(define (distrib v q) (map (λ (x) (if (list? x) (distrib v x) (let ([c (find-eq x car v)]) (if c (cadr c) x)))) q))
 (define (group x) (if (not (list? x)) x
   (let* ([c (filter (λ (z) z) (map (λ (q) (member q x)) punc*))]
          [d (findf (λ (q) (= (length q) (maxl (map length c)))) c)])
@@ -58,6 +61,8 @@
   [("$#") (list-ref (parse-expr l) (string->number (parse-expr r)))]
   [("=>") (begin (set! dyads* (push dyads* (list (car l) (car r)))) "True")]
   [("->") (begin (set! monads* (push monads* (list (car l) (car r)))) "True")]
+  [("$=") (begin (set! dyads* (push dyads* (list l r)))
+                 (set! punc* (push punc* l)) "True")]
   [(":") (monad (parse-expr l) r)] [("\\" "λ") (list 'lambda l (car r))]
   [else #f]))
 (define (prim-monad d r) (case d
@@ -83,3 +88,13 @@
   (if (and (list? x) (= (length x) 1)) (parse-expr (car x)) x))))
 
 (define (parse x) (parse-expr (check-parens (string-split-spec x))))
+
+(define (main) (if (= (length (vector->list (current-command-line-arguments))) 0)
+  (begin (fprintf o "Initiating finppn debugger...~nPress ENTER/RETURN once a command is entered.  Enter the command, `:q', to quit.~n")
+         (let main () (begin (fprintf o "~n> ") (let ([d (read-line)]) (if (or (equal? d ":q") (eof-object? d)) 
+                                                                           (begin (displayln "quitting") (exit)) 
+                                                                           (if (empty? (string->list d)) '() (fprintf o "~a" (parse d))))) (main))))
+  (let* ([c (vector->list (current-command-line-arguments))] [f (open-input-file (string-join (list (car c) ".li") ""))])
+    (parse (readn f "")))))
+
+(main)
