@@ -68,6 +68,7 @@
 (define (prim-monad d r) (case d
   [("show") (begin (fprintf o "~a" (parse-expr r)) "True")]
   [("#") (map parse-expr r)] [("$str") (string-join (map parse-expr r) "")]
+  [("$") (filter (λ (x) (not (equal? x "True"))) (map parse-expr r))]
   [("la" "λ") (list 'lambda (car r) (cadr r))]
   [("import") (if (member (car r) imports*) '()
                   (begin (parse (readn (open-input-file (string-join (list (car r) ".li") "")) ""))
