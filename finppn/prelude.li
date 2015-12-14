@@ -5,7 +5,7 @@ $:
 (CDyad -> (x)\($str:"char *" x "(char *x, char* y) {\nreturn "))
 (CMonad -> (x)\($str:"char *" x "(char *x) {\nreturn "))
 
-(=. $= (x y)\((#: (show:CMonad:x) (show:PARSE:(y $# 2)) 
+(=. $= (x y)\((#: (show:CMonad:x) (show:PARSE:(y $# 2)) (show:"; }\n")
                   (x -|> (BACK:y))) $# 2))
-(=' $= (x y)\((#: (show:CDyad:x) (show:PARSE:(y $# 2))
-                  (x =|> (BACK:y))) $# 2))
+(=' $= (x y)\((#: (show:CDyad:x) (show:PARSE:(y $# 2)) (show:"; }\n")
+                  (x =|> (BACK:y))) $# 3))
