@@ -20,6 +20,7 @@
 (define test6 "orand => (x y)λ($str:(x;y)(x,y))")
 (define test7 ">> $= (x y)λ((#:(show:x)(show:\"+\")(show:y)(x, y)) $# 3)")
 (define test8 "+ => (x y)λ($str:x + y)")
+(define test9 "y =. (x)\\(x,x)")
 
 (define (readn f str) (let ([c (read-line f)])
   (if (eof-object? c) str (readn f (string-join (list str c) " ")))))
@@ -35,7 +36,7 @@
   (cond [(equal? (car n) 'com) (if (equal? s #\~) (second n) n)]
         [(equal? (car n) 'str) (if (equal? s #\") (push (push (ret-pop (second n)) (pop (second n))) '()) 
                                    (list 'str (push (ret-pop (pop n)) (push (pop (pop n)) s))))]
-        [(equal? s #\") (list 'str n)] [(member s (list #\( #\) #\' #\, #\; #\: #\λ)) (append n (list (list s)) (list '()))]
+        [(equal? s #\") (list 'str n)] [(member s (list #\( #\) #\' #\, #\; #\: #\λ #\\)) (append n (list (list s)) (list '()))]
         [(equal? s #\~) (list 'com n)]
         [(char-whitespace? s) (push n '())] [else (push (ret-pop n) (push (pop n) s))])) '(()) (string->list str)))))
 
@@ -59,17 +60,22 @@
   [(",") (string-join (list "(" (parse-expr l) "&&" (parse-expr r) ")") "")]
   [(";") (string-join (list "(" (parse-expr l) "||" (parse-expr r) ")") "")]
   [("$#") (list-ref (parse-expr l) (string->number (parse-expr r)))]
+  [("HALT$#") (list-ref l (string->number (parse-expr r)))]
   [("=>") (begin (set! dyads* (push dyads* (list (car l) (car r)))) "True")]
   [("->") (begin (set! monads* (push monads* (list (car l) (car r)))) "True")]
+  [("=|>") (begin (set! dyads* (push dyads* (list (parse-expr l) (parse-expr r)))) "True")]
+  [("-|>") (begin (set! monads* (push monads* (list (parse-expr l) (parse-expr r)))) "True")]
   [("$=") (begin (set! dyads* (push dyads* (list l r)))
                  (set! punc* (push punc* l)) "True")]
   [(":") (monad (parse-expr l) r)] [("\\" "λ") (list 'lambda l (car r))]
+  [("!!") (monad l r)]
   [else #f]))
 (define (prim-monad d r) (case d
   [("show") (begin (fprintf o "~a" (parse-expr r)) "True")]
   [("#") (map parse-expr r)] [("$str") (string-join (map parse-expr r) "")]
   [("$") (filter (λ (x) (not (equal? x "True"))) (map parse-expr r))]
-  [("la" "λ") (list 'lambda (car r) (cadr r))]
+  [("la" "λ") (list 'lambda (car r) (cadr r))] [("BACK") (list (cadar r) "\\" (caddar r))]
+  [("PARSE") (parse-expr (parse-expr r))]
   [("import") (if (member (car r) imports*) '()
                   (begin (parse (readn (open-input-file (string-join (list (car r) ".li") "")) ""))
                          (set! imports* (push imports* (car r))) "True"))]
@@ -84,7 +90,7 @@
       (let ([c (find-eq d car monads*)]) (if c (parse-expr (list (cadr c) ":" r)) #f))))
 (define (dyad l d r) (if-do (delay (prim-dyad l d r)) (delay (app-dyad l d r))))
 (define (monad d r) (if-do (delay (prim-monad d r)) (delay (app-monad d r))))
-(define (parse-expr c) (let ([x (group c)]) (if (and (list? x) (> (length x) 2)) 
+(define (parse-expr c) (let ([x (group c)]) (if (and (list? x) (> (length x) 2) (not (equal? (car x) 'lambda))) 
   (dyad (car x) (parse-expr (cadr x)) (cddr x)) 
   (if (and (list? x) (= (length x) 1)) (parse-expr (car x)) x))))
 
