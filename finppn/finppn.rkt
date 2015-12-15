@@ -68,10 +68,10 @@
   [("$=") (begin (set! dyads* (push dyads* (list l r)))
                  (set! punc* (push punc* l)) "True")]
   [(":") (monad (parse-expr l) r)] [("\\" "λ") (list 'lambda l (car r))]
-  [("!!") (monad l r)]
   [else #f]))
 (define (prim-monad d r) (case d
   [("show") (begin (fprintf o "~a" (parse-expr r)) "True")]
+  [("showln") (begin (fprintf o "~a~n" (parse-expr r)) "True")]
   [("#") (map parse-expr r)] [("$str") (string-join (map parse-expr r) "")]
   [("$") (filter (λ (x) (not (equal? x "True"))) (map parse-expr r))]
   [("la" "λ") (list 'lambda (car r) (cadr r))] [("BACK") (list (cadar r) "\\" (caddar r))]
