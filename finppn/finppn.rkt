@@ -84,7 +84,7 @@
   (if (and (list? d) (equal? (car d) 'lambda) (length? (cadr d) 2))
       (parse-expr (distrib (list (list (caadr d) l) (list (cadadr d) (parse-expr r))) (caddr d)))
       (let ([c (find-eq d car dyads*)]) (if c (parse-expr (list l (cadr c) r)) #f))))
-(define (app-monad d r)
+(define (app-monad d r) ; rank system
   (if (and (list? d) (equal? (car d) 'lambda) (length? (cadr d) 1))
       (parse-expr (distrib (list (list (caadr d) (parse-expr r))) (caddr d))) 
       (let ([c (find-eq d car monads*)]) (if c (parse-expr (list (cadr c) ":" r)) #f))))
