@@ -34,7 +34,9 @@
 (define (quoti lst) (append (list #\") (push lst #\")))
 (define (string-split-spec str) (map list->string (filter (λ (x) (not (empty? x))) (foldl (λ (s n)
   (cond [(equal? (car n) 'com) (if (equal? s #\~) (second n) n)]
-        [(equal? (car n) 'str) (if (equal? s #\") (push (push (ret-pop (second n)) (pop (second n))) '()) 
+        [(equal? (car n) 'str) (if (equal? s #\") (if (equal? (pop (pop (pop n))) #\$)
+                                     (list 'str (push (ret-pop (cadr n)) (push (ret-pop (pop (cadr n))) #\")))
+                                     (push (push (ret-pop (second n)) (pop (second n))) '())) 
                                    (list 'str (push (ret-pop (pop n)) (push (pop (pop n)) s))))]
         [(equal? s #\") (list 'str n)] [(member s (list #\( #\) #\' #\, #\; #\: #\λ #\\)) (append n (list (list s)) (list '()))]
         [(equal? s #\~) (list 'com n)]
