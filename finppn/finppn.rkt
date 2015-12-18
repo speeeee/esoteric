@@ -29,7 +29,7 @@
 
 (define o (current-output-port))
 (define preds* '()) (define dyads* '(("," ()) (";" ()) ("=>" ()) ("->" ()))) (define monads* '())
-(define punc* '("," ";" "=>" "->")) (define imports* '())
+(define punc* '("," ";" "=>" "->")) (define cons* '()) (define imports* '())
 
 (define (quoti lst) (append (list #\") (push lst #\")))
 (define (string-split-spec str) (map list->string (filter (λ (x) (not (empty? x))) (foldl (λ (s n)
@@ -65,6 +65,7 @@
   [("->") (begin (set! monads* (push monads* (list (car l) (car r)))) "True")]
   [("=|>") (begin (set! dyads* (push dyads* (list (parse-expr l) (parse-expr r)))) "True")]
   [("-|>") (begin (set! monads* (push monads* (list (parse-expr l) (parse-expr r)))) "True")]
+  [("<->") (begin (set! cons* (push cons* (list l r))) "True")]
   [("$=") (begin (set! dyads* (push dyads* (list l r)))
                  (set! punc* (push punc* l)) "True")]
   [(":") (monad (parse-expr l) r)] [("\\" "λ") (list 'lambda l (car r))]
@@ -75,7 +76,8 @@
   [("#") (map parse-expr r)] [("$str") (string-join (map parse-expr r) "")]
   [("$") (filter (λ (x) (not (equal? x "True"))) (map parse-expr r))]
   [("la" "λ") (list 'lambda (car r) (cadr r))] [("BACK") (list (cadar r) "\\" (caddar r))]
-  [("PARSE") (parse-expr (parse-expr r))]
+  [("PARSE") (parse-expr (parse-expr r))] 
+  [("_.") (let ([c (find-eq (parse-expr r) car cons*)]) (if c (parse-expr (cadr c)) "True"))]
   [("import") (if (member (car r) imports*) '()
                   (begin (parse (readn (open-input-file (string-join (list (car r) ".li") "")) ""))
                          (set! imports* (push imports* (car r))) "True"))]
