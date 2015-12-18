@@ -1,0 +1,17 @@
+~ cc: functions that convert finppn to C.
+  11 December 2015
+----------------------------------------~
+$:
+
+(Cinit <-> (#: (showln:"#include <stdlib.h>") (showln:#include <stdio.h>")))
+
+(CDyad => (y x)\($str:"void *" x "(void *" (y $# 0) ", void *" (y $# 1) "{ return "))
+(CMonad => (y x)\($str:"void *" x "(void *" (y $# 0) ") { return "))
+
+(=. $= (x y)\((#: (show:((BACK:y) $# 0) CMonad x) (show:PARSE:(y $# 2)) (showln:"; }")
+                  (x -|> (BACK:y))) $# 2))
+(=' $= (x y)\((#: (show:((BACK:y) $# 0) CDyad x) (show:PARSE:(y $# 2)) (showln:"; }")
+                  (x =|> (BACK:y))) $# 3))
+
+(main -> (x)\((#: (showln:"int main(int argc, char **argv) {") (show:x)
+                  (showln:"; return 0; }")) $# 0))
