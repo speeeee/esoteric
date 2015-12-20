@@ -25,6 +25,9 @@ A language in its beginning stages that is supposed to be loosely based off of l
 ## GOLFLANG
 A "language" based somewhat off of golf.
 
+## finppn
+Will be reintroduced in new repo.
+
 # On hiatus
 
 ## LM
