@@ -1,9 +1,10 @@
 ~ cc: functions that convert finppn to C.
-  11 December 2015
+  19 December 2015
 ----------------------------------------~
 $:
 
-(Cinit <-> (#: (showln:"#include <stdlib.h>") (showln:#include <stdio.h>")))
+(Cinit <-> ((#: (showln:"#include <stdlib.h>") (showln:#include <stdio.h>")
+                (showln:"#include $"fpes.h$"")) $# 0))
 
 (CDyad => (y x)\($str:"void *" x "(void *" (y $# 0) ", void *" (y $# 1) "{ return "))
 (CMonad => (y x)\($str:"void *" x "(void *" (y $# 0) ") { return "))
