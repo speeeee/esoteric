@@ -7,9 +7,11 @@
 (define (length? x y) (= (length x) y))
 (define (maxl l) (foldl max 0 l)) (define (strcar x) (car (string->list x)))
 (define (push stk elt) (append stk (list elt)))
-(define (push& stk elt) (if (list? stk) (push stk elt) (list stk elt)))
+(define (push& stk elt) (if (list? stk) (push stk elt) (list "||" stk elt)))
 (define (pop stk) (if (> (length stk) 0) (car (reverse stk)) (begin (displayln "ERROR: stack underflow") (exit))))
 (define (ret-pop stk) (if (> (length stk) 0) (reverse (cdr (reverse stk))) (begin (displayln "ERROR: stack underflow") (exit))))
+
+(define test0 "1((_x _y)λ(|| _x,_y))2")
 
 (define o (current-output-port))
 (define dyads* '()) (define monads* '()) (define imports* '())
@@ -51,6 +53,7 @@
   [else #f]))
 (define (primm d r) (case d
   [("show") (begin (fprintf o "~a" r) "True")]
+  [("LIST") r]
   [else #f]))
 (define (monad d r) (let ([c (find-eq d car monads*)])
   (if c (parse-expr (list (cadr c) r))
@@ -60,22 +63,12 @@
   (if c (parse-expr (list l (cadr c) r)) 
       (if (lambda? d) (parse-expr (distrib (list (list (caadr d) l) (list (cadadr d) (parse-expr r))) (caddr d)))
           (if-do (delay (primd l d r)) (delay (fprintf o "unrecognized token: ~a" d)))))))
-; to-be-cleaned
-#;(define (analyze x)
-  (cond [(or (not (list? x)) (empty? x)) 'atom]
-        [(length? x 1) 'single]
-        [(and (lit? (parse-expr (car x))) (lit? (parse-expr (cadr x)))) 'lit]
-        [(not (lit? (cadr x))) 'dyadic] [(not (lit? (car x))) 'monadic] [else 'error]))
-#;(define (parse-expr x) (case (analyze x)
-  [('atom) x] [('single) (parse-expr (car x))]
-  [('lit) (parse-expr (cons (cddr x) (push& (parse-expr (car x)) (parse-expr (cadr x)))))]
-  [('dyadic) (dyad (parse-expr (car x)) (parse-expr (cadr x)) (parse-expr (cddr x)))]
-  [('monadc) (monad (parse-expr (car x)) (parse-expr (cdr x)))] [else "Error"]))
-(define (parse-expr x)
+(define (parse-expr x) (displayln x)
   (cond [(or (not (list? x)) (empty? x)) x]
         [(length? x 1) (parse-expr (car x))]
+        [(equal? (car x) "||") (cdr x)]
         [else (let ([a (parse-expr (car x))] [b (parse-expr (cadr x))])
-                (cond [(and (lit? a) (lit? b)) (parse-expr (cons (cddr x) (push& a b)))]
+                (cond [(and (lit? a) (lit? b)) (parse-expr (cons (push& a b) (cddr x)))]
                       [(not (lit? b)) (dyad a b (parse-expr (cddr x)))]
                       [(not (lit? a)) (monad a (parse-expr (cdr x)))] [else "Error"]))]))
 
