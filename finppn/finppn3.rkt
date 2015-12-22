@@ -7,7 +7,7 @@
 (define (length? x y) (= (length x) y))
 (define (maxl l) (foldl max 0 l)) (define (strcar x) (car (string->list x)))
 (define (push stk elt) (append stk (list elt)))
-(define (push& stk elt) (if (list? stk) (push stk elt) (list "||" stk elt)))
+(define (push& stk elt) (if (list? stk) (push (cons "||" stk) elt) (list "||" stk elt)))
 (define (pop stk) (if (> (length stk) 0) (car (reverse stk)) (begin (displayln "ERROR: stack underflow") (exit))))
 (define (ret-pop stk) (if (> (length stk) 0) (reverse (cdr (reverse stk))) (begin (displayln "ERROR: stack underflow") (exit))))
 
