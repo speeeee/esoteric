@@ -12,6 +12,7 @@
 (define (ret-pop stk) (if (> (length stk) 0) (reverse (cdr (reverse stk))) (begin (displayln "ERROR: stack underflow") (exit))))
 
 (define test0 "1((_x _y)λ(|| _x,_y))2")
+(define test1 "világ => (_x _y)λ(|| _x,_y,_x)")
 
 (define o (current-output-port))
 (define dyads* '()) (define monads* '()) (define imports* '())
@@ -50,6 +51,8 @@
 (define (primd l d r) (case d
   [(",") (string-join (list "(" l "&&" r ")") "")]
   [("\\" "λ") (list 'lambda l r)]
+  [("=>") (begin (set! dyads* (push dyads* (list l r))) "True")]
+  [("->") (begin (set! monads* (push monads* (list l r))) "True")]
   [else #f]))
 (define (primm d r) (case d
   [("show") (begin (fprintf o "~a" r) "True")]
@@ -63,10 +66,10 @@
   (if c (parse-expr (list l (cadr c) r)) 
       (if (lambda? d) (parse-expr (distrib (list (list (caadr d) l) (list (cadadr d) (parse-expr r))) (caddr d)))
           (if-do (delay (primd l d r)) (delay (fprintf o "unrecognized token: ~a" d)))))))
-(define (parse-expr x) (displayln x)
+(define (parse-expr x)
   (cond [(or (not (list? x)) (empty? x)) x]
         [(length? x 1) (parse-expr (car x))]
-        [(equal? (car x) "||") (cdr x)]
+        [(equal? (car x) "||") (cdr x)] [(equal? (car x) 'lambda) x]
         [else (let ([a (parse-expr (car x))] [b (parse-expr (cadr x))])
                 (cond [(and (lit? a) (lit? b)) (parse-expr (cons (push& a b) (cddr x)))]
                       [(not (lit? b)) (dyad a b (parse-expr (cddr x)))]
