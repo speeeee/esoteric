@@ -6,6 +6,9 @@
   #include "util.h"
   int yylex(void);
   void yyerror(void);
+  char *appDya(char *sym, char *l, char *r) { 
+    
+  char *appMon(char *sym, char *r) {
 %}
 
 %define api.value.type {char *}
@@ -27,15 +30,16 @@ expr:
 | STR { $$ = $1; }
 | INT expr { $$ = join(","itoa($1),$2); }
 | STR expr { $$ = join(",",$1,$2); }
-| expr SYM expr { $$ = appSym($2,$1,$3); }
+| expr SYM expr { $$ = appDya($2,$1,$3); }
+| Sym expr { $$ = appMon($1,$2); }
 | '(' expr ')' { $$ = $2; }
 | expr '[' expr ']' expr { $$ = appSym($2,$1,$3); } ;
 
 %%
 
 int yylex(void) {
-  int c; if(num(c)) { tok(&num,yylval,c); }
+  int c; while((c = getchar()) == ' ' || c == '\t' || c == '\n') continue;
+  if(num(c)) { tok(&num,yylval,c); }
   if(c=='"') { tok(&str,yylval,c); }
   if(c==EOF) { return 0; }
-  while((c = getchar()) == ' ' || c == '\t' || c == '\n') continue;
-  if { sym(c); } return c; }
+  else { sym(c); } return c; }
