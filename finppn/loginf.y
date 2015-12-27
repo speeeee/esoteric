@@ -38,4 +38,4 @@ int yylex(void) {
   if(c=='"') { tok(&str,yylval,c); }
   if(c==EOF) { return 0; }
   while((c = getchar()) == ' ' || c == '\t' || c == '\n') continue;
-  else { sym(c); } return c; }
+  if { sym(c); } return c; }

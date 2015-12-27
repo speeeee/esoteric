@@ -17,7 +17,7 @@ char *tok(int (*pred)(int), char *n, int c) {
   n = malloc(10*sizeof(char)); n[0] = c; 
   while(pred(c)) {
     if(q+1>sz) { n = realloc(n,(sz+=10)*sizeof(char)); } 
-    n[(q++)-1] = c; } n[q] = '\0'; }
+    n[(q++)-1] = c; c = getchar(); } n[q] = '\0'; ungetc(c,stdin); }
 
 int num(int c) { isdigit(c)||c == '.'; }
 int str(int c) { c != '"'; } int sym(int c) { c!=' '&&c!='\t'&&c!='\n'&&c!=EOF; }
