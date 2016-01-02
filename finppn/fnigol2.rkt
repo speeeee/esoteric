@@ -13,7 +13,7 @@
 (define (readn f str) (let ([c (read-line f)])
   (if (eof-object? c) str (readn f (string-join (list str c) " ")))))
 
-(define o (current-output-port))
+(define o (current-output-port)) (define l (current-output-port))
 (define funs* '(("+" 2 1))) (define v* 0)
 
 (define (if-do a b) (if (force a) (force a) (if (force b) (force b) #f)))
@@ -38,10 +38,10 @@
 (define (mk-tokens s) (check-parens (sss->str (string-split-spec (string->list s)))))
 
 (define (lex x) (if (list? x) 'group
-  (let ([c (strcar x)]) (if (or (member c '(#\" #\_ #\-)) (member x '("$x" "$y")) (char-numeric? c)) 
+  (let ([c (strcar x)]) (if (or (member c '(#\" #\_ #\-)) (char-numeric? c)) 
      'lit 'sym))))
 
-(define (gen-var) (set! v* (+ v* 1)))
+(define (gen-var) (set! v* (+ v* 1)) v*)
 
 (define (derive-ctype x) (let ([s (string->list x)])
   (if (char-numeric? (car s)) (if (member #\. s) "DOUBLE" "INT") "STRING")))
@@ -51,11 +51,29 @@
                [q (- (length n) (cadr f))])
           (case (caddr f) [(0) (begin (fprintf o "~a;~n" c) (take n q))]
             [(1) (push (take n q) c)] 
-            [else (let ([q (gen-var)]) (fprintf "void **~a = ~a;~n" q c)
+            [else (let ([q (gen-var)]) (fprintf o "void **a~a = ~a;~n" q c)
               (append (take n q) (map (λ (x) (string-join (list c "[" (number->string x) "]") "")) (range q))))]))
         (begin (printf "error: no such function: ~a~n" d) '("False")))))
 
+(define (ia xe) (let* ([q (foldr (λ (x i)
+  (case (lex x) [(lit group) (- i 1)] 
+    [(sym) (let ([c (find-eq x car funs*)]) (- (+ i (cadr c)) (caddr c)))])) 0 (cdr (reverse xe)))] 
+  [p (+ q (case (lex (last xe)) [(lit group) -1] [(sym) (cadr (find-eq (last xe) car funs*))]))])
+  (if (negative? p) 0 p)))
+(define (oa xe) (let ([q (foldl (λ (x i)
+  (case (lex x) [(lit group) (+ i 1)]
+    [(sym) (let ([c (find-eq x car funs*)]) (+ (- i (cadr c)) (caddr c)))])) 0 xe)])
+  (if (not (positive? q)) (case (lex (last xe)) [(lit group) 1] [(sym) (caddr (find-eq (last xe) car funs*))])
+      q)))
+(define (mk-la x n) (let ([i (list (ia x) (oa x))] [d (gen-var)]) (displayln i)
+  (fprintf l "if(!strcmp(la,\"LAMBDA_~a\")) { return ~a;~n}~n" d 
+           (parse-expr x (map (λ (x) (format "_vl[~a]" x)) (range (car i)))))
+  (push n (format "LAMBDA_~a" d))))
+                    
 (define (parse-expr xe init) (foldl (λ (x n) (case (lex x)
-  [(lit) (push n x)] [(group) (push n x)] [(sym) (app-sym x n)])) init xe))
+  [(lit) (push n x)] [(group) (if (and (not (empty? n)) (equal? (last n) ":"))
+                                  (push x n) #;(begin (word x (car (reverse n)) (cadr (reverse n))) '())
+                                  (mk-la x n))] 
+  [(sym) (app-sym x n)])) init xe))
 
 (define (parse xe) (parse-expr (mk-tokens xe) '()))
