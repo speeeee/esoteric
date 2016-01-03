@@ -40,9 +40,11 @@
 
 (define (prim d r) (case d
   [("la") (cons d r)] [(",") (string-join (map parse-expr r) ",")] 
-  [("CREATE-STORAGE") (begin (set! storage* (cons storage* (list (car r) '()))) "True")]
-  [("ADD-VAL") (let ([c (find-eq (parse-expr (car r)) car storage*)])
-                 (if c (begin (set! c (cons c (parse-expr (cadr r)))) "True") "False"))]
+  [("CREATE-STORAGE") (begin (set! storage* (cons (list (car r) '()) storage*)) "True")]
+  [("STORE") (let ([c (find-eq (parse-expr (car r)) car storage*)])
+                 (if c (begin (set! storage* (cons (list (car c) (cons (parse-expr (cadr r)) (cadr c))) 
+                                                   (filter (λ (x) (not (equal? x c))) storage*))) 
+                              "True") "False"))]
   [("PRINT") (fprintf o "~a" (parse-expr (car r)))] 
   [("REF") (list-ref (parse-expr (car r)) (string->number (parse-expr (cadr r))))]
   [("$") (map parse-expr r)] [("$str") (string-join (map parse-expr r) "")]
