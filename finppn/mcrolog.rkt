@@ -66,7 +66,7 @@
 (define (parse xe) (parse-expr (mk-tokens xe)))
 
 (define (main) (if (= (length (vector->list (current-command-line-arguments))) 0)
-  (begin (fprintf o "Initiating L__I_ REPL...~nPress ENTER/RETURN once a command is entered.  Enter the command, `:q', to quit.~n")
+  (begin (fprintf o "Initiating Mcrolog REPL...~nPress ENTER/RETURN once a command is entered.  Enter the command, `:q', to quit.~n")
          (let main () (begin (fprintf o "~n> ") (let ([d (read-line)]) (if (or (equal? d ":q") (eof-object? d)) 
                                                                            (begin (displayln "quitting") (exit)) 
                                                                            (if (empty? (string->list d)) '() (fprintf o "~a" (parse d))))) (main))))
