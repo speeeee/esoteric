@@ -46,6 +46,7 @@
                                                    (filter (λ (x) (not (equal? x c))) storage*))) 
                               "True") "False"))]
   [("PRINT") (fprintf o "~a" (parse-expr (car r)))] 
+  [("PRINTLN") (fprintf o "~a~n" (parse-expr (car r)))
   [("REF") (list-ref (parse-expr (car r)) (string->number (parse-expr (cadr r))))]
   [("$") (map parse-expr r)] [("$str") (string-join (map parse-expr r) "")]
   [("import") (if (member (cadr r) imports*) '()
@@ -70,7 +71,7 @@
          (let main () (begin (fprintf o "~n> ") (let ([d (read-line)]) (if (or (equal? d ":q") (eof-object? d)) 
                                                                            (begin (displayln "quitting") (exit)) 
                                                                            (if (empty? (string->list d)) '() (fprintf o "~a" (parse d))))) (main))))
-  (let* ([c (vector->list (current-command-line-arguments))] [f (open-input-file (string-join (list (car c) ".li") ""))])
+  (let* ([c (vector->list (current-command-line-arguments))] [f (open-input-file (string-join (list (car c) ".mc") ""))])
     (parse (readn f "")))))
 
 (main)
