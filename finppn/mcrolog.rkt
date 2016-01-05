@@ -38,6 +38,7 @@
 (define (sss->str lst) (map list->string (filter (compose not empty?) lst)))
 (define (mk-tokens s) (check-parens (sss->str (string-split-spec (string->list s)))))
 
+; varargs
 (define (prim d r) (case d
   [("la") (cons d r)] [(",") (string-join (map parse-expr r) ",")] 
   [("CREATE-STORAGE") (begin (set! storage* (cons (list (car r) '()) storage*)) "True")]
@@ -46,7 +47,7 @@
                                                    (filter (λ (x) (not (equal? x c))) storage*))) 
                               "True") "False"))]
   [("PRINT") (fprintf o "~a" (parse-expr (car r)))] 
-  [("PRINTLN") (fprintf o "~a~n" (parse-expr (car r)))
+  [("PRINTLN") (fprintf o "~a~n" (parse-expr (car r)))]
   [("REF") (list-ref (parse-expr (car r)) (string->number (parse-expr (cadr r))))]
   [("$") (map parse-expr r)] [("$str") (string-join (map parse-expr r) "")]
   [("import") (if (member (cadr r) imports*) '()
