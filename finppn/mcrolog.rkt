@@ -50,7 +50,7 @@
   [("PRINTLN") (fprintf o "~a~n" (parse-expr (car r)))]
   [("REF") (list-ref (parse-expr (car r)) (string->number (parse-expr (cadr r))))]
   [("$") (map parse-expr r)] [("$str") (string-join (map parse-expr r) "")]
-  [("#") (parse-expr (list (car r) (cdr r)))]
+  [("#") (parse-expr (list (car r) (cdr r)))] [("#IF") (if (parse-expr (car r)) (parse-expr (cadr r)) (parse-expr (caddr r)))]
   [("import") (if (member (cadr r) imports*) '()
                   (begin (parse (readn (open-input-file (string-join (list (cadr r) ".mc") "")) ""))
                          (set! imports* (push imports* (cadr r))) "True"))]
