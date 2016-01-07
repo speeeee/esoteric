@@ -40,17 +40,18 @@
 
 ; varargs
 (define (prim d r) (case d
-  [("la") (cons d r)] [(",") (string-join (map parse-expr r) ",")] 
+  [("la") (cons d r)] [("#.") (cons (parse-expr (car r)) (parse-expr (cadr r)))] 
+  [("#cdr") (cdr (parse-expr (car r)))] [("NIL?") (empty? (car r))]
   [("CREATE-STORAGE") (begin (set! storage* (cons (list (car r) '()) storage*)) "True")]
   [("STORE") (let ([c (find-eq (parse-expr (car r)) car storage*)])
                  (if c (begin (set! storage* (cons (list (car c) (cons (parse-expr (cadr r)) (cadr c))) 
                                                    (filter (λ (x) (not (equal? x c))) storage*))) 
                               "True") "False"))]
-  [("PRINT") (fprintf o "~a" (parse-expr (car r)))] 
-  [("PRINTLN") (fprintf o "~a~n" (parse-expr (car r)))]
+  [("FOUND?") (if (member (car r) (find-eq (cadr r) car storage*)) "True" "False")]
+  [("PRINT") (fprintf o "~a" (parse-expr (car r)))] [("PRINTLN") (fprintf o "~a~n" (parse-expr (car r)))]
   [("REF") (list-ref (parse-expr (car r)) (string->number (parse-expr (cadr r))))]
   [("$") (map parse-expr r)] [("$str") (string-join (map parse-expr r) "")]
-  [("#") (parse-expr (list (car r) (cdr r)))] [("#IF") (if (parse-expr (car r)) (parse-expr (cadr r)) (parse-expr (caddr r)))]
+  [("#") (parse-expr (list (car r) (cdr r)))] [("#IF") (if (equal? (parse-expr (car r)) "False") (parse-expr (caddr r)) (parse-expr (cadr r)))]
   [("import") (if (member (cadr r) imports*) '()
                   (begin (parse (readn (open-input-file (string-join (list (cadr r) ".mc") "")) ""))
                          (set! imports* (push imports* (cadr r))) "True"))]
@@ -61,7 +62,7 @@
   (let* ([q (parse-expr (car xe))]
          [c (find-eq q car funs*)]) 
     (if-do (prim q (cdr xe))
-      (delay (cond [c (parse-expr (cons (cadr c) (map parse-expr (cdr xe))))]
+      (delay (cond [c (parse-expr (cons (cadr c) (map parse-expr (cdr xe))))] [(empty? q) q]
                [(and (list? q) (equal? (car q) "la"))
                   (parse-expr (distrib (map (λ (x y) (list x y)) (cadr q) (cdr xe)) (caddr q)))]
                [else (fprintf o "error: no such function: ~a~n" q)])))) xe))
