@@ -13,6 +13,8 @@
 (define (readn f str) (let ([c (read-line f)])
   (if (eof-object? c) str (readn f (string-join (list str c) " ")))))
 
+(define test0 "c-fun name ($ int int) int (la (x y) ($ x y))")
+
 (define o (current-output-port)) (define l (current-output-port))
 (define funs* '()) (define storage* '()) (define imports* '())
 
@@ -40,21 +42,23 @@
 
 ; varargs
 (define (prim d r) (case d
-  [("la") (cons d r)] [("#.") (cons (parse-expr (car r)) (parse-expr (cadr r)))] 
-  [("#cdr") (cdr (parse-expr (car r)))] [("NIL?") (empty? (car r))]
+  [("la") (cons d r)] [("#.") (cons "$" (cons (parse-expr (car r)) (cdr (parse-expr (cadr r)))))] 
+  [("#cdr") (cons "$" (cddr (parse-expr (car r))))] [("NIL?") (if (equal? (car r) '("$")) "True" "False")]
   [("CREATE-STORAGE") (begin (set! storage* (cons (list (car r) '()) storage*)) "True")]
   [("STORE") (let ([c (find-eq (parse-expr (car r)) car storage*)])
                  (if c (begin (set! storage* (cons (list (car c) (cons (parse-expr (cadr r)) (cadr c))) 
                                                    (filter (λ (x) (not (equal? x c))) storage*))) 
                               "True") "False"))]
   [("FOUND?") (if (member (car r) (find-eq (cadr r) car storage*)) "True" "False")]
-  [("PRINT") (fprintf o "~a" (parse-expr (car r)))] [("PRINTLN") (fprintf o "~a~n" (parse-expr (car r)))]
+  [("PRINT") (begin (fprintf o "~a" (parse-expr (car r))) "True")] 
+  [("PRINTLN") (begin (fprintf o "~a~n" (parse-expr (car r))) "True")]
   [("REF") (list-ref (parse-expr (car r)) (string->number (parse-expr (cadr r))))]
-  [("$") (map parse-expr r)] [("$str") (string-join (map parse-expr r) "")]
+  [(">LIST") (cons "$" (parse-expr (car r)))]
+  [("$") (cons "$" (map parse-expr r))] [("$str") (string-join (map parse-expr r) "")]
   [("#") (parse-expr (list (car r) (cdr r)))] [("#IF") (if (equal? (parse-expr (car r)) "False") (parse-expr (caddr r)) (parse-expr (cadr r)))]
-  [("import") (if (member (cadr r) imports*) '()
-                  (begin (parse (readn (open-input-file (string-join (list (cadr r) ".mc") "")) ""))
-                         (set! imports* (push imports* (cadr r))) "True"))]
+  [("import") (if (member (car r) imports*) '()
+                  (begin (parse (readn (open-input-file (string-join (list (car r) ".mc") "")) ""))
+                         (set! imports* (push imports* (car r))) "True"))]
   [("define") (begin (set! funs* (push funs* (list (car r) (cadr r)))) "True")]
   [else #f]))
 
