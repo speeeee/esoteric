@@ -21,6 +21,11 @@
 (define (if-do a b) (if (force a) (force a) (if (force b) (force b) #f)))
 (define (distrib v q) (map (λ (x) (if (list? x) (distrib v x) (let ([c (find-eq x car v)]) (if c (cadr c) x)))) q))
 
+(define (quoti lst) (append (list #\") (push lst #\")))
+(define (quotish s) (list->string (quoti (string->list s))))
+(define (dequoti lst) (list->string (cdr (ret-pop (string->list lst)))))
+(define (q? lst) (and (equal? (car (string->list lst)) #\") (equal? (last (string->list lst)) #\")))
+(define (dequoti@ lst) (if (q? lst) (dequoti lst) lst))
 (define (string-split-spec s) (cadr (foldr (λ (c nn) (let ([m (car nn)] [n (cadr nn)]) (case m
    [(neutral) (cond [(equal? c #\") (list 'string (cons '() n))]
                     [(equal? c #\~) (list 'comment n)] [(member c '(#\( #\) #\, #\; #\:)) (list m (append (list '() (list c)) n))]
@@ -28,7 +33,7 @@
                     [else (list m (cons (cons c (car n)) (cdr n)))])]
    [(comment) (if (equal? c #\~) (list 'neutral n) nn)]
    [(string) (cond [(equal? (cadr nn) 'escape) (let ([cn (caddr nn)]) (list 'string (cons (cons c (car cn)) (cdr cn))))]
-                   [(equal? c #\") (list 'neutral (cons '() n))] [(equal? c #\\) (list 'string 'escape n)]
+                   [(equal? c #\") (list 'neutral (cons '() (cons (quoti (car n)) (cdr n))))] [(equal? c #\\) (list 'string 'escape n)]
                    [else (list 'string (cons (cons c (car n)) (cdr n)))])]
    [else 'error]))) '(neutral (())) s)))
 (define (check-parens lst) (foldl (λ (elt n)
@@ -50,11 +55,11 @@
                                                    (filter (λ (x) (not (equal? x c))) storage*))) 
                               "True") "False"))]
   [("FOUND?") (if (member (car r) (find-eq (cadr r) car storage*)) "True" "False")]
-  [("PRINT") (begin (fprintf o "~a" (parse-expr (car r))) "True")] 
-  [("PRINTLN") (begin (fprintf o "~a~n" (parse-expr (car r))) "True")]
+  [("PRINT") (begin (fprintf o "~a" (dequoti (parse-expr (car r)))) "True")] 
+  [("PRINTLN") (begin (fprintf o "~a~n" (dequoti (parse-expr (car r)))) "True")]
   [("REF") (list-ref (parse-expr (car r)) (string->number (parse-expr (cadr r))))]
   [(">LIST") (cons "$" (parse-expr (car r)))]
-  [("$") (cons "$" (map parse-expr r))] [("$str") (string-join (map parse-expr r) "")]
+  [("$") (cons "$" (map parse-expr r))] [("$str") (quotish (string-join (map (compose dequoti@ parse-expr) r) ""))]
   [("#") (parse-expr (list (car r) (cdr r)))] [("#IF") (if (equal? (parse-expr (car r)) "False") (parse-expr (caddr r)) (parse-expr (cadr r)))]
   [("import") (if (member (car r) imports*) '()
                   (begin (parse (readn (open-input-file (string-join (list (car r) ".mc") "")) ""))
