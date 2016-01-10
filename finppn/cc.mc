@@ -13,6 +13,6 @@ $
 
 ~ write a standard C function. ~
 (define c-fun (la (name args out body) ($
-  (PRINT ($str out name "(")) 
-  (map (la (x) (PRINT ($str (#car x) (#car (#cdr x)) ","))) 
+  (PRINT ($str out " " name "(")) 
+  (map (la (x) (PRINT ($str (#car x) " " (#car (#cdr x)) ","))) 
     (interpolate args (>LIST (REF body 1)))))))
