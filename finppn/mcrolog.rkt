@@ -13,7 +13,8 @@
 (define (readn f str) (let ([c (read-line f)])
   (if (eof-object? c) str (readn f (string-join (list str c) " ")))))
 
-(define test0 "c-fun name ($ int int) int (la (x y) ($ x y))")
+; requires logic and cc.
+(define test0 "c-fun name ($ int int) int (la (x y) (, x y))")
 
 (define o (current-output-port)) (define l (current-output-port))
 (define funs* '()) (define storage* '()) (define imports* '())
@@ -60,7 +61,9 @@
   [("REF") (list-ref (parse-expr (car r)) (string->number (parse-expr (cadr r))))]
   [(">LIST") (cons "$" (parse-expr (car r)))] [("LIST?") (if (list? (car r)) "True" "False")]
   [("$") (cons "$" (map parse-expr r))] [("$str") (quotish (string-join (map (compose dequoti@ parse-expr) r) ""))]
-  [("#") (parse-expr (list (car r) (cdr r)))] [("#IF") (if (equal? (parse-expr (car r)) "False") (parse-expr (caddr r)) (parse-expr (cadr r)))]
+  [("!#") (parse-expr (cons (parse-expr (car r)) (cdr (parse-expr (cadr r)))))]
+  [("#") (parse-expr (list (parse-expr (car r)) (map parse-expr (cdr r))))] 
+  [("#IF") (if (equal? (parse-expr (car r)) "False") (parse-expr (caddr r)) (parse-expr (cadr r)))]
   [("import") (if (member (car r) imports*) '()
                   (begin (parse (readn (open-input-file (string-join (list (car r) ".mc") "")) ""))
                          (set! imports* (push imports* (car r))) "True"))]
