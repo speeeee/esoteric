@@ -58,7 +58,7 @@
   [("PRINT") (begin (fprintf o "~a" (dequoti (parse-expr (car r)))) "True")] 
   [("PRINTLN") (begin (fprintf o "~a~n" (dequoti (parse-expr (car r)))) "True")]
   [("REF") (list-ref (parse-expr (car r)) (string->number (parse-expr (cadr r))))]
-  [(">LIST") (cons "$" (parse-expr (car r)))]
+  [(">LIST") (cons "$" (parse-expr (car r)))] [("LIST?") (if (list? (car r)) "True" "False")]
   [("$") (cons "$" (map parse-expr r))] [("$str") (quotish (string-join (map (compose dequoti@ parse-expr) r) ""))]
   [("#") (parse-expr (list (car r) (cdr r)))] [("#IF") (if (equal? (parse-expr (car r)) "False") (parse-expr (caddr r)) (parse-expr (cadr r)))]
   [("import") (if (member (car r) imports*) '()
