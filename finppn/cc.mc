@@ -5,14 +5,12 @@ $
 (import rlist)
 (define c-init (la () (REF ($ (PRINTLN "#include <stdlib.h>") 
                               (PRINTLN "#include <stdio.h>")) 0)))
-
-~ simple temporary function for interpolation. ~
-(define interpolate (la (x y) (interpolate$ x y ($))))
-(define interpolate$ (la (x y n) (#IF (NIL? x) n 
-  (interpolate$ (#cdr x) (#cdr y) (#. ($ (#car x) (#car y)) n)))))
+(CREATE-STORAGE cfuns)
 
 ~ write a standard C function. ~
 (define c-fun (la (name args out body) ($
   (PRINT ($str out " " name "(")) 
-  (map (la (x) (PRINT ($str (#car x) " " (#car (#cdr x)) ","))) 
-    (interpolate args (>LIST (REF body 1)))))))
+  (mapr (la (x) (PRINT ($str (#car x) " " (#car (#cdr x)) ","))) 
+    (init (interpolate args (>LIST (REF body 1)))))
+  (#IF (NIL? args) True (PRINTLN ($str (last args)" "(last (>LIST (REF body 1))) ") {")))
+  (PRINTLN (!# body (>LIST (REF body 1)))) (PRINTLN "; }") (STORE cfuns name))))
