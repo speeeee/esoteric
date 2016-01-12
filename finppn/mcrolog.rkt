@@ -29,7 +29,7 @@
 (define (dequoti@ lst) (if (q? lst) (dequoti lst) lst))
 (define (string-split-spec s) (cadr (foldr (λ (c nn) (let ([m (car nn)] [n (cadr nn)]) (case m
    [(neutral) (cond [(equal? c #\") (list 'string (cons '() n))]
-                    [(equal? c #\~) (list 'comment n)] [(member c '(#\( #\) #\, #\; #\:)) (list m (append (list '() (list c)) n))]
+                    [(equal? c #\~) (list 'comment n)] [(member c '(#\( #\) #\, #\; #\: #\@)) (list m (append (list '() (list c)) n))]
                     [(char-whitespace? c) (list m (cons '() n))]
                     [else (list m (cons (cons c (car n)) (cdr n)))])]
    [(comment) (if (equal? c #\~) (list 'neutral n) nn)]
