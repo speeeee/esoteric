@@ -24,3 +24,9 @@ $
 
 ~ access all but the head of a list; the reverse of the rest of the reverse of a list. ~
 (define init (la (lst) (reverse (#cdr (reverse lst)))))
+
+~ NOTE: add foldr/l for this function. ~
+~ insert a new element between each element. ~
+(define ins (la (lst i) (ins$ (#cdr lst) i (#. (#car lst) ($)))))
+(define ins$ (la (lst i n) (reverse (#IF (NIL? lst) n 
+  (ins$ (#cdr lst) i (#. (#car lst) (#. i n)))))))
