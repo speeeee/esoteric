@@ -13,4 +13,10 @@ $
   (mapr (la (x) (PRINT ($str (#car x) " " (#car (#cdr x)) ","))) 
     (init (interpolate args (>LIST (REF body 1)))))
   (#IF (NIL? args) True (PRINTLN ($str (last args)" "(last (>LIST (REF body 1))) ") {")))
-  (PRINTLN (!# body (>LIST (REF body 1)))) (PRINTLN "; }") (STORE cfuns name))))
+  (PRINTLN (!# body (>LIST (REF body 1)))) (PRINTLN "; }") ~(STORE cfuns name)~
+  (new-fun name (>LIST (REF body 1)) (REF body 1)))))
+(define new-fun (la (name args0 args) 
+  (define name (la args (!# $str (ins args0 ","))))))
+
+~ directly call a C function. ~
+~(define @ (la (name args) ~
