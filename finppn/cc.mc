@@ -16,7 +16,7 @@ $
   (PRINTLN (!# body (>LIST (REF body 1)))) (PRINTLN "; }") ~(STORE cfuns name)~
   (new-fun name (>LIST (REF body 1)) (REF body 1)))))
 (define new-fun (la (name args0 args) 
-  (define name (la args (!# $str (ins args0 ","))))))
+  (define name (la args ($str name "(" (!# $str (ins args0 ",")) ")")))))
 
 ~ directly call a C function. ~
 ~(define @ (la (name args) ~
