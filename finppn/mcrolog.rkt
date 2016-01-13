@@ -62,7 +62,7 @@
   [(">LIST") (cons "$" (parse-expr (car r)))] [("LIST?") (if (list? (car r)) "True" "False")]
   [("$") (cons "$" (map parse-expr r))] [("$str") (quotish (string-join (map (compose dequoti@ parse-expr) r) ""))]
   [("!#") (parse-expr (cons (parse-expr (car r)) (cdr (parse-expr (cadr r)))))]
-  [("#") (parse-expr (list (parse-expr (car r)) (map parse-expr (cdr r))))] 
+  [("#") (parse-expr (list (parse-expr (car r)) (cons "$" (map parse-expr (cdr r)))))] 
   [("#IF") (if (equal? (parse-expr (car r)) "False") (parse-expr (caddr r)) (parse-expr (cadr r)))]
   [("import") (if (member (car r) imports*) '()
                   (begin (parse (readn (open-input-file (string-join (list (car r) ".mc") "")) ""))
