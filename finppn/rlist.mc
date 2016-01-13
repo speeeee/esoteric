@@ -27,6 +27,6 @@ $
 
 ~ NOTE: add foldr/l for this function. ~
 ~ insert a new element between each element. ~
-(define ins (la (lst i) (ins$ (#cdr lst) i (#. (#car lst) ($)))))
+(define ins (la (lst i) (reverse (ins$ (#cdr lst) i (#. (#car lst) ($))))))
 (define ins$ (la (lst i n) (reverse (#IF (NIL? lst) n 
   (ins$ (#cdr lst) i (#. (#car lst) (#. i n)))))))
