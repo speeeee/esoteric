@@ -20,3 +20,7 @@ $
 
 ~ directly call a C function. ~
 ~(define @ (la (name args) ~
+
+(define MAIN (la (exprs) ($ (PRINTLN "int main(int argc, char **argv) { ")
+                            (mapr (la (x) (PRINTLN ($str x ";"))) exprs)
+                            (PRINTLN " return 0; }"))))
