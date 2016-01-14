@@ -23,8 +23,9 @@ $
   (define name (la args ($str name "(" (!# $str (ins args0 ",")) ")")))))
 
 ~ allow reference to an externally defined function. ~
-(define extern (la (name args) (define name 
-  (la (UNLIST args) ($str name "(" (!# $str (ins args ",")) ")")))))
+(define extern (la (name args) (extern0 name (UNLIST args) args)))
+(define extern0 (la (name args1 args)
+  (define name (la args1 ($str name "(" (!# $str (ins args ",")) ")")))))
 
 ~ define C functions from a list. ~
 (define list-c (la (lst) (map (la (x) (c-fun (#car x) (REF x 2) (REF x 3) (REF x 4))))))
