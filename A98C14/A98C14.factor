@@ -9,33 +9,6 @@ IN: A98C14
 
 TUPLE: a98-gadget < gadget map timer { pos initial: { 0 0 } } ;
 
-! :: mk-image ( x y img -- )
-!    0 [ dup img dim>> first2 pick [ 2dup * ] dip =
-!        [ [ drop /i ] [ nip mod ] 3bi 2dup img pixel-at first4
-!          [ pick ] dip swap glColor4f
-!          drop [ 3/64 * x + ] dip 3/39 * y + 0 glVertex3f t ] [ 3drop f ] if ] loop drop ;
-
-! :: mk-image ( x y img -- )
-!    img bitmap>> 4 group
-!    [ [ first4 glColor4ub ] dip img dim>> first2
-!      [ drop /i 3/64 * ] [ nip mod 3/39 * ] 3bi 0
-!      glVertex3f ] each-index ;
-
-! :: mk-image ( x y img -- )
-!    0 [ dup img dim>> first2 pick [ 2dup * ] dip =
-!        [ 3dup 3dup [ drop mod ] [ nip mod ] 3bi img pixel-at first4 glColor4ub
-!          [ drop /i 3/64 * ] [ nip mod 3/39 * ] 3bi 0 glVertex3f 2drop 1 + t ]
-!      [ 2drop 0 + f  ] if [ nip ] dip ] loop drop ; 
-
-:: mk-image ( x y img -- )
-    img dim>> first2 * [0,b)
-    [ img dim>> first2 3dup [ drop mod ] [ nip /i ] 3bi img pixel-at first4 glColor4ub
-      [ drop /i 3/64 * ] [ nip mod 3/39 * ] 3bi 0 glVertex3f ] each glEnd glEndList ;
-
-! :: mk-image ( x y img -- )
-!    0 0 img pixel-at first4 glColor3ub drop
-!    0 0 0 glVertex3f 10 0 0 glVertex3f 10 10 0 glVertex3f 0 10 0 glVertex3f ;
-
 : resize ( w h -- )
    [ 0 0 ] 2dip glViewport GL_PROJECTION glMatrixMode 
    GL_PROJECTION glMatrixMode
