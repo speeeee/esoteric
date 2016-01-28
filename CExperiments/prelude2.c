@@ -7,24 +7,34 @@
 #define FLT 1
 #define CHR 2
 #define LST 3
-#define FUN 4
+#define LAM 4
+#define FUN 5
 
 typedef void  *A;
 typedef long   Int;
 typedef double Flt;
 typedef char   Chr;
 
-typedef struct { union { Int i; Flt f; Chr c; } x; unsigned int type; } Lit;
-typedef struct { Lit lx; struct Elem *next; } Elem;
+typedef struct Elem Elem;
+typedef struct Lit Lit;
+typedef Lit (*FPtr)(Elem *);
+
+struct Lit { union { Int i; Flt f; Chr c; Elem *e; } x; unsigned int type; };
+struct Elem { Lit lx; struct Elem *next; };
+typedef struct { int t; union { char *la; FPtr f; }; } Fun;
 
 Lit lit(A x, int type) { Lit l;
-  switch(type) { case INT: l.x.i = x; break;
-                 case FLT: l.x.f = x; break;
-                 case CHR: l.x.c = x; break; } l.t = type; return l; }
+  switch(type) { case INT: l.x.i = *(long *) x; break;
+                 case FLT: l.x.f = *(double *) x; break;
+                 case CHR: l.x.c = *(char *) x; break;
+                 case LST: l.x.e = *(Elem **) x; break; } l.type = type; return l; }
 Lit readInt(void) { int i; scanf("%d",&i); return lit(i,INT); }
-Elem list(int n, ...) { 
+Elem *list(int n, ...) { 
   va_list vl; va_start(vl,n); Elem *x; Elem *curr;
   for(int i=0;i<n;i++) { Lit val = va_arg(vl,Lit);
     if(i==0) { x->lx = val; curr = x; }
     else { Elem *n; n->lx = val; curr->next = n; curr = n; } }
-  return x; }
+  va_end(vl); return x; }
+
+Lit call(Fun x, Elem *a) {
+  if(x.t==FUN) { return x.f(a); } }
