@@ -56,10 +56,17 @@ Lit printAtom(Elem *a) {
                        default: printf("error\n"); }
   return liti(0); }
 
-Lit call(FPtr x, Elem *a) {
-  return x(a); }
+Fun fun(FPtr x) { Fun r; r.t = FUN; r.f = x; return r; }
+Fun lam(char *x) { Fun r; r.t = LAM; r.la = malloc(sizeof x); strcpy(r.la,x);
+                   return r; }
+Lit call(Fun x, Elem *a) {
+  if(x.t==FUN) { return x.f(a); } }
+
+// == standard library ===================================================//
+
+//Elem *
 
 int main(int argc, char **argv) {
-  call(&printAtom,list(1,liti(3)));
+  call(fun(&printAtom),list(1,liti(3)));
   //Elem *root = malloc(sizeof(Elem)); root->lx.i = 3; root->lx.type = 0;
   /*printAtom(root); printf("%li",root->lx.i);*/ return 0; }
