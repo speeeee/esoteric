@@ -45,7 +45,7 @@ Elem *list(int n, ...) {
   Elem *curr = malloc(sizeof(Elem));
   for(int i=0;i<n;i++) { Lit val = va_arg(vl,Lit);
     if(i==0) { x->lx = val; curr = x; }
-    else { Elem *n; n->lx = val; curr->next = n; curr = n; } }
+    else { Elem *n = malloc(sizeof(Elem)); n->lx = val; curr->next = n; curr = n; } }
   va_end(vl); return x; }
 Elem *nlist(Lit x) { Elem *e; e->lx = x; return e; }
 // Elem *cons(Elem *a, Elem *l)
