@@ -62,9 +62,12 @@ Fun lam(char *x) { Fun r; r.t = LAM; r.la = malloc(sizeof x); strcpy(r.la,x);
 Lit call(Fun x, Elem *a) {
   if(x.t==FUN) { return x.f(a); } }
 
-// == standard library ===================================================//
+// == lambda storage   ===================================================//
+//    lambda expressions are stored as strings that refer to function pointers.
+//    it also has a small grammar to specify composition and similar actions on
+//    functions.  "fun1,fun2" is an example of a composition.
 
-//Elem *
+// == standard library ===================================================//
 
 int main(int argc, char **argv) {
   call(fun(&printAtom),list(1,liti(3)));
