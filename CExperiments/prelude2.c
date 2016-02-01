@@ -20,7 +20,8 @@ typedef struct Elem Elem;
 typedef struct Lit Lit;
 typedef Lit (*FPtr)(Elem *);
 
-struct Lit { union { Int i; Flt f; Chr c; Elem *e; } x; unsigned int type; };
+struct Lit { union { Int i; Flt f; Chr c; Chr *s; Elem *e; } x;
+             unsigned int type; };
 //struct Lit { Int i; Flt f; Chr c; Elem *e; unsigned int type; };
 struct Elem { Lit lx; struct Elem *next; };
 typedef struct { int t; union { char *la; FPtr f; }; } Fun;
