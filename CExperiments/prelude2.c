@@ -6,10 +6,12 @@
 #define INT 0
 #define FLT 1
 #define CHR 2
-#define LST 3
-#define LAM 4
-#define FUN 5
-#define SUC 6
+#define STR 3
+#define LST 4
+#define LAM 5
+#define FUN 6
+#define SUC 7
+#define SYM 8
 
 typedef void  *A;
 typedef long   Int;
@@ -38,7 +40,8 @@ typedef struct { int t; union { char *la; FPtr f; }; } Fun;
                  case CHR: l.x.c = va_arg(vl,int); break;
                  case LST: l.x.e = va_arg(vl,Elem *); break;
                  default: printf("nem"); } printf("%i", l.type); return l; }*/
-Lit liti(long i) { Lit l; l.x.i = i; l.type = 0; return l; }
+Lit liti(long i) { Lit l; l.x.i = i; l.type = INT; return l; }
+Lit lits(char *x) { Lit l; l.x.s = x; l.type = STR; return l; }
 
 Lit readInt(void) { int i; scanf("%d",&i); return liti(i); }
 Elem *list(int n, ...) { 
