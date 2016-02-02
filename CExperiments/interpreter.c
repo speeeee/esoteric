@@ -14,13 +14,14 @@ char *tok(FILE *s,int c) {
     if(sz==lsz) { str = realloc(str,(lsz+=10)*sizeof(char)); }
     str[sz++] = c; c = fgetc(s); } ungetc(c,stdin); str[sz] = '\0'; return str; }
 
-Lit lex(FILE *s) { int c;
+Lit lexd(FILE *s, int eofchar) { int c;
   while(isspace(c = fgetc(s)));
   if(isdigit(c)) { Lit q; fscanf(s,"%li",&q.x.i); q.type = INT; return q; }
   if(c=='(') { Lit e; e.x.i = -1; e.type = PAREN; }
   if(c==')') { Lit e; e.x.i = 1; e.type = PAREN; }
-  if(c==EOF) { Lit e; e.x.i = EOF; e.type = END; }
+  if(c==eofchar) { Lit e; e.x.i = EOF; e.type = END; }
   else { lits(tok(s,c)); } }
+Lit lex(FILE *s) { return lexd(s,EOF); }
 
 Elem *parse(FILE *s) { Elem *head = malloc(sizeof(Elem));
   Elem *curr = malloc(sizeof(Elem)); Lit l = lex(s);
