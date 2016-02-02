@@ -8,7 +8,8 @@
 #define PAREN 8
 #define END   9
 
-char *tok(s,c) { int sz = 0; int lsz = 10; char *str = malloc(lsz*sizeof(char));
+char *tok(FILE *s,int c) {
+  int sz = 0; int lsz = 10; char *str = malloc(lsz*sizeof(char));
   while(!isspace(c)&&c!='('&&c!=')') { 
     if(sz==lsz) { str = realloc(str,(lsz+=10)*sizeof(char)); }
     str[sz++] = c; c = fgetc(s); } ungetc(c,stdin); str[sz] = '\0'; return str; }
