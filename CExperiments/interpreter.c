@@ -27,9 +27,11 @@ Elem *parse(FILE *s) { Elem *head = malloc(sizeof(Elem));
   Elem *curr = malloc(sizeof(Elem)); Lit l = lex(s);
   head->lx = l; head->next = malloc(sizeof(Elem)); curr = head; curr = curr->next;
   while((l = lex(s)).type != END) {
-    if(l.type == PAREN) { if(l.x.i==-1) { l.x.e = parse(s); }
+    if(l.type == PAREN) { if(l.x.i==-1) { l.x.e = parse(s); l.type = LST; }
                           else { return head; } }
     else { curr->lx = l; }
     curr->next = malloc(sizeof(Elem)); curr = curr->next; }
   free(curr->next); return head; }
+
+//Lit prgm(Elem *s) { 
   
