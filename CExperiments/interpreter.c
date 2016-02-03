@@ -12,10 +12,13 @@
 
 #define PAREN 8
 #define END   9
+#define FAIL  10
 
 typedef struct { char *name; FPtr ptr; } Fn;
+typedef struct { int typ; union { Elem *a; Lit b; }; } LLit;
 
-Lit exec(Elem *);
+Lit exec(Lit);
+Lit word(Elem *);
 
 Lit and(Elem *a) { if(a->lx.type==SUC&&a->next->lx.type==SUC) {
   Lit e; e.type = SUC; 
@@ -23,7 +26,7 @@ Lit and(Elem *a) { if(a->lx.type==SUC&&a->next->lx.type==SUC) {
   DESTROY(a); /* not yet defined */ return e; }
   else { DESTROY(a); printf("type mismatch\n"); return liti(0); } }
 
-Fn prims[] = { { ",", and } };
+Fn prims[] = { { ",", &and } }; int fsz = 1;
 Elem **funs;
 
 char *tok(FILE *s,int c) {
@@ -51,9 +54,21 @@ Elem *parse(FILE *s) { Elem *head = malloc(sizeof(Elem));
     curr->next = malloc(sizeof(Elem)); curr = curr->next; }
   free(curr->next); return head; }
 
-/*Lit see_prim(Elem *, Elem *);
-Lit see_prim(Elem *n, Elem *s) {
-  
+Lit fail(void) { Lit r; r.x.i = 0; r.type = FAIL; return r; }
+int isfail(Lit x) { return x.type == FAIL; }
 
-Lit exec(Elem *s) { Lit q = see_prim(s,s->next);*/
+Lit see_prim(Elem *, Elem *);
+Lit see_prim(Elem *n, Elem *s) { if(n->lx.type == SYM) { char *q = n->lx.x.s; int i;
+  for(i=0;i<fsz;i++) {
+    if(!strcmp(q,prims[i].name)) { 
+      Elem *q = malloc(sizeof(Elem)); q = s;
+      while(q) { q->lx = exec(q->lx); q = q->next; }
+      return call(fun(prims[i].ptr),s); } }
+  if(i==fsz) { fail(); } } else { fail(); } }
+
+Lit exec(Lit x) { if(x.type!=LST) { return x; } else { return word(x.x.e); } }
+
+Lit word(Elem *s) { Lit q = see_prim(s,s->next);
+  if(!isfail(q)) { return q; }
+  
   
