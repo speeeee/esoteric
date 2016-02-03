@@ -20,6 +20,9 @@ typedef struct { int typ; union { Elem *a; Lit b; }; } LLit;
 Lit exec(Lit);
 Lit word(Elem *);
 
+void DESTROY(Elem *a) { if(a->next) { DESTROY(a->next); }
+  if(a->lx.x.e) { DESTROY(a->lx.x.e); } free(a); }
+
 Lit and(Elem *a) { if(a->lx.type==SUC&&a->next->lx.type==SUC) {
   Lit e; e.type = SUC; 
   e.x.i = a->lx.x.i&&a->lx.x.i;
@@ -27,7 +30,7 @@ Lit and(Elem *a) { if(a->lx.type==SUC&&a->next->lx.type==SUC) {
   else { DESTROY(a); printf("type mismatch\n"); return liti(0); } }
 
 Fn prims[] = { { ",", &and } }; int fsz = 1;
-Elem **funs;
+Elem **funs; int dsz = 0;
 
 char *tok(FILE *s,int c) {
   int sz = 0; int lsz = 10; char *str = malloc(lsz*sizeof(char));
@@ -69,6 +72,6 @@ Lit see_prim(Elem *n, Elem *s) { if(n->lx.type == SYM) { char *q = n->lx.x.s; in
 Lit exec(Lit x) { if(x.type!=LST) { return x; } else { return word(x.x.e); } }
 
 Lit word(Elem *s) { Lit q = see_prim(s,s->next);
-  if(!isfail(q)) { return q; }
+  if(!isfail(q)) { return q; } else { printf("FAILURE\n"); exit(0); return q; } }
   
   
