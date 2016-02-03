@@ -5,8 +5,26 @@
 #include <string.h>
 #include "prelude2.h"
 
+/*#define VAL(t,v) ((t)==INT?(v).x.i:(t)==FLT?(v).x.f: \
+                  (t)==CHR?(v).x.c:(t)==STR?(v).x.s: \
+                  (t)==LST?(v).x.e:0)*/
+#define VAL(t,v) ((t)==INT?(v).x.i:(t)==FLT?(v).x.f:(t)==CHR?(v).x.c:(t)==STR?(v).x.e:0)
+
 #define PAREN 8
 #define END   9
+
+typedef struct { char *name; FPtr ptr; } Fn;
+
+Lit exec(Elem *);
+
+Lit and(Elem *a) { if(a->lx.type==SUC&&a->next->lx.type==SUC) {
+  Lit e; e.type = SUC; 
+  e.x.i = a->lx.x.i&&a->lx.x.i;
+  DESTROY(a); /* not yet defined */ return e; }
+  else { DESTROY(a); printf("type mismatch\n"); return liti(0); } }
+
+Fn prims[] = { { ",", and } };
+Elem **funs;
 
 char *tok(FILE *s,int c) {
   int sz = 0; int lsz = 10; char *str = malloc(lsz*sizeof(char));
@@ -33,5 +51,9 @@ Elem *parse(FILE *s) { Elem *head = malloc(sizeof(Elem));
     curr->next = malloc(sizeof(Elem)); curr = curr->next; }
   free(curr->next); return head; }
 
-//Lit prgm(Elem *s) { 
+/*Lit see_prim(Elem *, Elem *);
+Lit see_prim(Elem *n, Elem *s) {
+  
+
+Lit exec(Elem *s) { Lit q = see_prim(s,s->next);*/
   
