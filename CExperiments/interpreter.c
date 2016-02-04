@@ -38,20 +38,20 @@ char *tok(FILE *s,int c) {
     if(sz==lsz) { str = realloc(str,(lsz+=10)*sizeof(char)); }
     str[sz++] = c; c = fgetc(s); } ungetc(c,stdin); str[sz] = '\0'; return str; }
 
-Lit lexd(FILE *s, int eofchar) { int c;
-  while(isspace(c = fgetc(s)));
+Lit lexd(FILE *s, int eofchar) { printf("lexing\n"); int c;
+  while(/*isspace(c = fgetc(s))*/(c = fgetc(s))==' '||c=='\t');
   if(isdigit(c)) { Lit q; fscanf(s,"%li",&q.x.i); q.type = INT; return q; }
-  if(c=='(') { Lit e; e.x.i = -1; e.type = PAREN; }
-  if(c==')') { Lit e; e.x.i = 1; e.type = PAREN; }
-  if(c==eofchar) { Lit e; e.x.i = EOF; e.type = END; }
-  else { lits(tok(s,c)); } }
+  if(c=='(') { Lit e; e.x.i = -1; e.type = PAREN; return e; }
+  if(c==')') { Lit e; e.x.i = 1; e.type = PAREN; return e; }
+  if(c==eofchar||c==EOF) { Lit e; e.x.i = EOF; e.type = END; return e; }
+  else { return lits(tok(s,c)); } }
 Lit lex(FILE *s) { return lexd(s,EOF); }
 
-Elem *parse(FILE *s) { Elem *head = malloc(sizeof(Elem));
-  Elem *curr = malloc(sizeof(Elem)); Lit l = lex(s);
+Elem *parse(FILE *s,int eo) { printf("parsing\n"); Elem *head = malloc(sizeof(Elem));
+  Elem *curr = malloc(sizeof(Elem)); Lit l = lexd(s,eo);
   head->lx = l; head->next = malloc(sizeof(Elem)); curr = head; curr = curr->next;
-  while((l = lex(s)).type != END) {
-    if(l.type == PAREN) { if(l.x.i==-1) { l.x.e = parse(s); l.type = LST; }
+  while((l = lexd(s,eo)).type != END) { printf("ohno\n");
+    if(l.type == PAREN) { if(l.x.i==-1) { l.x.e = parse(s,eo); l.type = LST; }
                           else { return head; } }
     else { curr->lx = l; }
     curr->next = malloc(sizeof(Elem)); curr = curr->next; }
@@ -73,5 +73,9 @@ Lit exec(Lit x) { if(x.type!=LST) { return x; } else { return word(x.x.e); } }
 
 Lit word(Elem *s) { Lit q = see_prim(s,s->next);
   if(!isfail(q)) { return q; } else { printf("FAILURE\n"); exit(0); return q; } }
-  
-  
+
+Lit prgm(FILE *s, int eofchar) { word(parse(s,eofchar)); }
+
+int main(int argc, char **argv) { printf("> "); Lit e = lexd(stdin,'\n'); 
+  Elem *x = malloc(sizeof(Elem)); x->lx = e;
+  printAtom(x); return 0; }
