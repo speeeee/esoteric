@@ -57,6 +57,7 @@ Lit printAtom(Elem *a) {
   switch(a->lx.type) { case INT: printf("%li",a->lx.x.i); break;
                        case FLT: printf("%g",a->lx.x.f); break;
                        case CHR: printf("%c",a->lx.x.c); break;
+                       case STR: printf("%s",a->lx.x.s); break;
                        default: printf("error\n"); }
   return liti(0); }
 
@@ -73,7 +74,7 @@ Lit call(Fun x, Elem *a) {
 
 // == standard library ===================================================//
 
-int main(int argc, char **argv) {
-  call(fun(&printAtom),list(1,liti(3)));
+//int main(int argc, char **argv) {
+//  call(fun(&printAtom),list(1,liti(3)));
   //Elem *root = malloc(sizeof(Elem)); root->lx.i = 3; root->lx.type = 0;
-  /*printAtom(root); printf("%li",root->lx.i);*/ return 0; }
+//  /*printAtom(root); printf("%li",root->lx.i);*/ return 0; }

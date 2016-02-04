@@ -6,10 +6,12 @@
 #define INT 0
 #define FLT 1
 #define CHR 2
-#define LST 3
-#define LAM 4
-#define FUN 5
-#define SUC 6
+#define STR 3
+#define LST 4
+#define LAM 5
+#define FUN 6
+#define SUC 7
+#define SYM 8
 
 typedef void  *A;
 typedef long   Int;
@@ -26,6 +28,7 @@ struct Elem { Lit lx; struct Elem *next; };
 typedef struct { int t; union { char *la; FPtr f; }; } Fun;
 
 Lit liti(long);
+Lit lits(char *);
 
 Lit readInt(void);
 Elem *list(int, ...);
@@ -35,7 +38,7 @@ Lit printAtom(Elem *);
 
 Fun fun(FPtr);
 Fun lam(char *);
-Lit call(Fun, Elem *)
+Lit call(Fun, Elem *);
 
 // == lambda storage   ===================================================//
 //    lambda expressions are stored as strings that refer to function pointers.
