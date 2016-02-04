@@ -28,7 +28,7 @@ struct Elem { Lit lx; struct Elem *next; };
 typedef struct { int t; union { char *la; FPtr f; }; } Fun;
 
 Lit liti(long);
-Lit lits(char *);
+Lit litsy(char *);
 
 Lit readInt(void);
 Elem *list(int, ...);

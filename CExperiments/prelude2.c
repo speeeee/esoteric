@@ -41,7 +41,7 @@ typedef struct { int t; union { char *la; FPtr f; }; } Fun;
                  case LST: l.x.e = va_arg(vl,Elem *); break;
                  default: printf("nem"); } printf("%i", l.type); return l; }*/
 Lit liti(long i) { Lit l; l.x.i = i; l.type = INT; return l; }
-Lit lits(char *x) { Lit l; l.x.s = x; l.type = STR; return l; }
+Lit litsy(char *x) { Lit l; l.x.s = x; l.type = SYM; return l; }
 
 Lit readInt(void) { int i; scanf("%d",&i); return liti(i); }
 Elem *list(int n, ...) { 
@@ -58,6 +58,7 @@ Lit printAtom(Elem *a) {
                        case FLT: printf("%g",a->lx.x.f); break;
                        case CHR: printf("%c",a->lx.x.c); break;
                        case STR: printf("%s",a->lx.x.s); break;
+                       case SYM: printf("%s",a->lx.x.s); break;
                        default: printf("error\n"); }
   return liti(0); }
 

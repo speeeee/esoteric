@@ -44,7 +44,7 @@ Lit lexd(FILE *s, int eofchar) { printf("lexing\n"); int c;
   if(c=='(') { Lit e; e.x.i = -1; e.type = PAREN; return e; }
   if(c==')') { Lit e; e.x.i = 1; e.type = PAREN; return e; }
   if(c==eofchar||c==EOF) { Lit e; e.x.i = EOF; e.type = END; return e; }
-  else { return lits(tok(s,c)); } }
+  else { return litsy(tok(s,c)); } }
 Lit lex(FILE *s) { return lexd(s,EOF); }
 
 Elem *parse(FILE *s,int eo) { printf("parsing\n"); Elem *head = malloc(sizeof(Elem));
