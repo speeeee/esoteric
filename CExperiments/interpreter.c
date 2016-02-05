@@ -29,7 +29,7 @@ Lit and(Elem *a) { if(a->lx.type==SUC&&a->next->lx.type==SUC) {
   DESTROY(a); /* not yet defined */ return e; }
   else { DESTROY(a); printf("type mismatch\n"); return liti(0); } }
 
-Fn prims[] = { { ",", &and } }; int fsz = 1;
+Fn prims[] = { { "and", &and } }; int fsz = 1;
 Elem **funs; int dsz = 0;
 
 char *tok(FILE *s,int c) {
@@ -59,9 +59,9 @@ Elem *parse(FILE *s,int eo) { printf("parsing\n"); Elem *head = malloc(sizeof(El
   while((l = lexd(s,eo)).type != END) { printf("ohno\n");
     if(l.type == PAREN) { if(l.x.i==-1) { l.x.e = parse(s,eo); l.type = LST; }
                           else { return head; } }
-    else { curr->lx = l; }
+    else { curr->lx = l; } printAtom(curr);
     curr->next = malloc(sizeof(Elem)); curr = curr->next; }
-  free(curr->next); return head; }
+  free(curr); return head; }
 
 Lit fail(void) { Lit r; r.x.i = 0; r.type = FAIL; return r; }
 int isfail(Lit x) { return x.type == FAIL; }
@@ -82,6 +82,6 @@ Lit word(Elem *s) { Lit q = see_prim(s,s->next);
 
 Lit prgm(FILE *s, int eofchar) { word(parse(s,eofchar)); }
 
-int main(int argc, char **argv) { printf("> "); Lit e = lexd(stdin,'\n'); 
+int main(int argc, char **argv) { printf("> "); /*Lit e = lexd(stdin,'\n'); 
   Elem *x = malloc(sizeof(Elem)); x->lx = e;
-  printAtom(x); return 0; }
+  printAtom(x);*/ prgm(stdin,'\n'); return 0; }
