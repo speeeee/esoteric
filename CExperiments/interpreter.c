@@ -37,10 +37,16 @@ char *tok(FILE *s,int c) {
   while(!isspace(c)&&c!='('&&c!=')') { 
     if(sz==lsz) { str = realloc(str,(lsz+=10)*sizeof(char)); }
     str[sz++] = c; c = fgetc(s); } ungetc(c,stdin); str[sz] = '\0'; return str; }
-
+long int tokl(FILE *s,int c) { 
+  int sz = 0; int lsz = 10; char *str = malloc(lsz*sizeof(char));
+  while(isdigit(c)) {
+    if(sz==lsz) { str = realloc(str,(lsz+=10)*sizeof(char)); }
+    str[sz++] = c; c = fgetc(s); } ungetc(c,stdin); str[sz] = '\0';
+    long int e = atol(str); return e; }
 Lit lexd(FILE *s, int eofchar) { printf("lexing\n"); int c;
   while(/*isspace(c = fgetc(s))*/(c = fgetc(s))==' '||c=='\t');
-  if(isdigit(c)) { Lit q; fscanf(s,"%li",&q.x.i); q.type = INT; return q; }
+  if(isdigit(c)) { //Lit q; fscanf(s,"%li",&q.x.i); q.type = INT; return q; }
+                   return liti(tokl(s,c)); }
   if(c=='(') { Lit e; e.x.i = -1; e.type = PAREN; return e; }
   if(c==')') { Lit e; e.x.i = 1; e.type = PAREN; return e; }
   if(c==eofchar||c==EOF) { Lit e; e.x.i = EOF; e.type = END; return e; }
