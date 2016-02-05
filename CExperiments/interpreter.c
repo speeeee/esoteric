@@ -29,8 +29,11 @@ Lit and(Elem *a) { printf("yes\n"); if(a->lx.type==SUC&&a->next->lx.type==SUC) {
   e.x.i = a->lx.x.i&&a->lx.x.i;
   DESTROY(a); /* not yet defined */ return e; }
   else { DESTROY(a); printf("type mismatch\n"); return liti(0); } }
+Lit add(Elem *a) { if(a->lx.type==INT&&a->next->lx.type==INT) {
+  Lit e = liti(a->lx.x.i+a->next->lx.x.i); DESTROY(a); return e; }
+  else { DESTROY(a); printf("type mismatch\n"); return liti(0); } }
 
-Fn prims[] = { { "and", &and } }; int fsz = 1;
+Fn prims[] = { { "and", &and }, { "+", &add } }; int fsz = 2;
 Elem **funs; int dsz = 0;
 
 char *tok(FILE *s,int c) {
