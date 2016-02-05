@@ -21,7 +21,8 @@ Lit exec(Lit);
 Lit word(Elem *);
 
 void DESTROY(Elem *a) { if(a->next) { DESTROY(a->next); }
-  /*if(a->lx.x.e) { DESTROY(a->lx.x.e); }*/ free(a); }
+  /*if(a->lx.x.e) { DESTROY(a->lx.x.e); }*/
+  if(a->lx.type==LST) { DESTROY(a->lx.x.e); } free(a); }
 
 Lit and(Elem *a) { printf("yes\n"); if(a->lx.type==SUC&&a->next->lx.type==SUC) {
   Lit e; e.type = SUC; 
