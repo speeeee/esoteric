@@ -21,9 +21,9 @@ Lit exec(Lit);
 Lit word(Elem *);
 
 void DESTROY(Elem *a) { if(a->next) { DESTROY(a->next); }
-  if(a->lx.x.e) { DESTROY(a->lx.x.e); } free(a); }
+  /*if(a->lx.x.e) { DESTROY(a->lx.x.e); }*/ free(a); }
 
-Lit and(Elem *a) { if(a->lx.type==SUC&&a->next->lx.type==SUC) {
+Lit and(Elem *a) { printf("yes\n"); if(a->lx.type==SUC&&a->next->lx.type==SUC) {
   Lit e; e.type = SUC; 
   e.x.i = a->lx.x.i&&a->lx.x.i;
   DESTROY(a); /* not yet defined */ return e; }
@@ -43,7 +43,7 @@ long int tokl(FILE *s,int c) {
     if(sz==lsz) { str = realloc(str,(lsz+=10)*sizeof(char)); }
     str[sz++] = c; c = fgetc(s); } ungetc(c,stdin); str[sz] = '\0';
     long int e = atol(str); return e; }
-Lit lexd(FILE *s, int eofchar) { printf("lexing\n"); int c;
+Lit lexd(FILE *s, int eofchar) { int c;
   while(/*isspace(c = fgetc(s))*/(c = fgetc(s))==' '||c=='\t');
   if(isdigit(c)) { //Lit q; fscanf(s,"%li",&q.x.i); q.type = INT; return q; }
                    return liti(tokl(s,c)); }
@@ -53,10 +53,10 @@ Lit lexd(FILE *s, int eofchar) { printf("lexing\n"); int c;
   else { return litsy(tok(s,c)); } }
 Lit lex(FILE *s) { return lexd(s,EOF); }
 
-Elem *parse(FILE *s,int eo) { printf("parsing\n"); Elem *head = malloc(sizeof(Elem));
+Elem *parse(FILE *s,int eo) { Elem *head = malloc(sizeof(Elem));
   Elem *curr = malloc(sizeof(Elem)); Lit l = lexd(s,eo);
   head->lx = l; head->next = malloc(sizeof(Elem)); curr = head; curr = curr->next;
-  while((l = lexd(s,eo)).type != END) { printf("ohno\n");
+  while((l = lexd(s,eo)).type != END) {
     if(l.type == PAREN) { if(l.x.i==-1) { l.x.e = parse(s,eo); l.type = LST; }
                           else { return head; } }
     else { curr->lx = l; } printAtom(curr);
@@ -67,11 +67,11 @@ Lit fail(void) { Lit r; r.x.i = 0; r.type = FAIL; return r; }
 int isfail(Lit x) { return x.type == FAIL; }
 
 Lit see_prim(Elem *, Elem *);
-Lit see_prim(Elem *n, Elem *s) { if(n->lx.type == SYM) { char *q = n->lx.x.s; int i;
+Lit see_prim(Elem *n, Elem *s) { if(n->lx.type == SYM) { char *q = n->lx.x.s; int i; 
   for(i=0;i<fsz;i++) {
     if(!strcmp(q,prims[i].name)) { 
       Elem *q = malloc(sizeof(Elem)); q = s;
-      while(q) { q->lx = exec(q->lx); q = q->next; }
+      while(q->next) { printf("%li\n",q->lx.x.i); q->lx = exec(q->lx); q = q->next; }
       return call(fun(prims[i].ptr),s); } }
   if(i==fsz) { fail(); } } else { fail(); } }
 
