@@ -92,7 +92,7 @@ Lit exec(Lit x) { if(x.type!=LST) { return x; } else { return word(x.x.e); } }
 Lit word(Elem *s) { Lit q = see_prim(s,s->next);
   if(!isfail(q)) { return q; } else { printf("FAILURE\n"); exit(0); return q; } }
 
-Lit prgm(FILE *s, int eofchar) { word(parse(s,eofchar)); }
+Lit prgm(FILE *s, int eofchar) { return word(parse(s,eofchar)); }
 
 int main(int argc, char **argv) { while(1) { printf("\n> "); prgm(stdin,'\n'); }
   return 0; }
