@@ -37,7 +37,7 @@ Fn prims[] = { { "and", &and }, { "+", &add } }; int fsz = 2;
 Elem **funs; int dsz = 0;
 
 Lit prnList(Elem *a) { Elem *curr = malloc(sizeof(Elem)); curr = a;
-  printf("("); while(curr->next) { if(curr->lx.type == LST) {
+  printf("("); while(curr) { if(curr->lx.type == LST) {
     prnList(curr->lx.x.e); } else { 
     printAtom(curr); printf(" "); curr = curr->next; } } printf(")\n"); return liti(0); }
 
