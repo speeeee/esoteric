@@ -37,7 +37,7 @@ Fn prims[] = { { "and", &and }, { "+", &add } }; int fsz = 2;
 Elem **funs; int dsz = 0;
 
 Lit prnList(Elem *a) { Elem *curr = malloc(sizeof(Elem)); curr = a;
-  printf("("); while(curr) { if(curr->lx.type == LST) {
+  printf("("); while(curr->next) { if(curr->lx.type == LST) {
     prnList(curr->lx.x.e); } else { 
     printAtom(curr); printf(" "); curr = curr->next; } } printf(")\n"); return liti(0); }
 
@@ -66,9 +66,10 @@ Elem *parse(FILE *s,int eo) { Elem *head = malloc(sizeof(Elem));
   Elem *curr = malloc(sizeof(Elem)); Lit l = lexd(s,eo);
   head->lx = l; head->next = malloc(sizeof(Elem)); curr = head; curr = curr->next;
   while((l = lexd(s,eo)).type != END) {
-    if(l.type == PAREN) { if(l.x.i==-1) { l.x.e = parse(s,eo); l.type = LST; }
+    if(l.type == PAREN) { if(l.x.i==-1) {
+                            curr->lx.x.e = parse(s,eo); curr->lx.type = LST; }
                           else { return head; } }
-    else { curr->lx = l; } prnList(head); //printAtom(curr);
+    else { curr->lx = l; } //prnList(head); //printAtom(curr);
     curr->next = malloc(sizeof(Elem)); curr = curr->next; }
   free(curr); return head; }
 
@@ -76,11 +77,11 @@ Lit fail(void) { Lit r; r.x.i = 0; r.type = FAIL; return r; }
 int isfail(Lit x) { return x.type == FAIL; }
 
 Lit see_prim(Elem *, Elem *);
-Lit see_prim(Elem *n, Elem *s) { printf("seen\n"); if(n->lx.type == SYM) { char *q = n->lx.x.s; int i; 
+Lit see_prim(Elem *n, Elem *s) { if(n->lx.type == SYM) { char *q = n->lx.x.s; int i; 
   for(i=0;i<fsz;i++) {
     if(!strcmp(q,prims[i].name)) { 
       Elem *q = malloc(sizeof(Elem)); q = s;
-      while(q->next) { printf("%li\n",q->lx.x.i); q->lx = exec(q->lx); q = q->next; }
+      while(q->next) { q->lx = exec(q->lx); q = q->next; }
       return call(fun(prims[i].ptr),s); } }
   if(i==fsz) { fail(); } } else { fail(); } }
 
