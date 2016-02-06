@@ -24,17 +24,22 @@ void DESTROY(Elem *a) { if(a->next) { DESTROY(a->next); }
   /*if(a->lx.x.e) { DESTROY(a->lx.x.e); }*/
   if(a->lx.type==LST) { DESTROY(a->lx.x.e); } free(a); }
 
-Lit and(Elem *a) { printf("yes\n"); if(a->lx.type==SUC&&a->next->lx.type==SUC) {
+Lit and(Elem *a) { if(a->lx.type==SUC&&a->next->lx.type==SUC) {
   Lit e; e.type = SUC; 
   e.x.i = a->lx.x.i&&a->lx.x.i;
   DESTROY(a); /* not yet defined */ return e; }
   else { DESTROY(a); printf("type mismatch\n"); return liti(0); } }
 Lit add(Elem *a) { if(a->lx.type==INT&&a->next->lx.type==INT) {
-  Lit e = liti(a->lx.x.i+a->next->lx.x.i); DESTROY(a); return e; }
+  Lit e = liti(a->lx.x.i+a->next->lx.x.i); DESTROY(a); printf("ans:%li\n",e.x.i); return e; }
   else { DESTROY(a); printf("type mismatch\n"); return liti(0); } }
 
 Fn prims[] = { { "and", &and }, { "+", &add } }; int fsz = 2;
 Elem **funs; int dsz = 0;
+
+Lit prnList(Elem *a) { Elem *curr = malloc(sizeof(Elem)); curr = a;
+  printf("("); while(curr->next) { if(curr->lx.type == LST) {
+    prnList(curr->lx.x.e); } else { 
+    printAtom(curr); printf(" "); curr = curr->next; } } printf(")\n"); return liti(0); }
 
 char *tok(FILE *s,int c) {
   int sz = 0; int lsz = 10; char *str = malloc(lsz*sizeof(char));
@@ -63,7 +68,7 @@ Elem *parse(FILE *s,int eo) { Elem *head = malloc(sizeof(Elem));
   while((l = lexd(s,eo)).type != END) {
     if(l.type == PAREN) { if(l.x.i==-1) { l.x.e = parse(s,eo); l.type = LST; }
                           else { return head; } }
-    else { curr->lx = l; } printAtom(curr);
+    else { curr->lx = l; } prnList(head); //printAtom(curr);
     curr->next = malloc(sizeof(Elem)); curr = curr->next; }
   free(curr); return head; }
 
@@ -71,7 +76,7 @@ Lit fail(void) { Lit r; r.x.i = 0; r.type = FAIL; return r; }
 int isfail(Lit x) { return x.type == FAIL; }
 
 Lit see_prim(Elem *, Elem *);
-Lit see_prim(Elem *n, Elem *s) { if(n->lx.type == SYM) { char *q = n->lx.x.s; int i; 
+Lit see_prim(Elem *n, Elem *s) { printf("seen\n"); if(n->lx.type == SYM) { char *q = n->lx.x.s; int i; 
   for(i=0;i<fsz;i++) {
     if(!strcmp(q,prims[i].name)) { 
       Elem *q = malloc(sizeof(Elem)); q = s;
@@ -79,7 +84,7 @@ Lit see_prim(Elem *n, Elem *s) { if(n->lx.type == SYM) { char *q = n->lx.x.s; in
       return call(fun(prims[i].ptr),s); } }
   if(i==fsz) { fail(); } } else { fail(); } }
 
-Lit exec(Lit x) { if(x.type!=LST) { return x; } else { return word(x.x.e); } }
+Lit exec(Lit x) { if(x.type!=LST) { printf("%i",x.type);return x; } else { return word(x.x.e); } }
 
 Lit word(Elem *s) { Lit q = see_prim(s,s->next);
   if(!isfail(q)) { return q; } else { printf("FAILURE\n"); exit(0); return q; } }
