@@ -30,10 +30,11 @@ Lit and(Elem *a) { if(a->lx.type==SUC&&a->next->lx.type==SUC) {
   DESTROY(a); /* not yet defined */ return e; }
   else { DESTROY(a); printf("type mismatch\n"); return liti(0); } }
 Lit add(Elem *a) { if(a->lx.type==INT&&a->next->lx.type==INT) {
-  Lit e = liti(a->lx.x.i+a->next->lx.x.i); DESTROY(a); printf("ans:%li\n",e.x.i); return e; }
+  Lit e = liti(a->lx.x.i+a->next->lx.x.i); DESTROY(a); return e; }
   else { DESTROY(a); printf("type mismatch\n"); return liti(0); } }
 
-Fn prims[] = { { "and", &and }, { "+", &add } }; int fsz = 2;
+Fn prims[] = { { "and", &and }, { "+", &add }, { "&prn", &printAtom } }; 
+int fsz = 3;
 Elem **funs; int dsz = 0;
 
 Lit prnList(Elem *a) { Elem *curr = malloc(sizeof(Elem)); curr = a;
@@ -77,7 +78,8 @@ Lit fail(void) { Lit r; r.x.i = 0; r.type = FAIL; return r; }
 int isfail(Lit x) { return x.type == FAIL; }
 
 Lit see_prim(Elem *, Elem *);
-Lit see_prim(Elem *n, Elem *s) { if(n->lx.type == SYM) { char *q = n->lx.x.s; int i; 
+Lit see_prim(Elem *n, Elem *s) { if(n->lx.type == SYM) { char *q = n->lx.x.s; int i;
+  if(!strcmp(q,":q")) { exit(0); } 
   for(i=0;i<fsz;i++) {
     if(!strcmp(q,prims[i].name)) { 
       Elem *q = malloc(sizeof(Elem)); q = s;
@@ -85,13 +87,12 @@ Lit see_prim(Elem *n, Elem *s) { if(n->lx.type == SYM) { char *q = n->lx.x.s; in
       return call(fun(prims[i].ptr),s); } }
   if(i==fsz) { fail(); } } else { fail(); } }
 
-Lit exec(Lit x) { if(x.type!=LST) { printf("%i",x.type);return x; } else { return word(x.x.e); } }
+Lit exec(Lit x) { if(x.type!=LST) { return x; } else { return word(x.x.e); } }
 
 Lit word(Elem *s) { Lit q = see_prim(s,s->next);
   if(!isfail(q)) { return q; } else { printf("FAILURE\n"); exit(0); return q; } }
 
 Lit prgm(FILE *s, int eofchar) { word(parse(s,eofchar)); }
 
-int main(int argc, char **argv) { printf("> "); /*Lit e = lexd(stdin,'\n'); 
-  Elem *x = malloc(sizeof(Elem)); x->lx = e;
-  printAtom(x);*/ prgm(stdin,'\n'); return 0; }
+int main(int argc, char **argv) { while(1) { printf("\n> "); prgm(stdin,'\n'); }
+  return 0; }
