@@ -34,7 +34,7 @@ Lit add(Elem *a) { if(a->lx.type==INT&&a->next->lx.type==INT) {
   else { DESTROY(a); printf("type mismatch\n"); return liti(0); } }
 
 Fn prims[] = { { "and", &and }, { "+", &add }, { "&prn", &printAtom } }; 
-int fsz = 3;
+int fsz = 4;
 Elem **funs; int dsz = 0;
 
 Lit prnList(Elem *a) { Elem *curr = malloc(sizeof(Elem)); curr = a;
@@ -77,9 +77,20 @@ Elem *parse(FILE *s,int eo) { Elem *head = malloc(sizeof(Elem));
 Lit fail(void) { Lit r; r.x.i = 0; r.type = FAIL; return r; }
 int isfail(Lit x) { return x.type == FAIL; }
 
+// TODO: make $: list and $': list-noeval.
+
+Lit lambda(Elem *a) { Lit q; q.type = LAM; q.x.e = malloc(sizeof(Elem)); 
+  q.x.e = a; return q; }
+
+Elem *replace_all(Elem *e, Elem *l) { Elem *q = malloc(sizeof(Elem)); q = e;
+  while(q->next) { if(q->lx.type==SYM&&!strcmp(q->lx.x.s,"x.")) { 
+    free(q->lx.x.s); q->lx.type = LST; q->lx.x.e = malloc(sizeof(Elem));
+    q->lx.x.e = l; } q = q->next; } return e; }
+
 Lit see_prim(Elem *, Elem *);
 Lit see_prim(Elem *n, Elem *s) { if(n->lx.type == SYM) { char *q = n->lx.x.s; int i;
-  if(!strcmp(q,":q")) { exit(0); } 
+  if(!strcmp(q,":q")) { exit(0); }
+  if(!strcmp(q,"\\")) { return lambda(s); } // '\'s arguments are not eval'd.
   for(i=0;i<fsz;i++) {
     if(!strcmp(q,prims[i].name)) { 
       Elem *q = malloc(sizeof(Elem)); q = s;
@@ -87,10 +98,18 @@ Lit see_prim(Elem *n, Elem *s) { if(n->lx.type == SYM) { char *q = n->lx.x.s; in
       return call(fun(prims[i].ptr),s); } }
   if(i==fsz) { fail(); } } else { fail(); } }
 
+Lit app_la(Elem *n, Elem *s) { if(n->lx.type == LAM) {
+  Elem *q = malloc(sizeof(Elem)); q = s;
+  while(q->next) { q->lx = exec(q->lx); q = q->next; }
+  return word(replace_all(n->lx.x.e,s)); }
+  else { exit(0); } }
+
 Lit exec(Lit x) { if(x.type!=LST) { return x; } else { return word(x.x.e); } }
 
-Lit word(Elem *s) { Lit q = see_prim(s,s->next);
-  if(!isfail(q)) { return q; } else { printf("FAILURE\n"); exit(0); return q; } }
+Lit word(Elem *s) { s->lx = exec(s->lx);
+  Lit q = see_prim(s,s->next);
+  if(!isfail(q)) { return q; } else {
+    return app_la(s,s->next); } }
 
 Lit prgm(FILE *s, int eofchar) { return word(parse(s,eofchar)); }
 
