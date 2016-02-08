@@ -1,0 +1,8 @@
+TEST: The following expressions (and ones similar to them) are confirmed to work.
+      This is not a comprehensive list of every possible expression that works; this
+      is only a compilation of expressions to test the interpreter.
+7 February 2016
+====================================================================================
+
+&prn (+ (+ 1 2) (+ 3 4))
+&prn (&REF 0 ($ 1 2 3))
