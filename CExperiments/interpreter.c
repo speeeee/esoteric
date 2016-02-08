@@ -10,9 +10,9 @@
                   (t)==LST?(v).x.e:0)*/
 #define VAL(t,v) ((t)==INT?(v).x.i:(t)==FLT?(v).x.f:(t)==CHR?(v).x.c:(t)==STR?(v).x.e:0)
 
-#define PAREN 8
-#define END   9
-#define FAIL  10
+#define PAREN 9
+#define END   10
+#define FAIL  11
 
 typedef struct { char *name; FPtr ptr; } Fn;
 typedef struct { int typ; union { Elem *a; Lit b; }; } LLit;
@@ -24,6 +24,8 @@ void DESTROY(Elem *a) { if(a->next) { DESTROY(a->next); }
   /*if(a->lx.x.e) { DESTROY(a->lx.x.e); }*/
   if(a->lx.type==LST) { DESTROY(a->lx.x.e); } free(a); }
 
+// -- general standard library ------------------------------------- //
+
 Lit and(Elem *a) { if(a->lx.type==SUC&&a->next->lx.type==SUC) {
   Lit e; e.type = SUC; 
   e.x.i = a->lx.x.i&&a->lx.x.i;
@@ -32,10 +34,20 @@ Lit and(Elem *a) { if(a->lx.type==SUC&&a->next->lx.type==SUC) {
 Lit add(Elem *a) { if(a->lx.type==INT&&a->next->lx.type==INT) {
   Lit e = liti(a->lx.x.i+a->next->lx.x.i); DESTROY(a); return e; }
   else { DESTROY(a); printf("type mismatch\n"); return liti(0); } }
+Lit ref(Elem *a) { if(a->lx.type==INT&&a->next->lx.type==LLT) { 
+  Elem *e = malloc(sizeof(Elem)); e = a->next->lx.x.e;
+  for(int i=0;i<a->lx.x.i;i++) { if(e->next) { e = e->next; } else {
+    printf("error: index out of bounds.\n"); exit(0); } } Lit r = e->lx;
+  DESTROY(a); return r; } else { printf("error: type mismatch.\n"); exit(0); } }
+Lit cr_list(Elem *a) { Lit e; e.type = LLT; e.x.e = malloc(sizeof(Elem));
+  e.x.e = a; return e; }
 
-Fn prims[] = { { "and", &and }, { "+", &add }, { "&prn", &printAtom } }; 
-int fsz = 4;
+Fn prims[] = { { "and", &and }, { "+", &add }, { "&prn", &printAtom },
+               { "$", &cr_list }, { "&REF", &ref } }; 
+int fsz = 5;
 Elem **funs; int dsz = 0;
+
+// ----------------------------------------------------------------- //
 
 Lit prnList(Elem *a) { Elem *curr = malloc(sizeof(Elem)); curr = a;
   printf("("); while(curr->next) { if(curr->lx.type == LST) {
