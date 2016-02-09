@@ -6,3 +6,4 @@ TEST: The following expressions (and ones similar to them) are confirmed to work
 
 &prn (+ (+ 1 2) (+ 3 4))
 &prn (&REF 0 ($ 1 2 3))
+&prn ((\ &REF 0 x.) 1 2 3) ~ does not search recursively for variable yet.
