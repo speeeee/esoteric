@@ -10,15 +10,16 @@
                   (t)==LST?(v).x.e:0)*/
 #define VAL(t,v) ((t)==INT?(v).x.i:(t)==FLT?(v).x.f:(t)==CHR?(v).x.c:(t)==STR?(v).x.e:0)
 
-#define PAREN 9
-#define END   10
-#define FAIL  11
+#define PAREN 10
+#define END   11
+#define FAIL  12
 
 typedef struct { char *name; FPtr ptr; } Fn;
 typedef struct { int typ; union { Elem *a; Lit b; }; } LLit;
 
 Lit exec(Lit);
 Lit word(Elem *);
+Lit prnList(Elem *);
 
 void DESTROY(Elem *a) { if(a->next) { DESTROY(a->next); }
   /*if(a->lx.x.e) { DESTROY(a->lx.x.e); }*/
@@ -38,7 +39,7 @@ Lit ref(Elem *a) { if(a->lx.type==INT&&a->next->lx.type==LLT) {
   Elem *e = malloc(sizeof(Elem)); e = a->next->lx.x.e;
   for(int i=0;i<a->lx.x.i;i++) { if(e->next) { e = e->next; } else {
     printf("error: index out of bounds.\n"); exit(0); } } Lit r = e->lx;
-  DESTROY(a); return r; } else { printf("error: type mismatch.\n"); exit(0); } }
+  DESTROY(a); return r; } else { printf("error:&REF: type mismatch.\n"); exit(0); } }
 Lit cr_list(Elem *a) { Lit e; e.type = LLT; e.x.e = malloc(sizeof(Elem));
   e.x.e = a; return e; }
 
@@ -77,7 +78,11 @@ Lit lex(FILE *s) { return lexd(s,EOF); }
 
 Elem *parse(FILE *s,int eo) { Elem *head = malloc(sizeof(Elem));
   Elem *curr = malloc(sizeof(Elem)); Lit l = lexd(s,eo);
-  head->lx = l; head->next = malloc(sizeof(Elem)); curr = head; curr = curr->next;
+  if(l.type == PAREN) { if(l.x.i==-1) { head->lx.x.e = parse(s,eo);
+                          head->lx.type = LST; } else { return head; } }
+  else { head->lx = l; }
+  /*head->lx = l;*/
+  head->next = malloc(sizeof(Elem)); curr = head; curr = curr->next;
   while((l = lexd(s,eo)).type != END) {
     if(l.type == PAREN) { if(l.x.i==-1) {
                             curr->lx.x.e = parse(s,eo); curr->lx.type = LST; }
@@ -96,8 +101,10 @@ Lit lambda(Elem *a) { Lit q; q.type = LAM; q.x.e = malloc(sizeof(Elem));
 
 Elem *replace_all(Elem *e, Elem *l) { Elem *q = malloc(sizeof(Elem)); q = e;
   while(q->next) { if(q->lx.type==SYM&&!strcmp(q->lx.x.s,"x.")) { 
-    free(q->lx.x.s); q->lx.type = LST; q->lx.x.e = malloc(sizeof(Elem));
-    q->lx.x.e = l; } q = q->next; } return e; }
+      free(q->lx.x.s); q->lx.type = LLT; q->lx.x.e = malloc(sizeof(Elem));
+      q->lx.x.e = l; }
+    //else if(q->lx.type==LST) { q->lx.x.e = replace_all(q->lx.x.e,l); }
+    q = q->next; } return e; }
 
 Lit see_prim(Elem *, Elem *);
 Lit see_prim(Elem *n, Elem *s) { if(n->lx.type == SYM) { char *q = n->lx.x.s; int i;
@@ -108,13 +115,13 @@ Lit see_prim(Elem *n, Elem *s) { if(n->lx.type == SYM) { char *q = n->lx.x.s; in
       Elem *q = malloc(sizeof(Elem)); q = s;
       while(q->next) { q->lx = exec(q->lx); q = q->next; }
       return call(fun(prims[i].ptr),s); } }
-  if(i==fsz) { fail(); } } else { fail(); } }
+  if(i==fsz) { return fail(); } } else { return fail(); } }
 
 Lit app_la(Elem *n, Elem *s) { if(n->lx.type == LAM) {
   Elem *q = malloc(sizeof(Elem)); q = s;
   while(q->next) { q->lx = exec(q->lx); q = q->next; }
   return word(replace_all(n->lx.x.e,s)); }
-  else { exit(0); } }
+  else { printf("is neither function nor lambda.\n"); exit(0); } }
 
 Lit exec(Lit x) { if(x.type!=LST) { return x; } else { return word(x.x.e); } }
 
