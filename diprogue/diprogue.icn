@@ -1,0 +1,5 @@
+procedure main()
+&window := open("diprogue", "g", "drawop=reverse", "size=800,800")
+repeat if Event() === (&lpress | &rpress | &mpress) then {
+  FillRectangle(0,0,800,800) }
+end
