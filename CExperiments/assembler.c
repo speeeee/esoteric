@@ -11,7 +11,26 @@
              09 - out (4 bytes)
              0A - in (returns char)
              0B - label
+             0C - ref (references stack by displacement) (4 bytes)
+             0D - jns (jump if null stack) (LABEL or 4 bytes)
+             0E - jmp (LABEL or 4 bytes)
+             0F - terminate
+             10 - pop
+
+   constants: TSTK - always points to the top of the stack. Note that referencing
+                     this does not pop.
 
    sample:
-   label main        ; labels are unnecessary, but good for gotos. */
+   label end
+   terminate
+   label main        ; labels are unnecessary, but good for gotos. 
+   push 32
+   push 33
+   push 34
+   label loop
+   jns end
+   out word TSTK
+   pop
+   jmp loop 
+*/
    
