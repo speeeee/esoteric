@@ -38,6 +38,9 @@
    or: 0B 00000000 0F 00000000 0B 00000001 01 00000020 01 00000021 01 00000022
        0B 00000002 0D 00000000 09 00000000 10 00000000 0E 00000023
 */
+
+// WARNING: code does NOT yet compile.
+
 #include <stdio.h>
 #include <stdlib.h>
 
