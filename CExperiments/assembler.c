@@ -82,14 +82,14 @@ Lit lexd(FILE *s, int eofchar) { int c;
   else { return litsy(tok(s,c)); } }
 Lit lex(FILE *s) { return lexd(s,EOF); }
 
-void parse(FILE *f, int eo) { Lit l;
-  while((l = lexd(f,eo)).type != END) {
+void parse(FILE *f, FILE *s, int eo) { Lit l;
+  while((l = lexd(s,eo)).type != END) {
   if(l.type != SYM) { printf("ERROR: must start with op-code.\n"); }
-  else { if(!strcmp(l.x.s,"test")) { char x[11]="hello world";
-           fwrite(x, sizeof(x[0]), sizeof(x)/sizeof(x[0]), f); }
+  else { if(!strcmp(l.x.s,"test")) {
+           fwrite("hello world", 1, 11, f); }
          if(!strcmp(l.x.s,"terminate")) { exit(0); } } } }
 
 int main(int argc, char **argv) {
   FILE *f; f = fopen("sample.usm","wb");
-  while(1) { printf("\n> "); parse(stdin,'\n'); }
+  while(1) { printf("\n> "); parse(f,stdin,'\n'); }
   fclose(f); return 0; }
