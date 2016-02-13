@@ -39,8 +39,6 @@
        0B 00000002 0D 00000000 09 00000000 10 00000000 0E 00000023
 */
 
-// WARNING: code does NOT yet compile.
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
