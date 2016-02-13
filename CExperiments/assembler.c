@@ -43,13 +43,25 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+#include <ctype.h>
+
+#define INT 0
+#define FLT 1
+#define CHR 2
+#define SYM 3
+#define END 4
 
 typedef long   Int;
 typedef double Flt;
 typedef char   Chr;
 
+typedef struct Lit Lit;
 struct Lit { union { Int i; Flt f; Chr c; Chr *s; } x;
              unsigned int type; };
+
+Lit liti(long i) { Lit l; l.x.i = i; l.type = INT; return l; }
+Lit litsy(char *x) { Lit l; l.x.s = x; l.type = SYM; return l; }
 
 char *tok(FILE *s,int c) {
   int sz = 0; int lsz = 10; char *str = malloc(lsz*sizeof(char));
@@ -66,15 +78,18 @@ Lit lexd(FILE *s, int eofchar) { int c;
   while(/*isspace(c = fgetc(s))*/(c = fgetc(s))==' '||c=='\t');
   if(isdigit(c)) { //Lit q; fscanf(s,"%li",&q.x.i); q.type = INT; return q; }
                    return liti(tokl(s,c)); }
-  if(c=='(') { Lit e; e.x.i = -1; e.type = PAREN; return e; }
-  if(c==')') { Lit e; e.x.i = 1; e.type = PAREN; return e; }
   if(c==eofchar||c==EOF) { Lit e; e.x.i = EOF; e.type = END; return e; }
   else { return litsy(tok(s,c)); } }
 Lit lex(FILE *s) { return lexd(s,EOF); }
 
-
+void parse(FILE *f, int eo) { Lit l;
+  while((l = lexd(f,eo)).type != END) {
+  if(l.type != SYM) { printf("ERROR: must start with op-code.\n"); }
+  else { if(!strcmp(l.x.s,"test")) { char x[11]="hello world";
+           fwrite(x, sizeof(x[0]), sizeof(x)/sizeof(x[0]), f); }
+         if(!strcmp(l.x.s,"terminate")) { exit(0); } } } }
 
 int main(int argc, char **argv) {
   FILE *f; f = fopen("sample.usm","wb");
   while(1) { printf("\n> "); parse(stdin,'\n'); }
-  return 0; }
+  fclose(f); return 0; }
