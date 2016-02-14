@@ -52,7 +52,8 @@
 #define LNG 5
 
 typedef struct { char *name; int argsz; } OpC;
-OpC opcodes[] = { { "push", -1 /* varies */ }, { "malloc", 4 }, 
+OpC opcodes[] = { { "push", -1 /* varies */ }, { "pushw", -1 }, { "pushf", -1 },
+                  { "pushc", -1 }, { "pushl", -1 }, { "malloc", 4 }, 
                   { "realloc", 4 }, { "free", 0 }, { "mov", 4 },
                   { "mov_s", 0 }, { "call", 4 }, { "out", 4 },
                   { "in", 0 }, { "label", -1 /* varies */ },
@@ -111,11 +112,15 @@ Lit lex(FILE *s) { return lexd(s,EOF); }
 void parse(FILE *o, FILE *i, int eo) { Lit l;
   while((l = lexd(i,eo)).type != END) {
   if(l.type != SYM) { printf("ERROR: must start with op-code.\n"); }
-  else { if(!strcmp(l.x.s,"push")) { write_c(0,o); Lit l = lexd(i,eo);
-           switch(l.type) { case INT: fwrite(&l.x.i,sizeof(int),1,o); break;
-                            case FLT: fwrite(&l.x.f,sizeof(double),1,o); break;
-                            case CHR: fwrite(&l.x.s,sizeof(char),1,o); break;
-                            case LNG: fwrite(&l.x.l,sizeof(long),1,o); break; 
+  else { if(!strcmp(l.x.s,"push")) { Lit l = lexd(i,eo);
+           switch(l.type) { case INT: write_c(0,o); 
+                              fwrite(&l.x.i,sizeof(int),1,o); break;
+                            case FLT: write_c(1,o); 
+                              fwrite(&l.x.f,sizeof(double),1,o); break;
+                            case CHR: write_c(2,o);
+                              fwrite(&l.x.s,sizeof(char),1,o); break;
+                            case LNG: write_c(3,o);
+                              fwrite(&l.x.l,sizeof(long),1,o); break; 
                             default: printf("error\n"); exit(0); } }
          else if(!strcmp(l.x.s,"label")) { write_c(9,o); l = lexd(i,eo);
            if(l.type == SYM) { addLabel(l.x.s); } 
