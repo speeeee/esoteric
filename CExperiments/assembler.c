@@ -80,7 +80,7 @@ struct Lit { union { Word i; DWord l; Flt f; Byte c; Byte *s; } x;
 Lit liti(long i) { Lit l; l.x.i = i; l.type = INT; return l; }
 Lit litsy(char *x) { Lit l; l.x.s = x; l.type = SYM; return l; }
 
-void write_c(int c, FILE *f) { fwrite(&c,1,1,f); }
+void write_c(char c, FILE *f) { fwrite(&c,1,1,f); }
 
 char *tok(FILE *s,int c) {
   int sz = 0; int lsz = 10; char *str = malloc(lsz*sizeof(char));
@@ -111,16 +111,16 @@ Lit lex(FILE *s) { return lexd(s,EOF); }
 void parse(FILE *o, FILE *i, int eo) { Lit l;
   while((l = lexd(i,eo)).type != END) {
   if(l.type != SYM) { printf("ERROR: must start with op-code.\n"); }
-  else { if(!strcmp(l.x.s,"push")) { write_c(0,o); l = lexd(i,eo);
+  else { if(!strcmp(l.x.s,"push")) { write_c(0,o); Lit l = lexd(i,eo);
            switch(l.type) { case INT: fwrite(&l.x.i,sizeof(int),1,o); break;
                             case FLT: fwrite(&l.x.f,sizeof(double),1,o); break;
                             case CHR: fwrite(&l.x.s,sizeof(char),1,o); break;
                             case LNG: fwrite(&l.x.l,sizeof(long),1,o); break; 
                             default: printf("error\n"); exit(0); } }
-         if(!strcmp(l.x.s,"label")) { write_c(9,o); l = lexd(i,eo);
+         else if(!strcmp(l.x.s,"label")) { write_c(9,o); l = lexd(i,eo);
            if(l.type == SYM) { addLabel(l.x.s); } 
            else { printf("error\n"); exit(0); } }
-         if(!strcmp(l.x.s,":q")) { exit(0); } } } }
+         else if(!strcmp(l.x.s,":q")) { exit(0); } } } }
 
 int main(int argc, char **argv) { ls = malloc(sizeof(char *));
   FILE *f; f = fopen("sample.usm","wb");
