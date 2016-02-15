@@ -51,15 +51,21 @@
 #define END 4
 #define LNG 5
 
+#define B sizeof(char)
+#define I sizeof(int)
+#define L sizeof(long)
+#define F sizeof(double)
+
 typedef struct { char *name; int argsz; } OpC;
 OpC opcodes[] = { { "push", -1 /* varies */ }, { "pushw", -1 }, { "pushf", -1 },
-                  { "pushc", -1 }, { "pushl", -1 }, { "malloc", 4 }, 
-                  { "realloc", 4 }, { "free", 0 }, { "mov", 4 },
-                  { "mov_s", 0 }, { "call", 4 }, { "out", 4 },
+                  { "pushc", -1 }, { "pushl", -1 }, { "malloc", I }, 
+                  { "realloc", I }, { "free", 0 }, { "mov", I },
+                  { "mov_s", 0 }, { "call", I }, { "out", I },
                   { "in", 0 }, { "label", -1 /* varies */ },
-                  { "ref", 4 }, { "jns", 4 }, { "jmp", 4 },
+                  { "ref", I }, { "jns", I }, { "jmp", I },
                   { "terminate", 0 }, { "pop", 0 }, { "out_s", 0 },
                   { "in_s", 0 } };
+int osz = 20;
 // current next-label number
 int lc = 0;
 // defined labels
@@ -82,6 +88,13 @@ Lit liti(long i) { Lit l; l.x.i = i; l.type = INT; return l; }
 Lit litsy(char *x) { Lit l; l.x.s = x; l.type = SYM; return l; }
 
 void write_c(char c, FILE *f) { fwrite(&c,1,1,f); }
+int opcode(char *x) { int i; for(i=0;i<osz;i++) {
+  if(!strcmp(x,opcodes[i].name)) { return i; } } return -1; }
+void n_out(Lit x, int n, FILE *o) { void *q; switch(x.type) {
+  case INT: q = &x.x.i; break; case FLT: q = &x.x.f; case CHR: q = &x.x.c;
+  case LNG: q = &x.x.l; default: exit(0); }
+  fwrite(q,n,1,o); }
+  
 
 char *tok(FILE *s,int c) {
   int sz = 0; int lsz = 10; char *str = malloc(lsz*sizeof(char));
@@ -109,6 +122,7 @@ Lit lexd(FILE *s, int eofchar) { int c;
     return litsy(x); } }
 Lit lex(FILE *s) { return lexd(s,EOF); }
 
+// bad code
 void parse(FILE *o, FILE *i, int eo) { Lit l;
   while((l = lexd(i,eo)).type != END) {
   if(l.type != SYM) { printf("ERROR: must start with op-code.\n"); }
@@ -118,14 +132,26 @@ void parse(FILE *o, FILE *i, int eo) { Lit l;
                             case FLT: write_c(1,o); 
                               fwrite(&l.x.f,sizeof(double),1,o); break;
                             case CHR: write_c(2,o);
-                              fwrite(&l.x.s,sizeof(char),1,o); break;
+                              fwrite(&l.x.c,sizeof(char),1,o); break;
                             case LNG: write_c(3,o);
                               fwrite(&l.x.l,sizeof(long),1,o); break; 
                             default: printf("error\n"); exit(0); } }
          else if(!strcmp(l.x.s,"label")) { write_c(9,o); l = lexd(i,eo);
-           if(l.type == SYM) { addLabel(l.x.s); } 
+           if(l.type == SYM) { addLabel(l.x.s); }
            else { printf("error\n"); exit(0); } }
-         else if(!strcmp(l.x.s,":q")) { exit(0); } } } }
+         else if(!strcmp(l.x.s,":q")) { exit(0); }
+         /*else { int ii; for(ii=0;ii<osz;i++) { if(!strcmp(l.x.s,opcodes[ii].name)) {
+           write_c(ii,o); break; } 
+           if(ii==osz) { printf("symbol doesn't exit.\n"); exit(0); }
+           if(ii) { Lit l = lexd(i,eo); switch(l.type) { 
+             case INT: fwrite(&l.x.i,opcodes[ii].argsz,1,o); break;
+             case FLT: fwrite(&l.x.f,opcodes[ii].argsz,1,o); break;
+             case CHR: fwrite(&l.x.c,opcodes[ii].argsz,1,o); break;
+             case LNG: fwrite(&l.x.l,opcodes[ii].argsz,1,o); break;
+             default: printf("error\n"); } } } } } } }*/
+         else if(opcode(l.x.s)!=-1) { int ii = opcode(l.x.s); write_c(ii,o); 
+           if(opcodes[ii].argsz) {
+             Lit l = lexd(i,eo); n_out(l,opcodes[ii].argsz,o); } } } } }
 
 int main(int argc, char **argv) { ls = malloc(sizeof(char *));
   FILE *f; f = fopen("sample.usm","wb");
