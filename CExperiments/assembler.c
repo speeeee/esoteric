@@ -64,8 +64,8 @@ OpC opcodes[] = { { "push", -1 /* varies */ }, { "pushw", -1 }, { "pushf", -1 },
                   { "in", 0 }, { "label", -1 /* varies */ },
                   { "ref", I }, { "jns", I }, { "jmp", I },
                   { "terminate", 0 }, { "pop", 0 }, { "out_s", 0 },
-                  { "in_s", 0 } };
-int osz = 20;
+                  { "in_s", 0 }, { "main", 0 } };
+int osz = 22;
 // current next-label number
 int lc = 0;
 // defined labels
