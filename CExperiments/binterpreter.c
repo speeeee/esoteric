@@ -4,11 +4,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define P 0
-#define PW 1
-#define PF 2
-#define PC 3
-#define PL 4
+#define P 4
+#define PW 0
+#define PF 1
+#define PC 2
+#define PL 3
 #define MALLOC 5
 #define REALL 6
 #define FREE 7
