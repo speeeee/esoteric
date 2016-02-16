@@ -73,6 +73,8 @@ int top_int(void) { int x = *(int *)stk->x; return x; }
 void pop(void) { if(stk->prev) { free(stk->x); stk = stk->prev; }
   else { printf("error: null stack.\n"); } }
 
+void DESTROY(void) { if(!stk->prev) { free(stk); } }
+
 /*typedef struct { char *name; int argsz; } OpC;
 OpC opcodes[] = { { "pushw", I }, { "pushf", F }, { "pushc", B },
                   { "pushl", L }, { "malloc", I }, 
@@ -92,7 +94,7 @@ void read_prgm(FILE *f) { char op; int mn = 0;
     case MALLOC: { int x = top_int(); pop(); push(malloc(x)); break; } } }
     else if(op==MAIN) { mn = 1; }
     else if(op==LABEL) { int adr; fread(&adr,4,1,f);
-      push_lbl(adr); } } }
+      push_lbl(adr); } } DESTROY(); }
 
 int main(int argc, char **argv) { stk = malloc(sizeof(Stk));
   FILE *f; f = fopen("sample.usm","rb"); read_prgm(f); return 0; }
