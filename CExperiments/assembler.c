@@ -58,14 +58,16 @@
 
 typedef struct { char *name; int argsz; } OpC;
 OpC opcodes[] = { { "push", -1 /* varies */ }, { "pushw", -1 }, { "pushf", -1 },
-                  { "pushc", -1 }, { "pushl", -1 }, { "malloc", I }, 
-                  { "realloc", I }, { "free", 0 }, { "mov", I },
-                  { "mov_s", 0 }, { "call", I }, { "out", I },
-                  { "in", 0 }, { "label", -1 /* varies */ },
-                  { "ref", I }, { "jns", I }, { "jmp", I },
+                  { "pushc", -1 }, { "pushl", -1 }, { "malloci", 0 }, 
+                  { "mallocf", 0 }, { "mallocc", 0 }, { "mallocl", 0 }, 
+                  { "realloc", 0 }, { "free", 0 }, { "mov", I },
+                  { "mov_s", 0 }, { "call", I }, { "call_s", 0 },
+                  { "out", I }, { "in", 0 }, { "label", -1 /* varies */ },
+                  { "ref", I }, { "ref_s", 0 }, { "jns", I }, { "jns_s", 0 },
+                  { "jmp", I }, { "jmp_s", 0 },
                   { "terminate", 0 }, { "pop", 0 }, { "out_s", 0 },
                   { "in_s", 0 }, { "main", 0 } };
-int osz = 22;
+int osz = 29;
 // current next-label number
 int lc = 0;
 // defined labels
