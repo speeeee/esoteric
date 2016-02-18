@@ -9,27 +9,30 @@
 #define PF 1
 #define PC 2
 #define PL 3
-#define MALLOC 5
-#define REALL 6
-#define FREE 7
-#define MOV 8
-#define MOV_S 9
-#define CALL 10
-#define CALL_S 11
-#define OUT 12
-#define IN 13
-#define LABEL 14
-#define REF 15
-#define REF_S 16
-#define JNS 17
-#define JNS_S 18
-#define JMP 19
-#define JMP_S 20
-#define TERM 21
-#define POP 22
-#define OUT_S 23
-#define IN_S 24
-#define MAIN 25
+#define MALLOCI 5
+#define MALLOCF 6
+#define MALLOCC 7
+#define MALLOCL 8
+#define REALL 9
+#define FREE 10
+#define MOV 11
+#define MOV_S 12
+#define CALL 13
+#define CALL_S 14
+#define OUT 15
+#define IN 16
+#define LABEL 17
+#define REF 18
+#define REF_S 19
+#define JNS 20
+#define JNS_S 21
+#define JMP 22
+#define JMP_S 23
+#define TERM 24
+#define POP 25
+#define OUT_S 26
+#define IN_S 27
+#define MAIN 28
 
 typedef int    Word;
 typedef long   DWord;
@@ -54,24 +57,32 @@ struct Lit { union { Word i; DWord l; Flt f; Byte c; Byte *s; void *v; } x;
 #define F sizeof(double)
 
 int *lbls; int lsz = 0;
-typedef struct Stk { void *x; struct Stk *prev; } Stk;
+//typedef struct Stk { void *x; struct Stk *prev; } Stk;
 typedef struct { union { char c; int i; long l; double f;
                          char *ca; int *ia; long *la; double *fa; }; } Lit;
 typedef struct { char op; Lit q; } Expr;
+typedef struct Stk { Lit x; struct Stk *prev; } Stk;
 Expr *exprs; int esz = 0; int mn = -1;
+Stk *stk;
 
 void push_lbl(int plc) { lbls = realloc(lbls,(lsz+1)*sizeof(int));
   lbls[lsz++] = plc; }
 void push_expr(char op, Lit q) { exprs = realloc(exprs,(esz+1)*sizeof(Expr));
   exprs[esz++] = (Expr) { op, q }; }
-/*void push(void *x) { if(stk->x) { Stk *q = malloc(sizeof(Stk));
-  q->prev = malloc(sizeof(Stk)); q->prev = stk; stk = q; stk->x = x; }
-  else { stk->x = x; } }
-int top_int(void) { int x = *(int *)stk->x; return x; }
-void pop(void) { if(stk->prev) { free(stk->x); stk = stk->prev; }
-  else { printf("error: null stack.\n"); } }
+// will be better made later.
+void nstkptr(void) { if(stk) { Stk *q = malloc(sizeof(Stk));
+  q->prev = malloc(sizeof(Stk)); q->prev = stk; stk = q; }
+  else { stk = malloc(sizeof(Stk)); } }
+void push_int(int i) { nstkptr(); stk->x.i = i; }
+void push_flt(double f) { nstkptr(); stk->x.f = f; }
+void push_chr(char c) { nstkptr(); stk->x.c = c; }
+void push_lng(long l) { nstkptr(); stk->x.l = l; }
+//void push_v(void *v) { nstkptr(); stk->x.v = v; }
+void *getptr(Lit x) { if(x.ia) { return x.ia; } else if(x.fa) { return x.fa; }
+  else if(x.ca) { return x.ca; } else if(x.la) { return x.la; }
+  else { printf("not a pointer.\n"); exit(0); } }
 
-void DESTROY(void) { if(!stk->prev) { free(stk); }
+/*void DESTROY(void) { if(!stk->prev) { free(stk); }
   else { printf("%i",*(int *)stk->x); } }*/
 
 int opcodes[] = { /*push*/INT,FLT,CHR,LNG,/*malloc*/0,/*realloc*/0,/*free*/0,
@@ -79,17 +90,18 @@ int opcodes[] = { /*push*/INT,FLT,CHR,LNG,/*malloc*/0,/*realloc*/0,/*free*/0,
                   /*ref*/INT,0,/*jns*/INT,0,/*jmp*/INT,0,/*terminate*/0,/*pop*/0,
                   /*out_s*/0,/*in_s*/0,/*main*/0 };
 
-
-/*void read_prgm(FILE *f) { char op; int mn = 0;
-  while((op = fgetc(f)) != TERM) { printf("%i",op); if(mn) { switch(op) {
-    case PW: { int *x = malloc(sizeof(int)); fread(x,I,1,f); push(x); break; }
-    case PF: { double *x = malloc(sizeof(double)); fread(x,F,1,f); push(x); break; }
-    case PC: { char *x = malloc(sizeof(char)); fread(x,B,1,f); push(x); break; }
-    case PL: { long *x = malloc(sizeof(long)); fread(x,L,1,f); push(x); break; }
-    case MALLOC: { int x = top_int(); pop(); push(malloc(x)); break; } } }
-    else if(op==MAIN) { mn = 1; }
-    else if(op==LABEL) { int adr; fread(&adr,4,1,f);
-      push_lbl(adr); } } DESTROY(); }*/
+void parse(void) { 
+  for(int i=0;i<esz;i++) { switch(exprs[i].op) {
+    case PW: push_int(exprs[i].q.i); break;
+    case PF: push_flt(exprs[i].q.f); break;
+    case PC: push_chr(exprs[i].q.c); break;
+    case PL: push_lng(exprs[i].q.l); break;
+    case MALLOCI: nstkptr(); stk->x.ia = malloc(exprs[i].q.i); break;
+    case MALLOCF: nstkptr(); stk->x.fa = malloc(exprs[i].q.i); break;
+    case MALLOCC: nstkptr(); stk->x.ca = malloc(exprs[i].q.i); break;
+    case MALLOCL: nstkptr(); stk->x.la = malloc(exprs[i].q.i); break;
+    case REALL: { void *x = getptr(stk->x); x = realloc(x,exprs[i].q.i); break; }
+    default: printf("what"); exit(0); } } }
 
 void read_prgm(FILE *f) { char op;
   while((op = fgetc(f)) != TERM) { switch(op) {
