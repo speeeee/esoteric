@@ -1,0 +1,8 @@
+~ test programs for the byte-code interpreter (written in uassembly). ~
+
+~ print '1' ~
+main
+push 1
+push 0
+out_s
+terminate
