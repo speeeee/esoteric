@@ -88,8 +88,9 @@ void out_s(int i, Lit q) { switch(i) {
 
 /*void DESTROY(void) { if(!stk->prev) { free(stk); }
   else { printf("%i",*(int *)stk->x); } }*/
+void DESTROY(Stk *x) { if (x->prev) { DESTROY(x->prev); } free(x); }
 
-int opcodes[] = { /*push*/INT,FLT,CHR,LNG,/*malloc*/INT,INT,INT,INT,
+int opcodes[] = { /*push*/INT,FLT,CHR,LNG,-1,/*malloc*/INT,INT,INT,INT,
                   /*realloc*/-1,/*free*/-1,
                   /*mov*/INT,-1,/*call*/INT,-1,/*out*/INT,/*in*/-1,/*label*/INT,
                   /*ref*/INT,-1,/*jns*/INT,-1,/*jmp*/INT,-1,/*terminate*/-1,
@@ -124,7 +125,7 @@ void read_prgm(FILE *f) { char op;
 int main(int argc, char **argv) { //stk = malloc(sizeof(Stk));
   exprs = malloc(sizeof(Expr));
   FILE *f; f = fopen("sample.usm","rb"); read_prgm(f); parse();
-  free(exprs); /*DESTROY();*/ return 0; }
+  free(exprs); /*DESTROY(stk);*/ return 0; }
 
 /*#define P 4
 #define PW 0
