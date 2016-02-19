@@ -58,8 +58,8 @@
 
 typedef struct { char *name; int argsz; } OpC;
 OpC opcodes[] = { { "push", -1 /* varies */ }, { "pushw", -1 }, { "pushf", -1 },
-                  { "pushc", -1 }, { "pushl", -1 }, { "malloci", 0 }, 
-                  { "mallocf", 0 }, { "mallocc", 0 }, { "mallocl", 0 }, 
+                  { "pushc", -1 }, { "pushl", -1 }, { "malloci", I }, 
+                  { "mallocf", I }, { "mallocc", I }, { "mallocl", I }, 
                   { "realloc", 0 }, { "free", 0 }, { "mov", I },
                   { "mov_s", 0 }, { "call", I }, { "call_s", 0 },
                   { "out", I }, { "in", 0 }, { "label", -1 /* varies */ },
