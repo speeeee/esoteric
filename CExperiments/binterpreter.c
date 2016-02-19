@@ -81,15 +81,21 @@ void push_lng(long l) { nstkptr(); stk->x.l = l; }
 void *getptr(Lit x) { if(x.ia) { return x.ia; } else if(x.fa) { return x.fa; }
   else if(x.ca) { return x.ca; } else if(x.la) { return x.la; }
   else { printf("not a pointer.\n"); exit(0); } }
+void pop(void) { Stk *e; e = stk; stk = stk->prev; free(e); }
+void out_s(int i, Lit q) { switch(i) { 
+  case INT: printf("%i",q.i); break; case FLT: printf("%lg",q.f);
+  case CHR: printf("%c",q.c); break; case LNG: printf("%li",q.l); } }
 
 /*void DESTROY(void) { if(!stk->prev) { free(stk); }
   else { printf("%i",*(int *)stk->x); } }*/
 
-int opcodes[] = { /*push*/INT,FLT,CHR,LNG,/*malloc*/0,/*realloc*/0,/*free*/0,
-                  /*mov*/INT,0,/*call*/INT,0,/*out*/INT,/*in*/0,/*label*/INT,
-                  /*ref*/INT,0,/*jns*/INT,0,/*jmp*/INT,0,/*terminate*/0,/*pop*/0,
-                  /*out_s*/0,/*in_s*/0,/*main*/0 };
+int opcodes[] = { /*push*/INT,FLT,CHR,LNG,/*malloc*/INT,INT,INT,INT,
+                  /*realloc*/-1,/*free*/-1,
+                  /*mov*/INT,-1,/*call*/INT,-1,/*out*/INT,/*in*/-1,/*label*/INT,
+                  /*ref*/INT,-1,/*jns*/INT,-1,/*jmp*/INT,-1,/*terminate*/-1,
+                  /*pop*/-1,/*out_s*/-1,/*in_s*/-1,/*main*/-1 };
 
+// pop for all necessary functions.
 void parse(void) { 
   for(int i=0;i<esz;i++) { switch(exprs[i].op) {
     case PW: push_int(exprs[i].q.i); break;
@@ -101,6 +107,8 @@ void parse(void) {
     case MALLOCC: nstkptr(); stk->x.ca = malloc(exprs[i].q.i); break;
     case MALLOCL: nstkptr(); stk->x.la = malloc(exprs[i].q.i); break;
     case REALL: { void *x = getptr(stk->x); x = realloc(x,exprs[i].q.i); break; }
+    case FREE: free(getptr(stk->x)); pop(); break;
+    case OUT_S: out_s(stk->x.i,stk->prev->x); pop(); pop(); break;
     default: printf("what"); exit(0); } } }
 
 void read_prgm(FILE *f) { char op;
@@ -115,7 +123,8 @@ void read_prgm(FILE *f) { char op;
 
 int main(int argc, char **argv) { //stk = malloc(sizeof(Stk));
   exprs = malloc(sizeof(Expr));
-  FILE *f; f = fopen("sample.usm","rb"); read_prgm(f); free(exprs); return 0; }
+  FILE *f; f = fopen("sample.usm","rb"); read_prgm(f); parse();
+  free(exprs); /*DESTROY();*/ return 0; }
 
 /*#define P 4
 #define PW 0
