@@ -110,7 +110,8 @@ void parse(void) {
     case REALL: { void *x = getptr(stk->x); x = realloc(x,exprs[i].q.i); break; }
     case FREE: free(getptr(stk->x)); pop(); break;
     case OUT_S: out_s(stk->x.i,stk->prev->x); pop(); pop(); break;
-    case JMP: { i=stk->x.i-1; pop(); }
+    case JMP_S: { i=stk->x.i-1; pop(); }
+    case JMP: { i=exprs[i].q.i-1; }
     default: printf("what"); exit(0); } } }
 
 void read_prgm(FILE *f) { char op;
