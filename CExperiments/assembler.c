@@ -100,9 +100,10 @@ void n_out(Lit x, int n, FILE *o) { void *q; switch(x.type) {
 
 char *tok(FILE *s,int c) {
   int sz = 0; int lsz = 10; char *str = malloc(lsz*sizeof(char));
-  while(!isspace(c)&&c!='('&&c!=')') { 
+  while(!isspace(c)&&c!='('&&c!=')'&&c!=EOF) { 
     if(sz==lsz) { str = realloc(str,(lsz+=10)*sizeof(char)); }
-    str[sz++] = c; c = fgetc(s); } ungetc(c,stdin); str[sz] = '\0'; return str; }
+    str[sz++] = c; c = fgetc(s); }
+    if(c!=EOF) { fseek(s,-1,SEEK_CUR); } str[sz] = '\0'; return str; }
 Lit tokl(FILE *s,int c) { 
   int sz = 0; int lsz = 10; char *str = malloc(lsz*sizeof(char));
   while(isdigit(c)&&c!='w'&&c!='d'&&c!='f'&&c!='b') {
@@ -112,10 +113,10 @@ Lit tokl(FILE *s,int c) {
                 case 'd': e.x.l = atol(str); e.type = LNG; break;
                 case 'f': e.x.f = atof(str); e.type = FLT; break;
                 case 'b': e.x.c = (char) atoi(str); e.type = CHR; break;
-                default: ungetc(c,stdin); e.x.i = atoi(str); e.type = INT; }
+                default: fseek(s,-1,SEEK_CUR); e.x.i = atoi(str); e.type = INT; }
     return e; }
 Lit lexd(FILE *s, int eofchar) { int c;
-  while(/*isspace(c = fgetc(s))*/(c = fgetc(s))==' '||c=='\t');
+  while(/*isspace(c = fgetc(s)));*/(c = fgetc(s))==' '||c=='\t'||c=='\n');
   if(isdigit(c)) { //Lit q; fscanf(s,"%li",&q.x.i); q.type = INT; return q; }
                    return tokl(s,c); }
   if(c==eofchar||c==EOF) { Lit e; e.x.i = EOF; e.type = END; return e; }
@@ -155,7 +156,6 @@ void parse(FILE *o, FILE *i, int eo) { Lit l;
            if(opcodes[ii].argsz) {
              Lit l = lexd(i,eo); n_out(l,opcodes[ii].argsz,o); } } } } }
 
-int main(int argc, char **argv) { ls = malloc(sizeof(char *));
-  FILE *f; f = fopen("sample.usm","wb");
-  while(1) { printf("\n> "); parse(f,stdin,'\n'); }
-  fclose(f); return 0; }
+int main(int argc, char **argv) { ls = malloc(sizeof(char *)); FILE *g;
+  FILE *f; f = fopen("sample.uo","wb"); g = fopen("sample.usm","r");
+  parse(f,g,EOF); fclose(f); fclose(g); return 0; }
