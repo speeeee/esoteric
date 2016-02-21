@@ -33,6 +33,11 @@
 #define OUT_S 26
 #define IN_S 27
 #define MAIN 28
+#define REFI 29
+#define REFF 30
+#define REFC 31
+#define REFL 32
+#define RETURN 33
 
 typedef int    Word;
 typedef long   DWord;
@@ -62,8 +67,9 @@ typedef struct { union { char c; int i; long l; double f;
                          char *ca; int *ia; long *la; double *fa; }; } Lit;
 typedef struct { char op; Lit q; } Expr;
 typedef struct Stk { Lit x; struct Stk *prev; } Stk;
+typedef struct Ref { int r; struct Ref *prev; } Ref;
 Expr *exprs; int esz = 0; int mn = -1;
-Stk *stk;
+Stk *stk; Ref *refs;
 
 void push_lbl(int plc) { lbls = realloc(lbls,(lsz+1)*sizeof(int));
   lbls[lsz++] = plc; }
@@ -98,7 +104,7 @@ int opcodes[] = { /*push*/INT,FLT,CHR,LNG,-1,/*malloc*/INT,INT,INT,INT,
 
 // pop for all necessary functions.
 void parse(void) { 
-  for(int i=0;i<esz;i++) { switch(exprs[i].op) {
+  for(int i=mn;i<esz;i++) { switch(exprs[i].op) {
     case PW: push_int(exprs[i].q.i); break;
     case PF: push_flt(exprs[i].q.f); break;
     case PC: push_chr(exprs[i].q.c); break;
@@ -110,8 +116,21 @@ void parse(void) {
     case REALL: { void *x = getptr(stk->x); x = realloc(x,exprs[i].q.i); break; }
     case FREE: free(getptr(stk->x)); pop(); break;
     case OUT_S: out_s(stk->x.i,stk->prev->x); pop(); pop(); break;
-    case JMP_S: { i=stk->x.i-1; pop(); }
-    case JMP: { i=exprs[i].q.i-1; }
+    case JMP_S: { i=lbls[stk->x.i]; pop(); }
+    case JMP: { i=lbls[exprs[i].q.i]; }
+    case POP: pop(); break;
+    case IN: push_chr(getchar()); break;
+    case REFI: { int q = (stk->x.ia)[stk->prev->x.i]; pop(); pop(); nstkptr();
+                 stk->x.i = q; break; }
+    case REFF: { double q = (stk->x.fa)[stk->prev->x.i]; pop(); pop(); nstkptr();
+                 stk->x.f = q; break; }
+    case REFC: { char q = (stk->x.ca)[stk->prev->x.i]; pop(); pop(); nstkptr();
+                 stk->x.c = q; break; }
+    case REFL: { long q = (stk->x.la)[stk->prev->x.i]; pop(); pop(); nstkptr();
+                 stk->x.l = q; break; }
+    case CALL_S: { Ref *r = malloc(sizeof(Ref)); r->r = i;
+      if(refs) { r->prev = refs; } refs = r; i=lbls[stk->x.i]; break; }
+    case RETURN: { Ref *r; r = refs; i = r->r; refs = refs->prev; free(r); }
     default: printf("what"); exit(0); } } }
 
 void read_prgm(FILE *f) { char op;
@@ -126,7 +145,7 @@ void read_prgm(FILE *f) { char op;
 
 int main(int argc, char **argv) { //stk = malloc(sizeof(Stk));
   exprs = malloc(sizeof(Expr));
-  FILE *f; f = fopen("sample.usm","rb"); read_prgm(f); parse();
+  FILE *f; f = fopen("sample.uo","rb"); read_prgm(f); parse();
   free(exprs); /*DESTROY(stk);*/ return 0; }
 
 /*#define P 4
