@@ -158,5 +158,8 @@ void parse(FILE *o, FILE *i, int eo) { Lit l;
              Lit l = lexd(i,eo); n_out(l,opcodes[ii].argsz,o); } } } } }
 
 int main(int argc, char **argv) { ls = malloc(sizeof(char *)); FILE *g;
-  FILE *f; f = fopen("sample.uo","wb"); g = fopen("sample.usm","r");
+  FILE *f; //f = fopen("sample.uo","wb"); g = fopen("sample.usm","r");
+  char *in; in = malloc((strlen(argv[2])+4)*sizeof(char)); strcpy(in,argv[2]);
+  strcat(in,".usm"); char *out; out = malloc((strlen(argv[1])+5)*sizeof(char));
+  strcpy(out,argv[1]); strcat(out,".uo"); f = fopen(out,"wb"); g = fopen(in,"r");
   parse(f,g,EOF); fclose(f); fclose(g); return 0; }

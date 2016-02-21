@@ -3,6 +3,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #define P 4
 #define PW 0
@@ -144,8 +145,9 @@ void read_prgm(FILE *f) { char op;
       case LNG: { long i; fread(&i,8,1,f); l.l = i; break; } } push_expr(op,l); } } } }
 
 int main(int argc, char **argv) { //stk = malloc(sizeof(Stk));
-  exprs = malloc(sizeof(Expr));
-  FILE *f; f = fopen("sample.uo","rb"); read_prgm(f); parse();
+  exprs = malloc(sizeof(Expr)); char *in; 
+  in = malloc((strlen(argv[1])+4)*sizeof(char)); strcpy(in,argv[1]);
+  strcat(in,".uo"); FILE *f; f = fopen(in,"rb"); read_prgm(f); parse();
   free(exprs); /*DESTROY(stk);*/ return 0; }
 
 /*#define P 4
