@@ -72,7 +72,8 @@ typedef struct Ref { int r; struct Ref *prev; } Ref;
 Expr *exprs; int esz = 0; int mn = -1;
 Stk *stk; Ref *refs;
 
-void push_lbl(int plc) { lbls = realloc(lbls,(lsz+1)*sizeof(int));
+void push_lbl(int plc) { if(lbls) { lbls = realloc(lbls,(lsz+1)*sizeof(int)); }
+  else { lbls = malloc(sizeof(int)); }
   lbls[lsz++] = plc; }
 void push_expr(char op, Lit q) { exprs = realloc(exprs,(esz+1)*sizeof(Expr));
   exprs[esz++] = (Expr) { op, q }; }
@@ -95,7 +96,10 @@ void out_s(int i, Lit q) { switch(i) {
 
 /*void DESTROY(void) { if(!stk->prev) { free(stk); }
   else { printf("%i",*(int *)stk->x); } }*/
-void DESTROY(Stk *x) { if (x->prev) { DESTROY(x->prev); } free(x); }
+void DESTROY(Stk *x) {
+ if(x) {
+ if(x->prev) { DESTROY(x->prev); } 
+  free(x); } }
 
 int opcodes[] = { /*push*/INT,FLT,CHR,LNG,-1,/*malloc*/INT,INT,INT,INT,
                   /*realloc*/-1,/*free*/-1,
@@ -104,7 +108,7 @@ int opcodes[] = { /*push*/INT,FLT,CHR,LNG,-1,/*malloc*/INT,INT,INT,INT,
                   /*pop*/-1,/*out_s*/-1,/*in_s*/-1,/*main*/-1 };
 
 // pop for all necessary functions.
-void parse(void) { 
+void parse(void) {
   for(int i=mn;i<esz;i++) { switch(exprs[i].op) {
     case PW: push_int(exprs[i].q.i); break;
     case PF: push_flt(exprs[i].q.f); break;
@@ -117,8 +121,8 @@ void parse(void) {
     case REALL: { void *x = getptr(stk->x); x = realloc(x,exprs[i].q.i); break; }
     case FREE: free(getptr(stk->x)); pop(); break;
     case OUT_S: out_s(stk->x.i,stk->prev->x); pop(); pop(); break;
-    case JMP_S: { i=lbls[stk->x.i]; pop(); }
-    case JMP: { i=lbls[exprs[i].q.i]; }
+    case JMP_S: { i=lbls[stk->x.i]-1; pop(); break; }
+    case JMP: { i=lbls[exprs[i].q.i]-1; break; } // it's correct
     case POP: pop(); break;
     case IN: push_chr(getchar()); break;
     case REFI: { int q = (stk->x.ia)[stk->prev->x.i]; pop(); pop(); nstkptr();
@@ -131,11 +135,12 @@ void parse(void) {
                  stk->x.l = q; break; }
     case CALL_S: { Ref *r = malloc(sizeof(Ref)); r->r = i;
       if(refs) { r->prev = refs; } refs = r; i=lbls[stk->x.i]; break; }
-    case RETURN: { Ref *r; r = refs; i = r->r; refs = refs->prev; free(r); }
+    case RETURN: { Ref *r; r = refs; i = r->r; refs = refs->prev; free(r); break; }
+    case TERM: exit(0); break;
     default: printf("what"); exit(0); } } }
 
 void read_prgm(FILE *f) { char op;
-  while((op = fgetc(f)) != TERM) { switch(op) {
+  while((op = fgetc(f)) != TERM||mn<0) { switch(op) {
     case LABEL: { int x; fread(&x,4,1,f); push_lbl(esz); break; }
     case MAIN: { mn = esz; break; }
     default: { Lit l; switch(opcodes[(int)op]) {
@@ -148,7 +153,7 @@ int main(int argc, char **argv) { //stk = malloc(sizeof(Stk));
   exprs = malloc(sizeof(Expr)); char *in; 
   in = malloc((strlen(argv[1])+4)*sizeof(char)); strcpy(in,argv[1]);
   strcat(in,".uo"); FILE *f; f = fopen(in,"rb"); read_prgm(f); parse();
-  free(exprs); /*DESTROY(stk);*/ return 0; }
+  free(exprs); fclose(f); /*DESTROY(stk);*/ return 0; }
 
 /*#define P 4
 #define PW 0
