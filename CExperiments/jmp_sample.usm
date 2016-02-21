@@ -1,0 +1,9 @@
+label print_int
+push 0
+out_s
+terminate
+
+main
+push 1
+jmp print_int
+terminate
