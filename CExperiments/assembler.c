@@ -140,8 +140,8 @@ void parse(FILE *o, FILE *i, int eo) { Lit l;
                             case LNG: write_c(3,o);
                               fwrite(&l.x.l,sizeof(long),1,o); break; 
                             default: printf("error\n"); exit(0); } }
-         else if(!strcmp(l.x.s,"label")) { write_c(9,o); l = lexd(i,eo);
-           if(l.type == SYM) { addLabel(l.x.s); }
+         else if(!strcmp(l.x.s,"label")) { write_c(17,o); l = lexd(i,eo);
+           if(l.type == SYM) { fwrite(&lsz,sizeof(int),1,o); addLabel(l.x.s); }
            else { printf("error\n"); exit(0); } }
          else if(!strcmp(l.x.s,":q")) { exit(0); }
          /*else { int ii; for(ii=0;ii<osz;i++) { if(!strcmp(l.x.s,opcodes[ii].name)) {
