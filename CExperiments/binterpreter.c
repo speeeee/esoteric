@@ -134,7 +134,9 @@ void parse(void) {
     case REFL: { long q = (stk->x.la)[stk->prev->x.i]; pop(); pop(); nstkptr();
                  stk->x.l = q; break; }
     case CALL_S: { Ref *r = malloc(sizeof(Ref)); r->r = i;
-      if(refs) { r->prev = refs; } refs = r; i=lbls[stk->x.i]; break; }
+      if(refs) { r->prev = refs; } refs = r; i=lbls[stk->x.i]-1; pop(); break; }
+    case CALL: { Ref *r = malloc(sizeof(Ref)); r->r = i;
+      if(refs) { r->prev = refs; } refs = r; i=lbls[exprs[i].q.i]-1; break; }
     case RETURN: { Ref *r; r = refs; i = r->r; refs = refs->prev; free(r); break; }
     case TERM: exit(0); break;
     default: printf("what"); exit(0); } } }
@@ -144,10 +146,11 @@ void read_prgm(FILE *f) { char op;
     case LABEL: { int x; fread(&x,4,1,f); push_lbl(esz); break; }
     case MAIN: { mn = esz; break; }
     default: { Lit l; switch(opcodes[(int)op]) {
-      case CHR: { char i; fread(&i,1,1,f); l.c = i; break; }
-      case INT: { int i; fread(&i,4,1,f); l.i = i; break; }
-      case FLT: { double i; fread(&i,8,1,f); l.f = i; break; }
-      case LNG: { long i; fread(&i,8,1,f); l.l = i; break; } } push_expr(op,l); } } } }
+      case CHR: { char i; fread(&i,sizeof(char),1,f); l.c = i; break; }
+      case INT: { int i; fread(&i,sizeof(int),1,f); l.i = i; break; }
+      case FLT: { double i; fread(&i,sizeof(double),1,f); l.f = i; break; }
+      case LNG: { long i; fread(&i,sizeof(long),1,f); l.l = i; break; } }
+    push_expr(op,l); } } } }
 
 int main(int argc, char **argv) { //stk = malloc(sizeof(Stk));
   exprs = malloc(sizeof(Expr)); char *in; 
