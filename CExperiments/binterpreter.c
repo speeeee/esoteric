@@ -39,6 +39,10 @@
 #define REFC 31
 #define REFL 32
 #define RETURN 33
+#define MOVI 34
+#define MOVF 35
+#define MOVC 36
+#define MOVL 37
 
 typedef int    Word;
 typedef long   DWord;
@@ -114,10 +118,10 @@ void parse(void) {
     case PF: push_flt(exprs[i].q.f); break;
     case PC: push_chr(exprs[i].q.c); break;
     case PL: push_lng(exprs[i].q.l); break;
-    case MALLOCI: nstkptr(); stk->x.ia = malloc(exprs[i].q.i); break;
-    case MALLOCF: nstkptr(); stk->x.fa = malloc(exprs[i].q.i); break;
-    case MALLOCC: nstkptr(); stk->x.ca = malloc(exprs[i].q.i); break;
-    case MALLOCL: nstkptr(); stk->x.la = malloc(exprs[i].q.i); break;
+    case MALLOCI: nstkptr(); stk->x.ia = malloc(exprs[i].q.i*I); break;
+    case MALLOCF: nstkptr(); stk->x.fa = malloc(exprs[i].q.i*F); break;
+    case MALLOCC: nstkptr(); stk->x.ca = malloc(exprs[i].q.i*B); break;
+    case MALLOCL: nstkptr(); stk->x.la = malloc(exprs[i].q.i*L); break;
     case REALL: { void *x = getptr(stk->x); x = realloc(x,exprs[i].q.i); break; }
     case FREE: free(getptr(stk->x)); pop(); break;
     case OUT_S: out_s(stk->x.i,stk->prev->x); pop(); pop(); break;
@@ -138,6 +142,10 @@ void parse(void) {
     case CALL: { Ref *r = malloc(sizeof(Ref)); r->r = i;
       if(refs) { r->prev = refs; } refs = r; i=lbls[exprs[i].q.i]-1; break; }
     case RETURN: { Ref *r; r = refs; i = r->r; refs = refs->prev; free(r); break; }
+    case MOVI: { (stk->x.ia)[stk->prev->x.i] = stk->prev->prev->x.i; 
+                 pop(); pop(); pop(); break; }
+    case MOVF: { (stk->x.fa)[stk->prev->x.i] = stk->prev->prev->x.f;
+                 pop(); pop(); pop(); break; }
     case TERM: exit(0); break;
     default: printf("what"); exit(0); } } }
 
