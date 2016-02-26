@@ -43,6 +43,8 @@
 #define MOVF 35
 #define MOVC 36
 #define MOVL 37
+#define SWAP 38
+#define SREF 39
 
 typedef int    Word;
 typedef long   DWord;
@@ -146,6 +148,7 @@ void parse(void) {
                  pop(); pop(); pop(); break; }
     case MOVF: { (stk->x.fa)[stk->prev->x.i] = stk->prev->prev->x.f;
                  pop(); pop(); pop(); break; }
+    case SWAP: { stk->prev->prev = stk; stk = stk->prev; break; }
     case TERM: exit(0); break;
     default: printf("what"); exit(0); } } }
 

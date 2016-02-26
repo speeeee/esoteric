@@ -67,7 +67,8 @@ OpC opcodes[] = { { "push", -1 /* varies */ }, { "pushw", -1 }, { "pushf", -1 },
                   { "jmp", I }, { "jmp_s", 0 },
                   { "terminate", 0 }, { "pop", 0 }, { "out_s", 0 },
                   { "in_s", 0 }, { "main", 0 }, { "refi", 0 }, { "reff", 0 },
-                  { "refc", 0 }, { "refl", 0 }, { "return", 0 } };
+                  { "refc", 0 }, { "refl", 0 }, { "return", 0 }, { "movi", 0 },
+                  { "movf", 0 }, { "swap", 0 }, { "sref", 0 } };
 int osz = 34;
 // current next-label number
 int lc = 0;
