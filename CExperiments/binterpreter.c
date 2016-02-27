@@ -68,18 +68,18 @@ struct Lit { union { Word i; DWord l; Flt f; Byte c; Byte *s; void *v; } x;
 #define L sizeof(long)
 #define F sizeof(double)
 
-int *lbls; int lsz = 0;
+long *lbls; int lsz = 0;
 //typedef struct Stk { void *x; struct Stk *prev; } Stk;
 typedef struct { union { char c; int i; long l; double f;
                          char *ca; int *ia; long *la; double *fa; }; } Lit;
 typedef struct { char op; Lit q; } Expr;
 typedef struct Stk { Lit x; struct Stk *prev; } Stk;
-typedef struct Ref { int r; struct Ref *prev; } Ref;
-Expr *exprs; int esz = 0; int mn = -1;
+typedef struct Ref { long r; struct Ref *prev; } Ref;
+Expr *exprs; long esz = 0; long mn = -1;
 Stk *stk; Ref *refs;
 
-void push_lbl(int plc) { if(lbls) { lbls = realloc(lbls,(lsz+1)*sizeof(int)); }
-  else { lbls = malloc(sizeof(int)); }
+void push_lbl(long plc) { if(lbls) { lbls = realloc(lbls,(lsz+1)*sizeof(long)); }
+  else { lbls = malloc(sizeof(long)); }
   lbls[lsz++] = plc; }
 void push_expr(char op, Lit q) { exprs = realloc(exprs,(esz+1)*sizeof(Expr));
   exprs[esz++] = (Expr) { op, q }; }
@@ -114,11 +114,13 @@ int opcodes[] = { /*push*/INT,FLT,CHR,LNG,-1,/*malloc*/INT,INT,INT,INT,
                   /*realloc*/-1,/*free*/-1,
                   /*mov*/INT,-1,/*call*/INT,-1,/*out*/INT,/*in*/-1,/*label*/INT,
                   /*ref*/INT,-1,/*jns*/INT,-1,/*jmp*/INT,-1,/*terminate*/-1,
-                  /*pop*/-1,/*out_s*/-1,/*in_s*/-1,/*main*/-1 };
+                  /*pop*/-1,/*out_s*/-1,/*in_s*/-1,/*main*/-1, /*refi*/-1,
+                  /*reff*/-1,/*refc*/-1,/*refl*/-1,/*return*/-1,/*movi*/-1,
+                  /*movf*/-1,/*swap*/-1,/*sref*/-1 };
 
 // pop for all necessary functions.
 void parse(void) {
-  for(int i=mn;i<esz;i++) { switch(exprs[i].op) {
+  for(long i=mn;i<esz;i++) { switch(exprs[i].op) {
     case PW: push_int(exprs[i].q.i); break;
     case PF: push_flt(exprs[i].q.f); break;
     case PC: push_chr(exprs[i].q.c); break;
@@ -154,13 +156,13 @@ void parse(void) {
     case SWAP: { stk->prev->prev = stk; stk = stk->prev; break; }
     case SREF: { Stk *e = stkref(stk->x.i); pop(); nstkptr();
                  *(stk) = *(e); break; }
-                 
+                
     case TERM: exit(0); break;
     default: printf("what"); exit(0); } } }
 
 void read_prgm(FILE *f) { char op;
   while((op = fgetc(f)) != TERM||mn<0) { switch(op) {
-    case LABEL: { int x; fread(&x,4,1,f); push_lbl(esz); break; }
+    case LABEL: { int x; fread(&x,sizeof(int),1,f); push_lbl(esz); break; }
     case MAIN: { mn = esz; break; }
     default: { Lit l; switch(opcodes[(int)op]) {
       case CHR: { char i; fread(&i,sizeof(char),1,f); l.c = i; break; }
