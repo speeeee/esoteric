@@ -156,7 +156,6 @@ void parse(void) {
     case SWAP: { stk->prev->prev = stk; stk = stk->prev; break; }
     case SREF: { Stk *e = stkref(stk->x.i); pop(); nstkptr();
                  *(stk) = *(e); break; }
-                
     case TERM: exit(0); break;
     default: printf("what"); exit(0); } } }
 
