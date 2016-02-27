@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <dlfcn.h>
 
 #define P 4
 #define PW 0
@@ -45,6 +46,11 @@
 #define MOVL 37
 #define SWAP 38
 #define SREF 39
+#define LINK 40
+#define ADDI 41
+#define ADDF 42
+#define ADDC 43
+#define ADDL 44
 
 typedef int    Word;
 typedef long   DWord;
@@ -116,7 +122,8 @@ int opcodes[] = { /*push*/INT,FLT,CHR,LNG,-1,/*malloc*/INT,INT,INT,INT,
                   /*ref*/INT,-1,/*jns*/INT,-1,/*jmp*/INT,-1,/*terminate*/-1,
                   /*pop*/-1,/*out_s*/-1,/*in_s*/-1,/*main*/-1, /*refi*/-1,
                   /*reff*/-1,/*refc*/-1,/*refl*/-1,/*return*/-1,/*movi*/-1,
-                  /*movf*/-1,/*swap*/-1,/*sref*/-1 };
+                  /*movf*/-1,/*swap*/-1,/*sref*/-1, /*link*/-1,/*addi*/-1,
+                  /*addf*/-1,/*addc*/-1,/*addl*/-1 };
 
 // pop for all necessary functions.
 void parse(void) {
@@ -156,6 +163,10 @@ void parse(void) {
     case SWAP: { stk->prev->prev = stk; stk = stk->prev; break; }
     case SREF: { Stk *e = stkref(stk->x.i); pop(); nstkptr();
                  *(stk) = *(e); break; }
+    case ADDI: { stk->prev->x.i = stk->x.i+stk->prev->x.i; pop(); break; }
+    case ADDF: { stk->prev->x.f = stk->x.f+stk->prev->x.f; pop(); break; }
+    case ADDC: { stk->prev->x.c = stk->x.c+stk->prev->x.c; pop(); break; }
+    case ADDL: { stk->prev->x.l = stk->x.l+stk->prev->x.l; pop(); break; }
     case TERM: exit(0); break;
     default: printf("what"); exit(0); } } }
 
