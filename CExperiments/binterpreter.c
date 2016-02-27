@@ -100,6 +100,9 @@ void out_s(int i, Lit q) { switch(i) {
   case INT: printf("%i",q.i); break; case FLT: printf("%lg",q.f);
   case CHR: printf("%c",q.c); break; case LNG: printf("%li",q.l); } }
 
+Stk *stkref(int e) { Stk *q; q = stk;
+  for(int i=0;i<e;i++) { q = q->prev; } return q; }
+
 /*void DESTROY(void) { if(!stk->prev) { free(stk); }
   else { printf("%i",*(int *)stk->x); } }*/
 void DESTROY(Stk *x) {
@@ -149,6 +152,9 @@ void parse(void) {
     case MOVF: { (stk->x.fa)[stk->prev->x.i] = stk->prev->prev->x.f;
                  pop(); pop(); pop(); break; }
     case SWAP: { stk->prev->prev = stk; stk = stk->prev; break; }
+    case SREF: { Stk *e = stkref(stk->x.i); pop(); nstkptr();
+                 *(stk) = *(e); break; }
+                 
     case TERM: exit(0); break;
     default: printf("what"); exit(0); } } }
 
