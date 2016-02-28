@@ -51,6 +51,8 @@
 #define ADDF 42
 #define ADDC 43
 #define ADDL 44
+#define IMPORT 45
+#define LCALL 46
 
 typedef int    Word;
 typedef long   DWord;
@@ -77,13 +79,17 @@ struct Lit { union { Word i; DWord l; Flt f; Byte c; Byte *s; void *v; } x;
 long *lbls; int lsz = 0;
 //typedef struct Stk { void *x; struct Stk *prev; } Stk;
 typedef struct { union { char c; int i; long l; double f;
-                         char *ca; int *ia; long *la; double *fa; }; } Lit;
+                         char *ca; int *ia; long *la; double *fa; void *v; }; } Lit;
 typedef struct { char op; Lit q; } Expr;
 typedef struct Stk { Lit x; struct Stk *prev; } Stk;
 typedef struct Ref { long r; struct Ref *prev; } Ref;
+//typedef struct FFn { void *x; } FFn;
 Expr *exprs; long esz = 0; long mn = -1;
+void **ffn; int ffsz = 0;
 Stk *stk; Ref *refs;
 
+void push_f(void *x) { if(ffn) { ffn = realloc(ffn,(ffsz+1)*sizeof(void *)); }
+  else { ffn = malloc(sizeof(void *)); } ffn[ffsz++] = x; }
 void push_lbl(long plc) { if(lbls) { lbls = realloc(lbls,(lsz+1)*sizeof(long)); }
   else { lbls = malloc(sizeof(long)); }
   lbls[lsz++] = plc; }
@@ -123,7 +129,7 @@ int opcodes[] = { /*push*/INT,FLT,CHR,LNG,-1,/*malloc*/INT,INT,INT,INT,
                   /*pop*/-1,/*out_s*/-1,/*in_s*/-1,/*main*/-1, /*refi*/-1,
                   /*reff*/-1,/*refc*/-1,/*refl*/-1,/*return*/-1,/*movi*/-1,
                   /*movf*/-1,/*swap*/-1,/*sref*/-1, /*link*/-1,/*addi*/-1,
-                  /*addf*/-1,/*addc*/-1,/*addl*/-1 };
+                  /*addf*/-1,/*addc*/-1,/*addl*/-1,/*import*/INT,/*lcall*/INT };
 
 // pop for all necessary functions.
 void parse(void) {
@@ -167,12 +173,19 @@ void parse(void) {
     case ADDF: { stk->prev->x.f = stk->x.f+stk->prev->x.f; pop(); break; }
     case ADDC: { stk->prev->x.c = stk->x.c+stk->prev->x.c; pop(); break; }
     case ADDL: { stk->prev->x.l = stk->x.l+stk->prev->x.l; pop(); break; }
+    case IMPORT: { nstkptr(); stk->x.v = dlopen(exprs[i].q.ca,RTLD_LAZY);
+                   break; }
+    case LCALL: { void *z; z = dlsym(stk->x.v,exprs[i].q.ca); push_f(z); break; }
     case TERM: exit(0); break;
     default: printf("what"); exit(0); } } }
 
 void read_prgm(FILE *f) { char op;
   while((op = fgetc(f)) != TERM||mn<0) { switch(op) {
     case LABEL: { int x; fread(&x,sizeof(int),1,f); push_lbl(esz); break; }
+    case IMPORT: { Lit l; int i; fread(&i,sizeof(int),1,f);
+                   fread(&l.ca,sizeof(char),i,f); push_expr(op,l); break; }
+    case LCALL: { Lit l; int i; fread(&i,sizeof(int),1,f);
+                  fread(&l.ca,sizeof(char),i,f); push_expr(op,l); break; }
     case MAIN: { mn = esz; break; }
     default: { Lit l; switch(opcodes[(int)op]) {
       case CHR: { char i; fread(&i,sizeof(char),1,f); l.c = i; break; }
@@ -184,8 +197,8 @@ void read_prgm(FILE *f) { char op;
 int main(int argc, char **argv) { //stk = malloc(sizeof(Stk));
   exprs = malloc(sizeof(Expr)); char *in; 
   in = malloc((strlen(argv[1])+4)*sizeof(char)); strcpy(in,argv[1]);
-  strcat(in,".uo"); FILE *f; f = fopen(in,"rb"); read_prgm(f); parse();
-  free(exprs); fclose(f); /*DESTROY(stk);*/ return 0; }
+  strcat(in,".uo"); FILE *f; f = fopen(in,"rb"); read_prgm(f); fclose(f); parse();
+  free(exprs); /*DESTROY(stk);*/ return 0; }
 
 /*#define P 4
 #define PW 0
