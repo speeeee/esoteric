@@ -52,7 +52,7 @@
 #define ADDC 43
 #define ADDL 44
 #define IMPORT 45
-#define LCALL 46
+#define LFUN 46
 
 typedef int    Word;
 typedef long   DWord;
@@ -128,7 +128,7 @@ int opcodes[] = { /*push*/INT,FLT,CHR,LNG,-1,/*malloc*/INT,INT,INT,INT,
                   /*ref*/INT,-1,/*jns*/INT,-1,/*jmp*/INT,-1,/*terminate*/-1,
                   /*pop*/-1,/*out_s*/-1,/*in_s*/-1,/*main*/-1, /*refi*/-1,
                   /*reff*/-1,/*refc*/-1,/*refl*/-1,/*return*/-1,/*movi*/-1,
-                  /*movf*/-1,/*swap*/-1,/*sref*/-1, /*link*/-1,/*addi*/-1,
+                  /*movf*/-1,/*swap*/-1,/*sref*/-1, /*link*/INT,/*addi*/-1,
                   /*addf*/-1,/*addc*/-1,/*addl*/-1,/*import*/INT,/*lcall*/INT };
 
 // pop for all necessary functions.
@@ -173,18 +173,18 @@ void parse(void) {
     case ADDF: { stk->prev->x.f = stk->x.f+stk->prev->x.f; pop(); break; }
     case ADDC: { stk->prev->x.c = stk->x.c+stk->prev->x.c; pop(); break; }
     case ADDL: { stk->prev->x.l = stk->x.l+stk->prev->x.l; pop(); break; }
-    case IMPORT: { nstkptr(); stk->x.v = dlopen(exprs[i].q.ca,RTLD_LAZY);
+    case LINK: { nstkptr(); stk->x.v = dlopen(exprs[i].q.ca,RTLD_LAZY);
                    break; }
-    case LCALL: { void *z; z = dlsym(stk->x.v,exprs[i].q.ca); push_f(z); break; }
+    case LFUN: { void *z; z = dlsym(stk->x.v,exprs[i].q.ca); push_f(z); break; }
     case TERM: exit(0); break;
     default: printf("what"); exit(0); } } }
 
 void read_prgm(FILE *f) { char op;
   while((op = fgetc(f)) != TERM||mn<0) { switch(op) {
     case LABEL: { int x; fread(&x,sizeof(int),1,f); push_lbl(esz); break; }
-    case IMPORT: { Lit l; int i; fread(&i,sizeof(int),1,f);
+    case LINK: { Lit l; int i; fread(&i,sizeof(int),1,f);
                    fread(&l.ca,sizeof(char),i,f); push_expr(op,l); break; }
-    case LCALL: { Lit l; int i; fread(&i,sizeof(int),1,f);
+    case LFUN: { Lit l; int i; fread(&i,sizeof(int),1,f);
                   fread(&l.ca,sizeof(char),i,f); push_expr(op,l); break; }
     case MAIN: { mn = esz; break; }
     default: { Lit l; switch(opcodes[(int)op]) {
