@@ -147,11 +147,15 @@ void parse(FILE *o, FILE *i, int eo) { Lit l;
          else if(!strcmp(l.x.s,"label")) { write_c(17,o); l = lexd(i,eo);
            if(l.type == SYM) { fwrite(&lsz,sizeof(int),1,o); addLabel(l.x.s); }
            else { printf("error\n"); exit(0); } }
-         else if(!strcmp(l.x.s,"link")) { write_c(45,o); l = lexd(i,eo);
+         else if(!strcmp(l.x.s,"link")) { write_c(40,o); l = lexd(i,eo);
            if(l.type == SYM) { int x = strlen(l.x.s); 
              fwrite(&x,sizeof(int),1,o); fwrite(&l.x.s,sizeof(char),x,o); }
            else { printf("error\n"); exit(0); } }
          else if(!strcmp(l.x.s,"lfun")) { write_c(46,o); l = lexd(i,eo);
+           if(l.type == SYM) { int x = strlen(l.x.s);
+             fwrite(&x,sizeof(int),1,o); fwrite(&l.x.s,sizeof(char),x,o); }
+           else { printf("error\n"); exit(0); } }
+         else if(!strcmp(l.x.s,"import")) { write_c(45,o); l = lexd(i,eo);
            if(l.type == SYM) { int x = strlen(l.x.s);
              fwrite(&x,sizeof(int),1,o); fwrite(&l.x.s,sizeof(char),x,o); }
            else { printf("error\n"); exit(0); } }
