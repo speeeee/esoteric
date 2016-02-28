@@ -70,8 +70,9 @@ OpC opcodes[] = { { "push", -1 /* varies */ }, { "pushw", -1 }, { "pushf", -1 },
                   { "refc", 0 }, { "refl", 0 }, { "return", 0 }, { "movi", 0 },
                   { "movf", 0 }, { "movc", 0 }, { "movl", 0 },
                   { "swap", 0 }, { "sref", 0 }, { "link", 0 },
-                  { "addi", 0 }, { "addf", 0 }, { "addc", 0 }, { "addl", 0 } };
-int osz = 45;
+                  { "addi", 0 }, { "addf", 0 }, { "addc", 0 }, { "addl", 0 },
+                  { "import", -1 /* varies */ }, { "lcall", -1 /* varies */ } };
+int osz = 47;
 // current next-label number
 int lc = 0;
 // defined labels
@@ -145,6 +146,14 @@ void parse(FILE *o, FILE *i, int eo) { Lit l;
                             default: printf("error\n"); exit(0); } }
          else if(!strcmp(l.x.s,"label")) { write_c(17,o); l = lexd(i,eo);
            if(l.type == SYM) { fwrite(&lsz,sizeof(int),1,o); addLabel(l.x.s); }
+           else { printf("error\n"); exit(0); } }
+         else if(!strcmp(l.x.s,"import")) { write_c(45,o); l = lexd(i,eo);
+           if(l.type == SYM) { int x = strlen(l.x.s); 
+             fwrite(&x,sizeof(int),1,o); fwrite(&l.x.s,sizeof(char),x,o); }
+           else { printf("error\n"); exit(0); } }
+         else if(!strcmp(l.x.s,"lcall")) { write_c(46,o); l = lexd(i,eo);
+           if(l.type == SYM) { int x = strlen(l.x.s);
+             fwrite(&x,sizeof(int),1,o); fwrite(&l.x.s,sizeof(char),x,o); }
            else { printf("error\n"); exit(0); } }
          else if(!strcmp(l.x.s,":q")) { exit(0); }
          /*else { int ii; for(ii=0;ii<osz;i++) { if(!strcmp(l.x.s,opcodes[ii].name)) {
