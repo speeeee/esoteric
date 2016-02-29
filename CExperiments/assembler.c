@@ -146,7 +146,8 @@ void parse(FILE *o, FILE *i, int eo) { Lit l;
                               fwrite(&l.x.l,sizeof(long),1,o); break; 
                             default: printf("error\n"); exit(0); } }
          else if(!strcmp(l.x.s,"label")) { write_c(17,o); l = lexd(i,eo);
-           if(l.type == SYM) { fwrite(&lsz,sizeof(int),1,o); addLabel(l.x.s); }
+           if(l.type == SYM) { int x = 0;
+             fwrite(&x,sizeof(int),1,o); addLabel(l.x.s); }
            else { printf("error\n"); exit(0); } }
          else if(!strcmp(l.x.s,"link")) { write_c(40,o); l = lexd(i,eo);
            if(l.type == SYM) { int x = strlen(l.x.s); 
