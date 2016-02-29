@@ -53,6 +53,7 @@
 #define ADDL 44
 #define IMPORT 45
 #define LFUN 46
+#define DONE 47
 
 typedef int    Word;
 typedef long   DWord;
@@ -131,7 +132,8 @@ int opcodes[] = { /*push*/INT,FLT,CHR,LNG,-1,/*malloc*/INT,INT,INT,INT,
                   /*pop*/-1,/*out_s*/-1,/*in_s*/-1,/*main*/-1, /*refi*/-1,
                   /*reff*/-1,/*refc*/-1,/*refl*/-1,/*return*/-1,/*movi*/-1,
                   /*movf*/-1,/*swap*/-1,/*sref*/-1, /*link*/INT,/*addi*/-1,
-                  /*addf*/-1,/*addc*/-1,/*addl*/-1,/*import*/INT,/*lcall*/INT };
+                  /*addf*/-1,/*addc*/-1,/*addl*/-1,/*import*/INT,/*lcall*/INT,
+                  /*done*/-1 };
 
 // pop for all necessary functions.
 void parse(void) {
@@ -193,7 +195,7 @@ void read_prgm(FILE *f) { char op;
                  fread(&l.ca,sizeof(char),i,f); push_expr(op,l); break; }
     case IMPORT: { Lit l; int i; fread(&i,sizeof(int),1,f);
                    fread(&l.ca,sizeof(char),i,f); push_expr(op,l); break; }
-    case MAIN: { mn = esz; break; }
+    case DONE: { break; } case MAIN: { mn = esz; break; }
     default: { Lit l; switch(opcodes[(int)op]) {
       case CHR: { char i; fread(&i,sizeof(char),1,f); l.c = i; break; }
       case INT: { int i; fread(&i,sizeof(int),1,f); l.i = i; break; }

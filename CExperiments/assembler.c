@@ -71,8 +71,9 @@ OpC opcodes[] = { { "push", -1 /* varies */ }, { "pushw", -1 }, { "pushf", -1 },
                   { "movf", 0 }, { "movc", 0 }, { "movl", 0 },
                   { "swap", 0 }, { "sref", 0 }, { "link", -1 /* varies */ },
                   { "addi", 0 }, { "addf", 0 }, { "addc", 0 }, { "addl", 0 },
-                  { "import", -1 /* varies */ }, { "lfun", -1 /* varies */ } };
-int osz = 47;
+                  { "import", -1 /* varies */ }, { "lfun", -1 /* varies */ },
+                  { "done", 0 } };
+int osz = 48;
 // current next-label number
 int lc = 0;
 // defined labels
