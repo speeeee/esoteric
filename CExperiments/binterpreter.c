@@ -79,23 +79,25 @@ struct Lit { union { Word i; DWord l; Flt f; Byte c; Byte *s; void *v; } x;
 
 void read_prgm(FILE *);
 
-long *lbls; int lsz = 0;
 //typedef struct Stk { void *x; struct Stk *prev; } Stk;
 typedef struct { union { char c; int i; long l; double f;
                          char *ca; int *ia; long *la; double *fa; void *v; }; } Lit;
 typedef struct { char op; Lit q; } Expr;
 typedef struct Stk { Lit x; struct Stk *prev; } Stk;
 typedef struct Ref { long r; struct Ref *prev; } Ref;
+typedef struct { long *l; unsigned int sz; } Modu;
 //typedef struct FFn { void *x; } FFn;
+Modu *lbls; int lsz = 0;
 Expr *exprs; long esz = 0; long mn = -1;
 void **ffn; int ffsz = 0;
 Stk *stk; Ref *refs;
 
 void push_f(void *x) { if(ffn) { ffn = realloc(ffn,(ffsz+1)*sizeof(void *)); }
   else { ffn = malloc(sizeof(void *)); } ffn[ffsz++] = x; }
-void push_lbl(long plc) { if(lbls) { lbls = realloc(lbls,(lsz+1)*sizeof(long)); }
-  else { lbls = malloc(sizeof(long)); }
-  lbls[lsz++] = plc; }
+void push_lbl(long plc) { if(lbls[0].sz) { 
+    lbls[0].l = realloc(lbls[0].l,(lbls[0].sz+1)*sizeof(long)); }
+  else { lbls[0].l = malloc(sizeof(long)); }
+  lbls[0].l[lbls[0].sz++] = plc; }
 void push_expr(char op, Lit q) { exprs = realloc(exprs,(esz+1)*sizeof(Expr));
   exprs[esz++] = (Expr) { op, q }; }
 // will be better made later.
@@ -149,8 +151,8 @@ void parse(void) {
     case REALL: { void *x = getptr(stk->x); x = realloc(x,exprs[i].q.i); break; }
     case FREE: free(getptr(stk->x)); pop(); break;
     case OUT_S: out_s(stk->x.i,stk->prev->x); pop(); pop(); break;
-    case JMP_S: { i=lbls[stk->x.i]-1; pop(); break; }
-    case JMP: { i=lbls[exprs[i].q.i]-1; break; } // it's correct
+    case JMP_S: { i=lbls[0].l[stk->x.i]-1; pop(); break; }
+    case JMP: { i=lbls[0].l[exprs[i].q.i]-1; break; } // it's correct
     case POP: pop(); break;
     case IN: push_chr(getchar()); break;
     case REFI: { int q = (stk->x.ia)[stk->prev->x.i]; pop(); pop(); nstkptr();
@@ -162,9 +164,9 @@ void parse(void) {
     case REFL: { long q = (stk->x.la)[stk->prev->x.i]; pop(); pop(); nstkptr();
                  stk->x.l = q; break; }
     case CALL_S: { Ref *r = malloc(sizeof(Ref)); r->r = i;
-      if(refs) { r->prev = refs; } refs = r; i=lbls[stk->x.i]-1; pop(); break; }
+      if(refs) { r->prev = refs; } refs = r; i=lbls[0].l[stk->x.i]-1; pop(); break; }
     case CALL: { Ref *r = malloc(sizeof(Ref)); r->r = i;
-      if(refs) { r->prev = refs; } refs = r; i=lbls[exprs[i].q.i]-1; break; }
+      if(refs) { r->prev = refs; } refs = r; i=lbls[0].l[exprs[i].q.i]-1; break; }
     case RETURN: { Ref *r; r = refs; i = r->r; refs = refs->prev; free(r); break; }
     case MOVI: { (stk->x.ia)[stk->prev->x.i] = stk->prev->prev->x.i; 
                  pop(); pop(); pop(); break; }
@@ -187,7 +189,7 @@ void parse(void) {
     default: printf("what"); exit(0); } } }
 
 void read_prgm(FILE *f) { char op;
-  while((op = fgetc(f)) != TERM||mn<0) { switch(op) {
+  while(((op = fgetc(f)) != TERM||mn<0)&&op!=DONE) { switch(op) {
     case LABEL: { int x; fread(&x,sizeof(int),1,f); push_lbl(esz); break; }
     case LINK: { Lit l; int i; fread(&i,sizeof(int),1,f);
                    fread(&l.ca,sizeof(char),i,f); push_expr(op,l); break; }
@@ -195,7 +197,7 @@ void read_prgm(FILE *f) { char op;
                  fread(&l.ca,sizeof(char),i,f); push_expr(op,l); break; }
     case IMPORT: { Lit l; int i; fread(&i,sizeof(int),1,f);
                    fread(&l.ca,sizeof(char),i,f); push_expr(op,l); break; }
-    case DONE: { break; } case MAIN: { mn = esz; break; }
+    case MAIN: { mn = esz; break; }
     default: { Lit l; switch(opcodes[(int)op]) {
       case CHR: { char i; fread(&i,sizeof(char),1,f); l.c = i; break; }
       case INT: { int i; fread(&i,sizeof(int),1,f); l.i = i; break; }
@@ -205,6 +207,7 @@ void read_prgm(FILE *f) { char op;
 
 int main(int argc, char **argv) { //stk = malloc(sizeof(Stk));
   exprs = malloc(sizeof(Expr)); char *in; 
+  lbls = malloc(sizeof(Modu)); lbls[0].sz = lsz++;
   in = malloc((strlen(argv[1])+4)*sizeof(char)); strcpy(in,argv[1]);
   strcat(in,".uo"); FILE *f; f = fopen(in,"rb"); read_prgm(f); fclose(f); parse();
   free(exprs); /*DESTROY(stk);*/ return 0; }
