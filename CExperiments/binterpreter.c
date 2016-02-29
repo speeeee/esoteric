@@ -76,6 +76,8 @@ struct Lit { union { Word i; DWord l; Flt f; Byte c; Byte *s; void *v; } x;
 #define L sizeof(long)
 #define F sizeof(double)
 
+void read_prgm(FILE *);
+
 long *lbls; int lsz = 0;
 //typedef struct Stk { void *x; struct Stk *prev; } Stk;
 typedef struct { union { char c; int i; long l; double f;
@@ -176,6 +178,9 @@ void parse(void) {
     case LINK: { nstkptr(); stk->x.v = dlopen(exprs[i].q.ca,RTLD_LAZY);
                    break; }
     case LFUN: { void *z; z = dlsym(stk->x.v,exprs[i].q.ca); push_f(z); break; }
+    case IMPORT: { char *in; in = malloc((strlen(exprs[i].q.ca)+4)*sizeof(char));
+      strcpy(in,exprs[i].q.ca); strcat(in,".uo"); FILE *u; u = fopen(in,"rb");
+      read_prgm(u); fclose(u); break; }
     case TERM: exit(0); break;
     default: printf("what"); exit(0); } } }
 
@@ -185,7 +190,9 @@ void read_prgm(FILE *f) { char op;
     case LINK: { Lit l; int i; fread(&i,sizeof(int),1,f);
                    fread(&l.ca,sizeof(char),i,f); push_expr(op,l); break; }
     case LFUN: { Lit l; int i; fread(&i,sizeof(int),1,f);
-                  fread(&l.ca,sizeof(char),i,f); push_expr(op,l); break; }
+                 fread(&l.ca,sizeof(char),i,f); push_expr(op,l); break; }
+    case IMPORT: { Lit l; int i; fread(&i,sizeof(int),1,f);
+                   fread(&l.ca,sizeof(char),i,f); push_expr(op,l); break; }
     case MAIN: { mn = esz; break; }
     default: { Lit l; switch(opcodes[(int)op]) {
       case CHR: { char i; fread(&i,sizeof(char),1,f); l.c = i; break; }
