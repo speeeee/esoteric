@@ -73,15 +73,14 @@ OpC opcodes[] = { { "push", -1 /* varies */ }, { "pushw", -1 }, { "pushf", -1 },
                   { "addi", 0 }, { "addf", 0 }, { "addc", 0 }, { "addl", 0 },
                   { "import", -1 /* varies */ }, { "lfun", -1 /* varies */ },
                   { "done", 0 } };
-int osz = 48;
-// current next-label number
-int lc = 0;
+typedef struct { char **s; int sz; } Ls;
+int osz = 48; int md = 0;
 // defined labels
-char **ls; int lsz = 0;
+Ls *ls; int lsz = 0;
 
-void addLabel(char *x) { ls = realloc(ls,(lsz+1)*sizeof(char *)); 
-  ls[lsz] = malloc(sizeof(char)*strlen(x));
-  ls[lsz++] = x; }
+void addLabel(char *x) { ls[0].s = realloc(ls[0].s,(ls[0].sz+1)*sizeof(char *)); 
+  ls[0].s[ls[0].sz] = malloc(sizeof(char)*strlen(x));
+  ls[0].s[ls[0].sz++] = x; }
 
 typedef int    Word;
 typedef long   DWord;
@@ -127,12 +126,12 @@ Lit lexd(FILE *s, int eofchar) { int c;
                    return tokl(s,c); }
   if(c==eofchar||c==EOF) { Lit e; e.x.i = EOF; e.type = END; return e; }
   else { char *x = tok(s,c);
-    for(int i=0;i<lsz;i++) { if(!strcmp(x,ls[i])) { return liti(i); } }
+    for(int i=0;i<ls[0].sz;i++) { if(!strcmp(x,ls[0].s[i])) { return liti(i); } }
     return litsy(x); } }
 Lit lex(FILE *s) { return lexd(s,EOF); }
 
 // bad code
-void parse(FILE *o, FILE *i, int eo) { Lit l;
+void parse(FILE *o, FILE *i, int eo, int m) { Lit l;
   while((l = lexd(i,eo)).type != END) {
   if(l.type != SYM) { printf("ERROR: must start with op-code.\n"); }
   else { if(!strcmp(l.x.s,"push")) { Lit l = lexd(i,eo);
@@ -146,8 +145,8 @@ void parse(FILE *o, FILE *i, int eo) { Lit l;
                               fwrite(&l.x.l,sizeof(long),1,o); break; 
                             default: printf("error\n"); exit(0); } }
          else if(!strcmp(l.x.s,"label")) { write_c(17,o); l = lexd(i,eo);
-           if(l.type == SYM) { int x = 0;
-             fwrite(&x,sizeof(int),1,o); addLabel(l.x.s); }
+           if(l.type == SYM) {
+             fwrite(&m,sizeof(int),1,o); addLabel(l.x.s); }
            else { printf("error\n"); exit(0); } }
          else if(!strcmp(l.x.s,"link")) { write_c(40,o); l = lexd(i,eo);
            if(l.type == SYM) { int x = strlen(l.x.s); 
@@ -175,9 +174,10 @@ void parse(FILE *o, FILE *i, int eo) { Lit l;
            if(opcodes[ii].argsz) {
              Lit l = lexd(i,eo); n_out(l,opcodes[ii].argsz,o); } } } } }
 
-int main(int argc, char **argv) { ls = malloc(sizeof(char *)); FILE *g;
+int main(int argc, char **argv) { ls = malloc(sizeof(Ls));
+  ls[0].s = malloc(sizeof(char *)); FILE *g;
   FILE *f; //f = fopen("sample.uo","wb"); g = fopen("sample.usm","r");
   char *in; in = malloc((strlen(argv[2])+4)*sizeof(char)); strcpy(in,argv[2]);
   strcat(in,".usm"); char *out; out = malloc((strlen(argv[1])+5)*sizeof(char));
   strcpy(out,argv[1]); strcat(out,".uo"); f = fopen(out,"wb"); g = fopen(in,"r");
-  parse(f,g,EOF); fclose(f); fclose(g); return 0; }
+  parse(f,g,EOF,0); fclose(f); fclose(g); return 0; }
