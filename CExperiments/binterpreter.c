@@ -65,6 +65,21 @@ struct Lit { union { Word i; DWord l; Flt f; Byte c; Byte *s; void *v; } x;
              unsigned int type; };*/
 //typedef struct Arr { 
 
+/* on modules: The interpreter reads in the label opcodes as well as an
+               integer.  This integer represents the module that the
+               label being defined refers to.  A new module is added during
+               import (unfinished).  The assembler handles calls outside
+               of its own self by quickly scanning the imported file's
+               contents for the labels.  There are versions of jmp and call
+               for calling out-of-main-file labels:
+
+               ocall [int : module] [int : label]
+               ocall_s [int : module]
+               ojmp [int : module] [int : label]
+               ojmp_s [int : module]
+            
+               This continues with jns and jez. */
+
 #define INT 0
 #define FLT 1
 #define CHR 2
@@ -98,6 +113,9 @@ void push_lbl(long plc) { if(lbls[0].sz) {
     lbls[0].l = realloc(lbls[0].l,(lbls[0].sz+1)*sizeof(long)); }
   else { lbls[0].l = malloc(sizeof(long)); }
   lbls[0].l[lbls[0].sz++] = plc; }
+void push_lbl_gen(int m,long plc) { if(lbls[m].sz) {
+    lbls[m].l = realloc(lbls[m].l,(lbls[m].sz+1)*sizeof(long)); }
+  else { lbls[m].l = malloc(sizeof(long)); } lbls[m].l[lbls[m].sz++] = plc; }
 void push_expr(char op, Lit q) { exprs = realloc(exprs,(esz+1)*sizeof(Expr));
   exprs[esz++] = (Expr) { op, q }; }
 // will be better made later.
@@ -190,7 +208,7 @@ void parse(void) {
 
 void read_prgm(FILE *f) { char op;
   while(((op = fgetc(f)) != TERM||mn<0)&&op!=DONE) { switch(op) {
-    case LABEL: { int x; fread(&x,sizeof(int),1,f); push_lbl(esz); break; }
+    case LABEL: { int x; fread(&x,sizeof(int),1,f); push_lbl_gen(x,esz); break; }
     case LINK: { Lit l; int i; fread(&i,sizeof(int),1,f);
                    fread(&l.ca,sizeof(char),i,f); push_expr(op,l); break; }
     case LFUN: { Lit l; int i; fread(&i,sizeof(int),1,f);
