@@ -84,7 +84,9 @@ Ls *ls; int lsz = 0;
 void addLabel(char *x) { ls[0].s = realloc(ls[0].s,(ls[0].sz+1)*sizeof(char *)); 
   ls[0].s[ls[0].sz] = malloc(sizeof(char)*strlen(x));
   ls[0].s[ls[0].sz++] = x; }
-void addLabelGen(int m,char *x) { ls[m].s = realloc(ls[m].s,(ls[m].sz+1)*sizeof(char *)); 
+void addLabelGen(int m,char *x) { if(ls[m].sz) { 
+    ls[m].s = realloc(ls[m].s,(ls[m].sz+1)*sizeof(char *)); }
+  else { ls[m].s = malloc((ls[m].sz+1)*sizeof(char *)); } 
   ls[m].s[ls[m].sz] = malloc(sizeof(char)*strlen(x));
   ls[m].s[ls[m].sz++] = x; }
 
@@ -98,6 +100,8 @@ typedef struct Addr { int m; int x; } Addr;
 struct Lit { union { Word i; DWord l; Flt f; Byte c; Byte *s; Addr a; } x;
              unsigned int type; };
 
+Lit lexd(FILE *, int);
+
 Lit liti(long i) { Lit l; l.x.i = i; l.type = INT; return l; }
 Lit litsy(char *x) { Lit l; l.x.s = x; l.type = SYM; return l; }
 
@@ -108,6 +112,14 @@ void n_out(Lit x, int n, FILE *o) { void *q; switch(x.type) {
   case INT: q = &x.x.i; break; case FLT: q = &x.x.f; case CHR: q = &x.x.c;
   case LNG: q = &x.x.l; default: exit(0); }
   fwrite(q,n,1,o); }  
+void nmodule(char *lb) { char *q; q = malloc((strlen(lb)+4)*sizeof(char));
+  strcpy(q,lb); strcat(q,".usm"); FILE *e; e = fopen(q,"r");
+  ls = realloc(ls,(lsz+1)*sizeof(Ls)); Lit l;
+  while((l = lexd(e,EOF)).type != END) {
+    if(l.type == SYM) { if(!strcmp(l.x.s,"label")) { l = lexd(e,EOF);
+      if(l.type == SYM) { addLabelGen(lsz,l.x.s); }
+      else { printf("error 1\n"); } } } }
+  fclose(e); lsz++; }
 
 char *tok(FILE *s,int c) {
   int sz = 0; int lsz = 10; char *str = malloc(lsz*sizeof(char));
@@ -132,7 +144,7 @@ Lit lexd(FILE *s, int eofchar) { int c;
                    return tokl(s,c); }
   if(c==eofchar||c==EOF) { Lit e; e.x.i = EOF; e.type = END; return e; }
   else { char *x = tok(s,c); for(int q=0;q<lsz;q++) {
-    for(int i=0;i<ls[0].sz;i++) { if(!strcmp(x,ls[0].s[i])) { Lit l; l.x.a.x = i;
+    for(int i=0;i<ls[q].sz;i++) { if(!strcmp(x,ls[q].s[i])) { Lit l; l.x.a.x = i;
       l.x.a.m = q; l.type = ADR; return l; } } }
     return litsy(x); } }
 // ** make better search here ** //
@@ -154,7 +166,7 @@ void parse(FILE *o, FILE *i, int eo, int m) { Lit l;
                             case ADR: write_c(0,o);
                               fwrite(&l.x.a.x,sizeof(int),1,o); write_c(0,o);
                               fwrite(&l.x.a.m,sizeof(int),1,o); break;
-                            default: printf("error\n"); exit(0); } }
+                            default: printf("error push:%i\n",l.type); exit(0); } }
          else if(!strcmp(l.x.s,"label")) { write_c(17,o); l = lexd(i,eo);
            if(l.type == SYM) {
              fwrite(&m,sizeof(int),1,o); addLabelGen(m,l.x.s); }
@@ -168,7 +180,7 @@ void parse(FILE *o, FILE *i, int eo, int m) { Lit l;
              fwrite(&x,sizeof(int),1,o); fwrite(&l.x.s,sizeof(char),x,o); }
            else { printf("error\n"); exit(0); } }
          else if(!strcmp(l.x.s,"import")) { write_c(45,o); l = lexd(i,eo);
-           if(l.type == SYM) { int x = strlen(l.x.s); // nmodule();
+           if(l.type == SYM) { int x = strlen(l.x.s); nmodule(l.x.s);
              fwrite(&x,sizeof(int),1,o); fwrite(&l.x.s,sizeof(char),x,o); }
            else { printf("error\n"); exit(0); } }
          else if(!strcmp(l.x.s,":q")) { exit(0); }
