@@ -181,7 +181,7 @@ void parse(FILE *o, FILE *i, int eo, int m) { Lit l;
            else { printf("error\n"); exit(0); } }
          else if(!strcmp(l.x.s,"import")) { write_c(45,o); l = lexd(i,eo);
            if(l.type == SYM) { int x = strlen(l.x.s); nmodule(l.x.s);
-             fwrite(&x,sizeof(int),1,o); fwrite(&l.x.s,sizeof(char),x,o); }
+             fwrite(&x,sizeof(int),1,o); fwrite(l.x.s,sizeof(char),x,o); }
            else { printf("error\n"); exit(0); } }
          else if(!strcmp(l.x.s,":q")) { exit(0); }
          else if(opcode(l.x.s)!=-1) { int ii = opcode(l.x.s); write_c(ii,o); 
