@@ -54,6 +54,10 @@
 #define IMPORT 45
 #define LFUN 46
 #define DONE 47
+#define OCALL 48
+#define OJMP 49
+#define OJNS 50
+#define OJEZ 51
 
 typedef int    Word;
 typedef long   DWord;
@@ -92,7 +96,7 @@ struct Lit { union { Word i; DWord l; Flt f; Byte c; Byte *s; void *v; } x;
 #define L sizeof(long)
 #define F sizeof(double)
 
-void read_prgm(FILE *);
+void read_prgm(FILE *, int);
 
 //typedef struct Stk { void *x; struct Stk *prev; } Stk;
 typedef struct { union { char c; int i; long l; double f;
@@ -106,6 +110,7 @@ Modu *lbls; int lsz = 0;
 Expr *exprs; long esz = 0; long mn = -1;
 void **ffn; int ffsz = 0;
 Stk *stk; Ref *refs;
+int md = 0;
 
 void push_f(void *x) { if(ffn) { ffn = realloc(ffn,(ffsz+1)*sizeof(void *)); }
   else { ffn = malloc(sizeof(void *)); } ffn[ffsz++] = x; }
@@ -152,12 +157,12 @@ int opcodes[] = { /*push*/INT,FLT,CHR,LNG,-1,/*malloc*/INT,INT,INT,INT,
                   /*pop*/-1,/*out_s*/-1,/*in_s*/-1,/*main*/-1, /*refi*/-1,
                   /*reff*/-1,/*refc*/-1,/*refl*/-1,/*return*/-1,/*movi*/-1,
                   /*movf*/-1,/*swap*/-1,/*sref*/-1, /*link*/INT,/*addi*/-1,
-                  /*addf*/-1,/*addc*/-1,/*addl*/-1,/*import*/INT,/*lcall*/INT,
-                  /*done*/-1 };
+                  /*addf*/-1,/*addc*/-1,/*addl*/-1,/*import*/INT,/*lfun*/INT,
+                  /*done*/-1,/*ocall*/-1,/*ojmp*/-1,/*ojns*/-1,/*ojez*/-1 };
 
 // pop for all necessary functions.
 void parse(void) {
-  for(long i=mn;i<esz;i++) { switch(exprs[i].op) {
+  for(long i=mn;i<esz;i++) { switch(exprs[i].op) { 
     case PW: push_int(exprs[i].q.i); break;
     case PF: push_flt(exprs[i].q.f); break;
     case PC: push_chr(exprs[i].q.c); break;
@@ -202,19 +207,24 @@ void parse(void) {
     case LFUN: { void *z; z = dlsym(stk->x.v,exprs[i].q.ca); push_f(z); break; }
     case IMPORT: { char *in; in = malloc((strlen(exprs[i].q.ca)+4)*sizeof(char));
       strcpy(in,exprs[i].q.ca); strcat(in,".uo"); FILE *u; u = fopen(in,"rb");
-      read_prgm(u); fclose(u); break; }
+      lbls = realloc(lbls,(++lsz)*sizeof(Modu));
+      read_prgm(u,md++); fclose(u); break; /* simply allocate the next lblarr */ }
+    case OJMP: { // pop module, then word
+      i = lbls[stk->x.i].l[stk->prev->x.i]-1; pop(); pop(); break; }
     case TERM: exit(0); break;
     default: printf("what"); exit(0); } } }
 
-void read_prgm(FILE *f) { char op;
+void read_prgm(FILE *f, int m) { char op;
   while(((op = fgetc(f)) != TERM||mn<0)&&op!=DONE) { switch(op) {
-    case LABEL: { int x; fread(&x,sizeof(int),1,f); push_lbl_gen(x,esz); break; }
+    case LABEL: { int x; fread(&x,sizeof(int),1,f); push_lbl_gen(x+m,esz); break; }
     case LINK: { Lit l; int i; fread(&i,sizeof(int),1,f);
                    fread(&l.ca,sizeof(char),i,f); push_expr(op,l); break; }
     case LFUN: { Lit l; int i; fread(&i,sizeof(int),1,f);
                  fread(&l.ca,sizeof(char),i,f); push_expr(op,l); break; }
     case IMPORT: { Lit l; int i; fread(&i,sizeof(int),1,f);
-                   fread(&l.ca,sizeof(char),i,f); push_expr(op,l); break; }
+                   l.ca = malloc((i+1)*sizeof(char));
+                   for(int z=0;z<i;z++) { l.ca[z] = fgetc(f); } l.ca[i] = '\0';
+                   push_expr(op,l); break; }
     case MAIN: { mn = esz; break; }
     default: { Lit l; switch(opcodes[(int)op]) {
       case CHR: { char i; fread(&i,sizeof(char),1,f); l.c = i; break; }
@@ -227,7 +237,7 @@ int main(int argc, char **argv) { //stk = malloc(sizeof(Stk));
   exprs = malloc(sizeof(Expr)); char *in; 
   lbls = malloc(sizeof(Modu)); lbls[0].sz = lsz++;
   in = malloc((strlen(argv[1])+4)*sizeof(char)); strcpy(in,argv[1]);
-  strcat(in,".uo"); FILE *f; f = fopen(in,"rb"); read_prgm(f); fclose(f); parse();
+  strcat(in,".uo"); FILE *f; f = fopen(in,"rb"); read_prgm(f,md++); fclose(f); parse();
   free(exprs); /*DESTROY(stk);*/ return 0; }
 
 /*#define P 4
