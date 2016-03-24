@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <limits.h>
 #include <time.h>
+#include <math.h>
 #include <GLFW/glfw3.h>
 #include <OpenGL/GL.h>
 
@@ -26,11 +28,16 @@ nation snat[100];
 
 void init_map(void) { srand(time(NULL)); // not final algorithm!
   for(int i=0;i<4E6;i++) { map[i%2000][i/2000].mval = 0; 
-    map[i%2000][i/2000].unit = NONE; map[i%2000][i/2000].typ = rand()%2; } }
+    map[i%2000][i/2000].unit = NONE; 
+    map[i%2000][i/2000].typ = rand()%10; } }
 void draw_map(void) { glBegin(GL_POINTS);
   for(int i=0;i<4E6;i++) { if(map[i%2000][i/2000].typ==LAND) {
     glVertex3f(1.5*(i%2000)/2000,1.5*(i/2000)/2000,0); } } glEnd(); }
-
+void tree_(double l,int lim,double tht,double x,double y) { //printf("%g",tht);
+  glVertex3f(x,y,0); glVertex3f(x+l*cos(tht),y+l*sin(tht),0);
+  if(lim) { tree_(l/2,lim-1,tht-M_PI/4,x+l*cos(tht),y+l*sin(tht));
+            tree_(l/2,lim-1,tht+M_PI/4,x+l*cos(tht),y+l*sin(tht)); } }
+void tree(double l,int lim) { tree_(l,lim,M_PI/2,0,0); }
 void error_callback(int error, const char* description) {
     fputs(description, stderr); }
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
@@ -59,8 +66,9 @@ void paint(GLFWwindow *win) {
   glColor3f(0.f, 0.f, 1.f);
   glVertex3f(0.f, 0.6f, 0.f); 
   glEnd();*/
-  glTranslatef(-1,-1,0);
-  draw_map(); }
+  glTranslatef(0,-1,0);
+  /*draw_map();*/
+  glBegin(GL_LINES); tree(1,10); glEnd(); }
 
 int main(void) {
   GLFWwindow* window; init_map();
