@@ -6,8 +6,8 @@
 #include <GLFW/glfw3.h>
 #include <OpenGL/GL.h>
 
-#define BASE_HEIGHT 255
-#define SEA_LEVEL 127
+#define BASE_HEIGHT_A 255
+#define SEA_LEVEL_A 127
 
 #define SZ 16
 
@@ -48,21 +48,21 @@ int amap[SZ][SZ];
 void dr(double x, double y, double w, double h) { glBegin(GL_QUADS);
   glVertex3f(x,y,0); glVertex3f(x+w,y,0); glVertex3f(x+w,y+h,0);
   glVertex3f(x,y+h,0); glEnd(); }
-void draw_map_appx(void) { for(int i=0;i<pow(SZ,2);i++) {
-  if(amap[i%SZ][i/SZ]>=SEA_LEVEL) {
-    dr((double)(i%SZ)*ASZX,(double)(i/SZ)*ASZY,ASZX,ASZY); } } }
+void draw_map_appx(int sz, int sl) { for(int i=0;i<pow(sz,2);i++) {
+  if(amap[i%sz][i/sz]>=sl) {
+    dr((double)(i%sz)*ASZX,(double)(i/sz)*ASZY,ASZX,ASZY); } } }
 //void mapp(void) { for(int i=0;i<
-void ds_map(int bh, int l, int r, int t, int b) {
+void ds_map(int sz,int bmap[sz][sz], int bh, int l, int r, int t, int b) {
   int x_cnt = (r+l)/2; int y_cnt = (t+b)/2;
   int cv = amap[x_cnt][y_cnt] = (amap[l][t]+amap[r][t]+amap[l][b]+amap[r][b])/4
     - (rand()%bh-bh/2)/2; //floor((double)rand()/RAND_MAX*bh);
-  amap[x_cnt][t] = ((amap[l][t]+amap[r][t])-(rand()%bh-bh/2))/2;
-  amap[x_cnt][b] = ((amap[l][b]+amap[r][b])-(rand()%bh-bh/2))/2;
-  amap[l][y_cnt] = ((amap[l][t]+amap[l][b])-(rand()%bh-bh/2))/2;
-  amap[r][y_cnt] = ((amap[r][t]+amap[r][b])-(rand()%bh-bh/2))/2;
+  bmap[x_cnt][t] = ((bmap[l][t]+bmap[r][t])-(rand()%bh-bh/2))/2;
+  bmap[x_cnt][b] = ((bmap[l][b]+bmap[r][b])-(rand()%bh-bh/2))/2;
+  bmap[l][y_cnt] = ((bmap[l][t]+bmap[l][b])-(rand()%bh-bh/2))/2;
+  bmap[r][y_cnt] = ((bmap[r][t]+bmap[r][b])-(rand()%bh-bh/2))/2;
   if(r-l>2) { int nbh = floor((double)bh*(double)pow(2.0,-0.75));
-    ds_map(nbh,l,x_cnt,t,y_cnt); ds_map(nbh,x_cnt,r,t,y_cnt);
-    ds_map(nbh,l,x_cnt,y_cnt,b); ds_map(nbh,x_cnt,r,y_cnt,b); } }
+    ds_map(sz,bmap,nbh,l,x_cnt,t,y_cnt); ds_map(sz,bmap,nbh,x_cnt,r,t,y_cnt);
+    ds_map(sz,bmap,nbh,l,x_cnt,y_cnt,b); ds_map(sz,bmap,nbh,x_cnt,r,y_cnt,b); } }
 void init_map(void) { // not final algorithm!
   for(int i=0;i<4E6;i++) { map[i%2000][i/2000].mval = 0; 
     map[i%2000][i/2000].unit = NONE; int cram = rand()%2; //printf("%i",cram);
@@ -122,14 +122,14 @@ void paint(GLFWwindow *win) {
   glColor3f(0.f, 0.f, 1.f);
   glVertex3f(0.f, 1.f, 0.f); 
   glEnd();*/
-  draw_map_appx();
+  draw_map_appx(SZ,SEA_LEVEL_A);
   glBegin(GL_LINES); tree(1,10); glEnd(); }
 
 int main(void) {
   GLFWwindow* window; seed = time(NULL); srand(seed); 
-  amap[0][0] = SEA_LEVEL; amap[SZ-1][0] = SEA_LEVEL;
-  amap[SZ-1][SZ-1] = SEA_LEVEL; amap[0][SZ-1] = SEA_LEVEL;
-  ds_map(BASE_HEIGHT,0,SZ-1,SZ-1,0);
+  amap[0][0] = SEA_LEVEL_A; amap[SZ-1][0] = SEA_LEVEL_A;
+  amap[SZ-1][SZ-1] = SEA_LEVEL_A; amap[0][SZ-1] = SEA_LEVEL_A;
+  ds_map(SZ,amap,BASE_HEIGHT_A,0,SZ-1,SZ-1,0);
   glfwSetErrorCallback(error_callback);
   if (!glfwInit()) exit(EXIT_FAILURE);
   window = glfwCreateWindow(800, 800, "Macrodip", NULL, NULL);
