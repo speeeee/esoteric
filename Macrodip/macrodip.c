@@ -9,7 +9,7 @@
 #define BASE_HEIGHT_A 255
 #define SEA_LEVEL_A 127
 
-#define SZ 16
+#define SZ 2048
 
 #define ASZX (2.13/SZ)
 #define ASZY (2.0/SZ)
@@ -50,7 +50,7 @@ void dr(double x, double y, double w, double h) { glBegin(GL_QUADS);
   glVertex3f(x,y+h,0); glEnd(); }
 void draw_map_appx(int sz, int sl) { for(int i=0;i<pow(sz,2);i++) {
   if(amap[i%sz][i/sz]>=sl) {
-    dr((double)(i%sz)*ASZX,(double)(i/sz)*ASZY,ASZX,ASZY); } } }
+    dr((double)(i%sz)*ASZX,2-(double)(i/sz)*ASZY,ASZX,-ASZY); } } }
 //void mapp(void) { for(int i=0;i<
 void ds_map(int sz,int bmap[sz][sz], int bh, int l, int r, int t, int b) {
   int x_cnt = (r+l)/2; int y_cnt = (t+b)/2;
@@ -60,7 +60,7 @@ void ds_map(int sz,int bmap[sz][sz], int bh, int l, int r, int t, int b) {
   bmap[x_cnt][b] = ((bmap[l][b]+bmap[r][b])-(rand()%bh-bh/2))/2;
   bmap[l][y_cnt] = ((bmap[l][t]+bmap[l][b])-(rand()%bh-bh/2))/2;
   bmap[r][y_cnt] = ((bmap[r][t]+bmap[r][b])-(rand()%bh-bh/2))/2;
-  if(r-l>2) { int nbh = floor((double)bh*(double)pow(2.0,-0.75));
+  if(r-l>2) { int nbh = ceil((double)bh*(double)pow(2.0,-0.75));
     ds_map(sz,bmap,nbh,l,x_cnt,t,y_cnt); ds_map(sz,bmap,nbh,x_cnt,r,t,y_cnt);
     ds_map(sz,bmap,nbh,l,x_cnt,y_cnt,b); ds_map(sz,bmap,nbh,x_cnt,r,y_cnt,b); } }
 void init_map(void) { // not final algorithm!
@@ -126,7 +126,7 @@ void paint(GLFWwindow *win) {
   glBegin(GL_LINES); tree(1,10); glEnd(); }
 
 int main(void) {
-  GLFWwindow* window; seed = time(NULL); srand(seed); 
+  GLFWwindow* window; seed = 8792734;/*time(NULL);*/ srand(seed); 
   amap[0][0] = SEA_LEVEL_A; amap[SZ-1][0] = SEA_LEVEL_A;
   amap[SZ-1][SZ-1] = SEA_LEVEL_A; amap[0][SZ-1] = SEA_LEVEL_A;
   ds_map(SZ,amap,BASE_HEIGHT_A,0,SZ-1,SZ-1,0);
