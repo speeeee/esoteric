@@ -126,9 +126,9 @@ void paint(GLFWwindow *win) {
   glBegin(GL_LINES); tree(1,10); glEnd(); }
 
 int main(void) {
-  GLFWwindow* window; seed = 8792734;/*time(NULL);*/ srand(seed); 
-  amap[0][0] = SEA_LEVEL_A; amap[SZ-1][0] = SEA_LEVEL_A;
-  amap[SZ-1][SZ-1] = SEA_LEVEL_A; amap[0][SZ-1] = SEA_LEVEL_A;
+  GLFWwindow* window; seed = time(NULL); srand(seed); 
+  amap[0][0] = BASE_HEIGHT_A/2; amap[SZ-1][0] = BASE_HEIGHT_A/2;
+  amap[SZ-1][SZ-1] = BASE_HEIGHT_A/2; amap[0][SZ-1] = BASE_HEIGHT_A/2;
   ds_map(SZ,amap,BASE_HEIGHT_A,0,SZ-1,SZ-1,0);
   glfwSetErrorCallback(error_callback);
   if (!glfwInit()) exit(EXIT_FAILURE);
