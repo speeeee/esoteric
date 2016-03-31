@@ -14,6 +14,11 @@
 #define ASZX (2.13/SZ)
 #define ASZY (2.0/SZ)
 
+// map approximation every fourth tile.
+#define BSZ (SZ/4)
+#define BSZX (2.13/BSZ)
+#define BSZY (2.0/BSZ)
+
 #define NONE 0
 #define ARMY 1
 #define NAVY 2
@@ -33,24 +38,18 @@ typedef struct { char *name; int treas; int *provs; unit *u; } nation;
 typedef struct { int x; int y; } crds;
 typedef struct { double x; double y; } dcds;
 
-tile map[2000][2000];
-nation nat[1000000];
-
-dcds m_apx[1000] = { { 0,0 }, { 2.13,0 }, { 1,2 } }; int sz = 3;
-
 int amap[SZ][SZ];
-
-//tile smap[20][20];
-//nation snat[100];
-
-//int safe_rand(void) { srand(time(NULL)); return rand(); }
+int aamap[BSZ][BSZ];
 
 void dr(double x, double y, double w, double h) { glBegin(GL_QUADS);
   glVertex3f(x,y,0); glVertex3f(x+w,y,0); glVertex3f(x+w,y+h,0);
   glVertex3f(x,y+h,0); glEnd(); }
-void draw_map_appx(int sz, int sl) { for(int i=0;i<pow(sz,2);i++) {
-  if(amap[i%sz][i/sz]>=sl) {
-    dr((double)(i%sz)*ASZX,2-(double)(i/sz)*ASZY,ASZX,-ASZY); } } }
+void draw_map_appx(int sz, int bmap[sz][sz], double ix, double iy, int sl) { 
+  for(int i=0;i<pow(sz,2);i++) { if(bmap[i%sz][i/sz]>=sl) {
+    dr((double)(i%sz)*ix,2-(double)(i/sz)*iy,ix,-iy); } } }
+void fill_map(int sz, int csz, int bmap[sz][sz], int cmap[csz][csz]) { 
+  int inc = sz/csz; for(int i=0;i<pow(csz,2);i++) { int ii = i*inc;
+    cmap[i%csz][i/csz] = bmap[ii%sz][ii/csz]; } }
 //void mapp(void) { for(int i=0;i<
 void ds_map(int sz,int bmap[sz][sz], int bh, int l, int r, int t, int b) {
   int x_cnt = (r+l)/2; int y_cnt = (t+b)/2;
@@ -63,28 +62,11 @@ void ds_map(int sz,int bmap[sz][sz], int bh, int l, int r, int t, int b) {
   if(r-l>2) { int nbh = ceil((double)bh*(double)pow(2.0,-0.75));
     ds_map(sz,bmap,nbh,l,x_cnt,t,y_cnt); ds_map(sz,bmap,nbh,x_cnt,r,t,y_cnt);
     ds_map(sz,bmap,nbh,l,x_cnt,y_cnt,b); ds_map(sz,bmap,nbh,x_cnt,r,y_cnt,b); } }
-void init_map(void) { // not final algorithm!
-  for(int i=0;i<4E6;i++) { map[i%2000][i/2000].mval = 0; 
-    map[i%2000][i/2000].unit = NONE; int cram = rand()%2; //printf("%i",cram);
-    map[i%2000][i/2000].typ = cram+1; } }
-void draw_map(void) { glBegin(GL_POINTS);
-  for(int i=0;i<4000;i++) { if(map[i%2000][i/2000].typ==LAND) {
-    glVertex3f((i%2000)/2000,2-(i/2000)/2000,0); } } glEnd(); }
 void tree_(double l,int lim,double tht,double x,double y) { //printf("%g",tht);
   glVertex3f(x+1,y,0); glVertex3f((x+1)+l*cos(tht),y+l*sin(tht),0);
   if(lim) { tree_(l*1/1.818,lim-1,tht-M_PI/4,x+l*cos(tht),y+l*sin(tht));
             tree_(l*1/1.818,lim-1,tht+M_PI/4,x+l*cos(tht),y+l*sin(tht)); } }
 void tree(double l,int lim) { tree_(l,lim,M_PI/2,0,0); }
-void dsm(int lim,int mag, crds a, crds b, crds c, crds d) {
-  crds md = { ((a.x+b.x)/2+(c.x+d.x)/2)/2, ((a.y+c.y)/2+(b.y+d.y)/2)/2 };
-  //md.x = md.x + (rand()%100-50); md.y = md.y + (rand()%100-50);
-  map[md.x][md.y].typ = SEA; 
-  crds ab = { md.x-abs(b.x-a.x)/2,md.y }; crds bb = { md.x,md.y-abs(c.y-a.y)/2 };
-  crds cb = { md.x*2-1,md.y }; crds db = { md.x,md.y*2-1 };
-  if(lim) { dsm(lim-1,mag/4,ab,bb,cb,db); } }
-/*void init_map2(void) { srand(time(NULL));
-  crds a = { 0,0 }; crds b = { 1999, 0 }; crds c = { 0, 1999 }; 
-  crds d = { 1999, 1999 }; dsm(10,100,a,b,c,d); }*/
 
 void error_callback(int error, const char* description) {
     fputs(description, stderr); }
@@ -111,18 +93,8 @@ void setup(GLFWwindow *win) {
   glMatrixMode(GL_MODELVIEW);
   glLoadIdentity(); }
 
-void paint(GLFWwindow *win) {
-  //glRotatef((float) glfwGetTime() * 50.f, 0.f, 0.f, 1.f);
-  //glTranslatef(1,0,0);
-  /*glBegin(GL_TRIANGLES);
-  glColor3f(1.f, 0.f, 0.f);
-  glVertex3f(0.f, 0.f, 0.f);
-  glColor3f(0.f, 1.f, 0.f);
-  glVertex3f(1.2f, 0.f, 0.f);
-  glColor3f(0.f, 0.f, 1.f);
-  glVertex3f(0.f, 1.f, 0.f); 
-  glEnd();*/
-  draw_map_appx(SZ,SEA_LEVEL_A);
+void paint(GLFWwindow *win) { 
+  draw_map_appx(BSZ,aamap,BSZX,BSZY,SEA_LEVEL_A);
   glBegin(GL_LINES); tree(1,10); glEnd(); }
 
 int main(void) {
@@ -130,6 +102,10 @@ int main(void) {
   amap[0][0] = BASE_HEIGHT_A/2; amap[SZ-1][0] = BASE_HEIGHT_A/2;
   amap[SZ-1][SZ-1] = BASE_HEIGHT_A/2; amap[0][SZ-1] = BASE_HEIGHT_A/2;
   ds_map(SZ,amap,BASE_HEIGHT_A,0,SZ-1,SZ-1,0);
+  /*aamap[0][0] = BASE_HEIGHT_A/2; aamap[BSZ-1][0] = BASE_HEIGHT_A/2;
+  aamap[BSZ-1][BSZ-1] = BASE_HEIGHT_A/2; aamap[0][BSZ-1] = BASE_HEIGHT_A/2;
+  ds_map(BSZ,aamap,BASE_HEIGHT_A,0,BSZ-1,BSZ-1,0);*/
+  fill_map(2048,512,amap,aamap);
   glfwSetErrorCallback(error_callback);
   if (!glfwInit()) exit(EXIT_FAILURE);
   window = glfwCreateWindow(800, 800, "Macrodip", NULL, NULL);
