@@ -37,6 +37,7 @@ typedef struct { int x; int y; int type; } unit;
 typedef struct { char *name; int treas; int *provs; unit *u; } nation;
 typedef struct { int x; int y; } crds;
 typedef struct { double x; double y; } dcds;
+typedef struct { double x; double y; double z; } cam;
 
 int amap[SZ][SZ];
 int aamap[BSZ][BSZ];
@@ -93,11 +94,23 @@ void setup(GLFWwindow *win) {
   glMatrixMode(GL_MODELVIEW);
   glLoadIdentity(); }
 
-void paint(GLFWwindow *win) { 
+void paint(GLFWwindow *win, cam c) { 
+  glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); glLoadIdentity();
+  glTranslatef(-c.x/10,-c.y/10,0);
   draw_map_appx(BSZ,aamap,BSZX,BSZY,SEA_LEVEL_A);
   glBegin(GL_LINES); tree(1,10); glEnd(); }
 
-int main(void) {
+int pressed(GLFWwindow *win,int x) { return glfwGetKey(win,x)!=GLFW_RELEASE; }
+
+crds getInput(GLFWwindow *win) { 
+  int l = -pressed(win,GLFW_KEY_LEFT); int r = pressed(win,GLFW_KEY_RIGHT);
+  int u = pressed(win,GLFW_KEY_UP); int d = -pressed(win,GLFW_KEY_DOWN);
+  return (crds) { l+r,u+d }; }
+
+cam parse_input(GLFWwindow *win, cam c) {
+  crds e = getInput(win); c = (cam){ c.x+e.x, c.y+e.y, c.z }; return c; }
+
+int main(void) { cam c = { 0, 0, 0 };
   GLFWwindow* window; seed = time(NULL); srand(seed); 
   amap[0][0] = BASE_HEIGHT_A/2; amap[SZ-1][0] = BASE_HEIGHT_A/2;
   amap[SZ-1][SZ-1] = BASE_HEIGHT_A/2; amap[0][SZ-1] = BASE_HEIGHT_A/2;
@@ -116,8 +129,8 @@ int main(void) {
   glfwSwapInterval(1);
   glfwSetKeyCallback(window, key_callback); setup(window);
   glfwSetFramebufferSizeCallback(window, rsz);
-  while (!glfwWindowShouldClose(window)) { paint(window);
-    glfwSwapBuffers(window); glfwPollEvents(); }
+  while (!glfwWindowShouldClose(window)) { paint(window,c);
+    c = parse_input(window,c); glfwSwapBuffers(window); glfwPollEvents(); }
   glfwDestroyWindow(window);
   glfwTerminate();
   exit(EXIT_SUCCESS); }
