@@ -48,7 +48,7 @@ void dr(double x, double y, double w, double h) { glBegin(GL_QUADS);
 void draw_map_appx(int sz, int bmap[sz][sz], double ix, double iy, int sl
                   ,int l, int r, int t, int b) { 
   for(int i=0;i<(r-l)*(t-b);i++) { int x = l+i%(r-l); int y = b+i/(t-b);
-    if(bmap[x][y]>=sl/*&&x>=l&&x<r&&y<=t&&y>b*/) {
+    if(x>=0&&y>=0&&x<sz&&y<sz&&bmap[x][y]>=sl) {
       dr((double)x*ix,2-(double)y*iy,ix,-iy); } } }
 void fill_map(int sz, int csz, int bmap[sz][sz], int cmap[csz][csz]) { 
   int inc = sz/csz; for(int i=0;i<pow(csz,2);i++) { int ii = i*inc;
@@ -98,10 +98,11 @@ void setup(GLFWwindow *win) {
 
 void paint(GLFWwindow *win, cam c) { 
   glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); glLoadIdentity();
-  glTranslatef(-c.x/10,-c.y/10,0); 
-  if(c.z>7) { draw_map_appx(SZ,amap,ASZX+2.13*c.z/SZ,ASZY+2*c.z/SZ,SEA_LEVEL_A
-                           ,0,SZ/10,SZ/10,0); }
-  else { draw_map_appx(BSZ,aamap,BSZX+2.13*c.z/SZ,BSZY+2*c.z/SZ,SEA_LEVEL_A
+  glTranslatef(-c.x/10,-c.y/10,0); printf("%f, %f, %f\n",c.z,c.x,c.y); 
+  if(c.z>3) { draw_map_appx(SZ,amap,ASZX+2.13/3*c.z/SZ,ASZY+2.0/3*c.z/SZ
+                           ,SEA_LEVEL_A,c.x*18,c.x*18+SZ/4
+                           ,SZ/4,0); }
+  else { draw_map_appx(BSZ,aamap,BSZX+2.13/3*c.z/BSZ,BSZY+2.0/3*c.z/BSZ,SEA_LEVEL_A
                       ,0,BSZ,BSZ,0); }
   glBegin(GL_LINES); tree(1,10); glEnd(); }
 
