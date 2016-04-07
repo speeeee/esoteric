@@ -19,6 +19,8 @@
 #define BSZX (2.13/BSZ)
 #define BSZY (2.0/BSZ)
 
+#define Z 16
+
 #define NONE 0
 #define ARMY 1
 #define NAVY 2
@@ -71,6 +73,10 @@ void tree_(double l,int lim,double tht,double x,double y) { //printf("%g",tht);
             tree_(l*1/1.818,lim-1,tht+M_PI/4,x+l*cos(tht),y+l*sin(tht)); } }
 void tree(double l,int lim) { tree_(l,lim,M_PI/2,0,0); }
 
+/* == JPEG map generation == */
+
+
+
 void error_callback(int error, const char* description) {
     fputs(description, stderr); }
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
@@ -98,11 +104,11 @@ void setup(GLFWwindow *win) {
 
 void paint(GLFWwindow *win, cam c) { 
   glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); glLoadIdentity();
-  glTranslatef(-c.x/10,-c.y/10,0); printf("%f, %f, %f\n",c.z,c.x,c.y); 
-  if(c.z>3) { draw_map_appx(SZ,amap,ASZX+2.13/3*c.z/SZ,ASZY+2.0/3*c.z/SZ
-                           ,SEA_LEVEL_A,c.x*18,c.x*18+SZ/4
-                           ,SZ/4,0); }
-  else { draw_map_appx(BSZ,aamap,BSZX+2.13/3*c.z/BSZ,BSZY+2.0/3*c.z/BSZ,SEA_LEVEL_A
+  glTranslatef(-c.x/10,-c.y/10,0); //printf("%f, %f, %f\n",c.z,c.x,c.y); 
+  if(c.z) { draw_map_appx(SZ,amap,ASZX+2.13/4*Z/SZ,ASZY+2.0/4*Z/SZ
+                            ,SEA_LEVEL_A,c.x*18,c.x*18+SZ/4
+                            ,-c.y*20+SZ/4,-c.y*20); }
+  else { draw_map_appx(BSZ,aamap,BSZX+2.13/4*c.z/BSZ,BSZY+2.0/4*c.z/BSZ,SEA_LEVEL_A
                       ,0,BSZ,BSZ,0); }
   glBegin(GL_LINES); tree(1,10); glEnd(); }
 
@@ -115,7 +121,9 @@ cam getInput(GLFWwindow *win) {
   return (cam) { l+r,u+d,i+o }; }
 
 cam parse_input(GLFWwindow *win, cam c) {
-  cam e = getInput(win); c = (cam){ c.x+e.x, c.y+e.y, c.z+e.z }; return c; }
+  cam e = getInput(win); c = (cam){ c.x+e.x, c.y+e.y, e.z==0?c.z:1 };
+  if(e.z<0) { c = (cam){ 0, 0, 0 }; }
+  return c; }
 
 int main(void) { cam c = { 0, 0, 0 };
   GLFWwindow* window; seed = time(NULL); srand(seed); 
