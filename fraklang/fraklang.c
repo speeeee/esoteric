@@ -31,8 +31,13 @@ void sine_wave(int16_t *buf, int32_t len, float freq, float ratio, float amp) {
     else if((int32_t)pt+(int32_t)buf[i]<=-pow(2,16)/2) { buf[i] = -32766; }
     else { buf[i] += (int16_t)(sin(tht*freq)*32767.f*amp); } } }
 
+void add_waves(int16_t *buf, int32_t len, float ratio, float *freqs, int amt) {
+  for(int i=0;i<amt;i++) { sine_wave(buf,len,freqs[i],ratio,1/(float)amt); } }
+
 int main(int argc, char **argv) { FILE *f;
-  int16_t buf[44100]; sine_wave(buf,44100,440.f,44100,0.33);
-  sine_wave(buf,44100,293.66,44100,0.33); sine_wave(buf,44100,369.99,44100,0.33);
+  int16_t buf[44100]; //sine_wave(buf,44100,440.f,44100,0.33);
+  //sine_wave(buf,44100,293.66,44100,0.33); sine_wave(buf,44100,369.99,44100,0.33);
+  float freqs[3] = { 440.f, 293.66, 369.99 };
+  add_waves(buf,44100,44100,freqs,3);
   f = fopen("cdjoiw.wav","w"); wav_header(f,44100,1);
   out_buf(f,buf,44100); return 0; }
