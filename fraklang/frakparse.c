@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <ctype.h>
+#include <string.h>
 
 #define SYM 0
 #define INT 1
@@ -18,8 +19,6 @@ Lit liti(int64_t i) { Lit l; l.x.i = i; l.type = INT; return l; }
 Lit litsy(char *x) { Lit l; l.x.s = x; l.type = SYM; return l; }
 
 void write_c(char c, FILE *f) { fwrite(&c,1,1,f); }
-int opcode(char *x) { int i; for(i=0;i<osz;i++) {
-  if(!strcmp(x,opcodes[i].name)) { return i; } } return -1; }
 void n_out(Lit x, int n, FILE *o) { void *q; switch(x.type) {
   case INT: q = &x.x.i; break; case FLT: q = &x.x.f; default: exit(0); }
   fwrite(q,n,1,o); }  
@@ -44,10 +43,7 @@ Lit lexd(FILE *s, int eofchar) { int c;
   if(isdigit(c)) { //Lit q; fscanf(s,"%li",&q.x.i); q.type = INT; return q; }
                    return tokl(s,c); }
   if(c==eofchar||c==EOF) { Lit e; e.x.i = EOF; e.type = END; return e; }
-  else { char *x = tok(s,c); for(int q=0;q<lsz;q++) {
-    for(int i=0;i<ls[q].sz;i++) { if(!strcmp(x,ls[q].s[i])) { Lit l; l.x.a.x = i;
-      l.x.a.m = q; l.type = ADR; return l; } } }
-    return litsy(x); } }
+  else { char *x = tok(s,c); return litsy(x); } }
 // ** make better search here ** //
 Lit lex(FILE *s) { return lexd(s,EOF); }
 
@@ -56,10 +52,10 @@ Elem *stk;
 void nstkptr(Elem *s) { if(s) { Elem *q = malloc(sizeof(Elem));
   q->prev = malloc(sizeof(Elem)); q->prev = s; s = q; }
   else { s = malloc(sizeof(Elem)); } }
-void push(Elem *s, Lit l) { nstkptr(); stk->x = l; }
-void pushi(Elem *s, int64_t i) { nstkptr(); stk->x.i = i; }
-void pushf(Elem *s, double f) { nstkptr(); stk->x.f = f; }
-void pop(Elem *s) { Stk *e; e = s; s = s->prev; free(e); }
+void push(Elem *s, Lit l) { nstkptr(s); stk->x = l; }
+void pushi(Elem *s, int64_t i) { nstkptr(s); stk->x.type = INT; stk->x.x.i = i; }
+void pushf(Elem *s, double f) { nstkptr(s); stk->x.type = FLT; stk->x.x.f = f; }
+void pop(Elem *s) { Elem *e; e = s; s = s->prev; free(e); }
 
 // first pass through file which linearly places the program retrieved into
 // stk.
@@ -72,3 +68,6 @@ void read(FILE *i, int eo) { Lit l; while((l=lexd(i,eo)).type!=END) {
 // third pass through program which actually evaluated the contents as expected.
 // the first and second pass allow for a faster third pass hopefully.
 
+int main(int argc, char **argv) { FILE *f;
+  char *in; in = malloc((strlen(argv[2])+3)*sizeof(char)); strcpy(in,argv[2]);
+  strcat(in,".fl"); f = fopen(in,"r"); read(f,EOF); fclose(f); return 0; }
