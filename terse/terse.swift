@@ -29,6 +29,8 @@ func rp(i : Int, q : [String]) -> [String] { return Array(q[0..<q.count-i]); }
 //   too "complex" when expressed using the conditional ternary operator.
 func funize(s : String) -> ((Double,Double) -> Double) { switch(s) { case "+": return (+); 
   case "-": return (-); case "*": return (*); case "/": return (/); default: return (+); } }
+func call(nzx : [String], stk : [String]) -> Stk {
+  return parseExpr(nzx,ep:stk); }
 
 // goes through list of tokens and parses them accordingly.
 
@@ -57,7 +59,11 @@ func parseExpr(e : [String],ep : [String]) -> Stk { return (e.reduce((Stk(mode:0
   case (0,")"): let q = Int(pop(0,q:n.stk))!; 
                 let e = Array(n.stk[n.stk.count-q-1..<n.stk.count-1]);
                 return (Stk(mode:0,stk:rp(1,q:n.stk)+e),nz.1);
-  case (0,"\\"): let q = nz.1[Int(n.stk.last!)!]; 
+  case (0,"?"): let q = nz.1[Int(n.stk.last!)!]; let e = nz.1[Int(pop(1,q:n.stk))!];
+                let z = pop(2,q:n.stk); 
+                if z == "f" { return (call(q,stk:Array(n.stk[0..<n.stk.count-3])),nz.1); }
+                else { return (call(e,stk:Array(n.stk[0..<n.stk.count-3])),nz.1); }
+  //case (0,"\\"): let q = nz.1[Int(n.stk.last!)!]; 
   case (0,_): if funs.filter({s == $0.name}).isEmpty {
       return (Stk(mode:n.mode,stk:n.stk+[s]),nz.1); }
     else { let f : Fun = funs[funs.indexOf({$0.name == s})!];
