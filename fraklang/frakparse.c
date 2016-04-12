@@ -39,7 +39,7 @@ Lit tokl(FILE *s,int c) {
                 default: fseek(s,-1,SEEK_CUR); e.x.i = atoi(str); e.type = INT; }
     return e; }
 Lit lexd(FILE *s, int eofchar) { int c;
-  while(/*isspace(c = fgetc(s)));*/(c = fgetc(s))==' '||c=='\t'||c=='\n');
+  while(/*isspace(c = fgetc(s)));*/(c = fgetc(s))==' '||c=='\t'/*||c=='\n'*/);
   if(isdigit(c)) { //Lit q; fscanf(s,"%li",&q.x.i); q.type = INT; return q; }
                    return tokl(s,c); }
   if(c==eofchar||c==EOF) { Lit e; e.x.i = EOF; e.type = END; return e; }
@@ -52,7 +52,11 @@ Elem *stk;
 void nstkptr(Elem *s) { if(s) { Elem *q = malloc(sizeof(Elem));
   q->prev = malloc(sizeof(Elem)); q->prev = s; s = q; }
   else { s = malloc(sizeof(Elem)); } }
-void push(Elem *s, Lit l) { nstkptr(s); stk->x = l; }
+void nstkptrg(void) { if(stk) { Elem *q = malloc(sizeof(Elem));
+  q->prev = malloc(sizeof(Elem)); q->prev = stk; stk = q; }
+  else { stk = malloc(sizeof(Elem)); } }
+
+void pushg(Lit l) { nstkptrg(); stk->x = l; }
 void pushi(Elem *s, int64_t i) { nstkptr(s); stk->x.type = INT; stk->x.x.i = i; }
 void pushf(Elem *s, double f) { nstkptr(s); stk->x.type = FLT; stk->x.x.f = f; }
 void pop(Elem *s) { Elem *e; e = s; s = s->prev; free(e); }
@@ -60,7 +64,7 @@ void pop(Elem *s) { Elem *e; e = s; s = s->prev; free(e); }
 // first pass through file which linearly places the program retrieved into
 // stk.
 void read(FILE *i, int eo) { Lit l; while((l=lexd(i,eo)).type!=END) {
-  push(stk,l); } }
+  pushg(l); } }
 
 // second pass through program which appropriately branches and aliases functions
 // while also defining new functions by use of the define function.
@@ -68,6 +72,7 @@ void read(FILE *i, int eo) { Lit l; while((l=lexd(i,eo)).type!=END) {
 // third pass through program which actually evaluated the contents as expected.
 // the first and second pass allow for a faster third pass hopefully.
 
-int main(int argc, char **argv) { FILE *f;
+int main(int argc, char **argv) { /*FILE *f;
   char *in; in = malloc((strlen(argv[2])+3)*sizeof(char)); strcpy(in,argv[2]);
-  strcat(in,".fl"); f = fopen(in,"r"); read(f,EOF); fclose(f); return 0; }
+  strcat(in,".fl"); f = fopen(in,"r"); read(f,EOF); fclose(f); return 0;*/
+  printf("> "); read(stdin,'\n'); return 0; }
