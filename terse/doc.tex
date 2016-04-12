@@ -1,0 +1,118 @@
+\documentclass[12pt]{report}
+\title{the \emph{terse} interpreter}
+\author{Spencer Sallay}
+\usepackage{amsmath}
+\usepackage[pdftex,bookmarks,colorlinks]{hyperref}
+\begin{document}
+  \maketitle
+  \tableofcontents
+  \newpage
+  \chapter{Introduction}
+  \emph{terse} is a very terse, stack-based, concatenative language built for iOS systems
+  (specifically iOS 7.0+).  Out of the box, the language will also provide graphics
+  capability, allowing the user to write very small programs that can manipulate a 
+  canvas.  The aim of the project is to provide a programming language that does not 
+  require much writing to execute certain things.  Programming on iOS platforms is 
+  practically non-existant, though this is probably for the better.  While terse is a 
+  programming language itself, its use is not in writing practical applications, but 
+  instead in writing quick programs.
+
+  terse is built using Swift 2.x, while the graphics librarry accompanying it is 
+  {CoreGraphics?/GLKit?}.  All information regarding the details of terse are explained
+  in the documentation below.
+  \chapter{Tutorial}
+  This document acts as a complete\footnote{This document is \emph{not} yet complete as
+  of \date{}} reference and tutorial for \emph{terse}.  While it is highly recommended
+  that the user read the tutorial, there is no expectation to read the entire
+  reference.  However, at the end of this tutorial, there will be a list of words 
+  (function) that are recommended to be read about in the reference.
+  \section{Stack languages}
+  As mentioned before, \emph{terse} is a stack-based, concatenative language.  Ignoring
+  the "concatenative" part for now, a stack-based language is essentially a language
+  where all actions performed are done so on an stack structure (also known as a
+  \emph{LIFO-queue}).  A stack is a very simple structure in that it has two
+  operations: \emph{push} and \emph{pop}.  Pushing something onto the stack will put
+  what is to be pushed onto the stack for later use.  Popping something from the
+  stack will take the top element of the stack, remove it, and do \emph{something} with
+  it.  The something that it does will be explained later.
+  \section{terse as a stack language}
+  \verb|terse| works like most high level stack-based languages as it uses a
+  concatenative style of programming to represent interactions with the stack.
+  For example, the expression \verb|1 2 3| represents the pushing of three numbers,
+  \verb|1|, \verb|2|, and \verb|3|, to the stack.  In general, any whitespace character
+  is used to separate tokens, while any token is represented by a numeric value or
+  a symbol.
+  \subsection{Calling functions}
+  Being able to only push to the stack is a fairly limited feature.  Most stack-based
+  languages implement functions as things that pop items from the stack for use and
+  push what is returned from the function.  An example of this using the function,
+  \verb|+|, is as follows:
+  \newline\newline
+  \verb|1 2 3 + +|
+  \newline\newline
+  This example is a direct representation of the infix counterpart: \verb|(2 + 3) + 1|.
+  Another thing to note is that because of how each token is read sequentially, it
+  is possible to chain functions emulating function composition.  This is one of
+  the main advantages of stack-based languages; for example, to represent the
+  composition \begin{math}(f\circ g\circ h)(x)\end{math} in a stack-based
+  setting as opposed to most traditional function application languages:
+  \verb|x h g f| and \verb|f(g(h(x)))|.  This greatly reduces the amount of typing
+  necessary, while arguably not compromising the clarity of it.  Of course, this does
+  have a change to lead to some ambiguity when reading code.  Consider the expression,
+  \verb|1 2 3 a b|.  Assuming that \verb|a| and \verb|b| are functions, the actual
+  amount of arguments each function takes is slightly ambiguous.  Because of this,
+  the programmer should make sure to clear those ambiguities if readability is a
+  necessity (for example, assuming that \verb|a| takes two arguments and returns one,
+  and \verb|b| also takes two arguments and returns 0, it could be rewritten as
+  \verb|1 2 a 3 b|).
+  \newline\newline
+  Finally, all functions' inputs and outputs from now on will be represented by
+  their \emph{stack signature}.  For example, the stack signature for \verb|+| is
+  \verb|( a b -- c )|.
+  \subsection{Creating functions and quotes}
+  Before covering functions, it should be explained what quotes are.  Quotes are
+  terse's (and a few other stack languages, Joy being the first to implement them)
+  representation of first-class functions.  First-class functions in other languages
+  are functions that act as literals, meaning that they can be used like numbers,
+  strings\footnote{This assumes that strings are counted as literals themselves, like
+  how a few LISP variants do.}, etc.  This document will not go very in-depth on what
+  first-class functions can do, but they are very imporant to understanding the
+  language.  The following is an example of a quote being called:
+  \newline\newline
+  \verb|2 [ 1 + } !|
+  \newline\newline
+  The actual quote itself is the expression between the \verb|[| and the \verb|}|.
+  Within the quote is the expression, \verb|1 +|.  However, this expression is not
+  yet called, and is instead pushed to the stack.  The function, \verb|!|, calls
+  the quote on top of the stack, which means that whatever is in the expression is
+  essentially pushed directly to the stack, making the expression \verb|2 1 +|.
+  This is then evaluated to \verb|3|, as it would normally.  Quotes, as mentioned
+  before, can be used like anything else on the stack, meaning it can be subject
+  to things like conditional expressions, giving it a lot of potential use.
+  \newline\newline
+  This relates to functions as all functions are in terse are essentially just named
+  quotes.  The following is an example of a function that takes the average of two
+  numbers, \verb|avg|:
+  \newline\newline
+  \verb|: avg + 2 / }|
+  \newline\newline
+  The first token read, \verb|:|, is special in that it changes the \emph{mode} of
+  the reading.  It actually does the same thing as \verb|[| does, as \verb|[| is
+  technically another mode-changing function itself.  Because of this, \verb|}|
+  acts as the closing of that mode.  However, instead of pushing this to the stack,
+  it instead stores it in a list of other functions, where the name of the function
+  is \verb|avg| and its body is \verb|2 + /|.  One thing to note is the absence
+  of any argument declaration.  Instead, all that are there are the name and body
+  of the function.  The reason for this is because the actual stack signature of
+  the function can be derived from the body fairly easily.  For example, the
+  stack signature of this is \verb|( a b -- c )|.  There is only one time, however,
+  where it is impossible to derive the signature, and that is for recursive functions.
+  Since they call themselves within themselves, it is impossible to tell what
+  the actual signature is.  This is not an issue by default in terse though, as
+  the interpreter does not actually bother coming up with the stack signature.
+  \newline\newline
+  Now that the function is defined, it can now be called.  Calling functions is fairly
+  straightfoward, as it only requires that the amount of arguments necessary be on
+  the stack and that the function itself is pushed: 
+  \verb|avg 1 3| $\leftarrow$ \verb|2|.
+\end{document}
