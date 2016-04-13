@@ -5,7 +5,7 @@
 
 // WAV files only; assume data up to byte 44.
 
-typedef struct { float freq; char *name; } note;
+typedef struct { char *name; float freq; } note;
 note pn[88] = { { "C4", 261.63 }, { "C4#", 277.18 }, { "D4", 293.66 },
                 { "D4#", 311.13 }, { "E4", 329.63 }, { "F4", 349.23 },
                 { "F4#", 369.99 }, { "G4", 392 }, { "G4#", 415.3 },
@@ -34,9 +34,10 @@ void sine_wave(int16_t *buf, int32_t len, int32_t pos, float freq, float ratio,
                float amp) {
   for(int i=pos; i<len; i++) { float tht = ((float)i/ratio) * M_PI;
     int16_t pt = (int16_t)(sin(tht*freq)*32767.f*amp);
-    if((int32_t)pt+(int32_t)buf[i]>=pow(2,16)/2) { buf[i] = 32766; }
-    else if((int32_t)pt+(int32_t)buf[i]<=-pow(2,16)/2) { buf[i] = -32766; }
-    else { buf[i] += (int16_t)(sin(tht*freq)*32767.f*amp); } } }
+    //if((int32_t)pt+(int32_t)buf[i]>=pow(2,16)/2) { buf[i] = 32766; }
+    //else if((int32_t)pt+(int32_t)buf[i]<=-pow(2,16)/2) { buf[i] = -32766; }
+    buf[i] = ((int32_t)buf[i]+(int32_t)pt)%32766; } }
+    //else { buf[i] += (int16_t)(sin(tht*freq)*32767.f*amp); } } }
 
 void add_waves(int16_t *buf, int32_t len, int32_t pos, float ratio, float *freqs,
                int amt) {
