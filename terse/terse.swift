@@ -51,11 +51,13 @@ func parseExpr(e : [String],ep : [String]) -> Stk { return (e.reduce((Stk(mode:0
   case (0,"+"), (0,"-"), (0,"*"), (0,"/"): 
     let x : String = String((funize(s))(Double(pop(1,q:n.stk))!,Double(n.stk.last!)!));
     return (Stk(mode:0,stk:rp(2,q:n.stk)+[x]),nz.1);
+  case (0,"="): let q = Double(n.stk.last!); let e = Double(pop(1,q:n.stk));
+                return (Stk(mode:0,stk:rp(2,q:n.stk)+(q==e ? [n.stk.last!] : ["f"])),nz.1);
   case (0,"."): print(n.stk.last!,terminator:""); return (Stk(mode:0,stk:rp(1,q:n.stk)),nz.1);
   case (0,":"): return (Stk(mode:2,stk:n.stk+["["]),nz.1);
   case (2,"}"): let q = popb(n.stk); funs += [Fun(name:q.1[0],
                                                   expr:Array(q.1[1..<q.1.count]))];
-                return (Stk(mode:0,stk:q.1),nz.1);
+                return (Stk(mode:0,stk:[]),nz.1);
   case (0,")"): let q = Int(pop(0,q:n.stk))!; 
                 let e = Array(n.stk[n.stk.count-q-1..<n.stk.count-1]);
                 return (Stk(mode:0,stk:rp(1,q:n.stk)+e),nz.1);
