@@ -94,8 +94,11 @@ void cross(Elem *s) { Lit l; l.x.i = lookupf(s->x.x.s); l.type = FUN;
 
 // third pass through program which actually evaluated the contents as expected.
 // the first and second pass allow for a faster third pass hopefully.
+Lit eval(Elem *s) { Lit l; if(s->x.type==FUN&&s->x.x.i==0) {
+  l.x.i = eval(s->up).x.i+eval(s->up->next).x.i; l.type = INT; }
+  l = s->x; return l; }
 
 int main(int argc, char **argv) { /*FILE *f;
   char *in; in = malloc((strlen(argv[2])+3)*sizeof(char)); strcpy(in,argv[2]);
   strcat(in,".fl"); f = fopen(in,"r"); read(f,EOF); fclose(f); return 0;*/
-  printf("> "); read(stdin,'\n'); organize(top); return 0; }
+  printf("> "); read(stdin,'\n'); organize(top); eval(top); return 0; }
