@@ -15,6 +15,10 @@
 #define F 1
 #define S 2
 #define E 3
+#define D 4
+#define C 5
+
+// example using pseudo-bytecode: EC0I2I3D = (+ 2 3) where 0 is the id for '+'.
 
 typedef struct Lit Lit;
 struct Lit { union { int64_t i; double f; char *s; } x;
@@ -40,7 +44,7 @@ Lit tok(FILE *in) { Lit l; int c = fgetc(in); switch(c) {
   case F: fread(&l.x.f,sizeof(double),1,in); l.type = FLT;
   case S: { int e; fread(&e,sizeof(int64_t),1,in); fread(&l.x.s,1,e,in);
             l.type = SYM; }
-  case E: l.x.i = 0; l.type = EXP;
+  case E: l.x.i = 0; l.type = EXP; case D: l.x.i = 0; l.type = FXP;
   case EOF: l.x.i = 0; l.type = END; } return l; }
 
 void ureader(FILE *in, Elem *s) { Lit l; while((l=tok(in)).type!=END&&
