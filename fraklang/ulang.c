@@ -40,11 +40,11 @@ Lit liti(int64_t i) { Lit l; l.x.i = i; l.type = INT; return l; }
 Lit litsy(char *x) { Lit l; l.x.s = x; l.type = SYM; return l; }
 
 Lit tok(FILE *in) { Lit l; int c = fgetc(in); switch(c) {
-  case I: fread(&l.x.i,sizeof(int64_t),1,in); l.type = INT;
-  case F: fread(&l.x.f,sizeof(double),1,in); l.type = FLT;
+  case I: fread(&l.x.i,sizeof(int64_t),1,in); l.type = INT; break;
+  case F: fread(&l.x.f,sizeof(double),1,in); l.type = FLT; break;
   case S: { int e; fread(&e,sizeof(int64_t),1,in); fread(&l.x.s,1,e,in);
-            l.type = SYM; }
-  case E: l.x.i = 0; l.type = EXP; case D: l.x.i = 0; l.type = FXP;
+            l.type = SYM; break; }
+  case E: l.x.i = 0; l.type = EXP; case D: l.x.i = 0; l.type = FXP; break;
   case EOF: l.x.i = 0; l.type = END; } return l; }
 
 void ureader(FILE *in, Elem *s) { Lit l; while((l=tok(in)).type!=END&&
@@ -54,4 +54,4 @@ void ureader(FILE *in, Elem *s) { Lit l; while((l=tok(in)).type!=END&&
   else { appeg(l); } } }
 
 int main(int argc, char **argv) { FILE *f; f = fopen("test.ul","rb");
-  ureader(f,top); return 0; }
+  ureader(f,top); fclose(f); return 0; }
