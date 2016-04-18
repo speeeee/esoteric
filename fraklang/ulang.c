@@ -50,12 +50,12 @@ Lit tok(FILE *in) { Lit l; int c = fgetc(in); printf("%i\n",c); switch(c) {
   case E: l.x.i = 0; l.type = EXP; break; case D: l.x.i = 0; l.type = FXP; break;
   case EOF: l.x.i = 0; l.type = END; } return l; }
 
-void ureader(FILE *in, Elem *s) { Lit l; while((l=tok(in)).type!=END&&
-                                               l.type!=FXP) {
-  if(l.type == EXP) { nlstptr(s); l = tok(in); s->x = l;
-    s->up = malloc(sizeof(Elem)); ureader(in,s->up); }
-  else { appeg(l,s); } } }
+void ureader(FILE *in, Elem *s, int d) { for(int i=0;i<d;i++) { printf("."); }
+  Lit l; while((l=tok(in)).type!=END&&l.type!=FXP) {
+    if(l.type == EXP) { nlstptr(s); l = tok(in); s->x = l;
+      s->up = malloc(sizeof(Elem)); ureader(in,s->up,d+1); }
+    else { appeg(l,s); } } }
 
 int main(int argc, char **argv) { FILE *f; f = fopen("test.ul","rb");
   stk = top = malloc(sizeof(Elem)); top->x.type = NIL;
-  ureader(f,top); fclose(f); return 0; }
+  ureader(f,top,0); fclose(f); return 0; }
