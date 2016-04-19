@@ -68,7 +68,7 @@ func parseExpr(e : [String],ep : [String],lnz : [[String]]) -> Stk { return (e.r
                 else { return (call(e,stk:Array(n.stk[0..<n.stk.count-3]),lnz:[]),nz.1); }
   case (0,"\\"): let q = nz.1[Int(n.stk.last!)!];
                  let e : Stk = call(q,stk:rp(1,q:n.stk),lnz:nz.1);
-                 if rp(1,q:n.stk).isEmpty { return (Stk(mode:0,stk:n.stk),nz.1); }
+                 if rp(2,q:n.stk).isEmpty { return (Stk(mode:0,stk:rp(2,q:n.stk)),nz.1); }
                  else { return (parseExpr(["\\"],ep:e.stk+[n.stk.last!],lnz:nz.1),nz.1); }
   case (0,_): if funs.filter({s == $0.name}).isEmpty {
       return (Stk(mode:n.mode,stk:n.stk+[s]),nz.1); }
