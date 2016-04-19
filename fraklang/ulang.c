@@ -14,7 +14,11 @@
 // functions are stored as pointers to their name, where [ptr]->next is the
 // body of the function.
 #define NFN 7
+// in the reading phase, function names are changed to their respective
+// addresses, to save time.  e.g. (call +) will put the actual function in place.
 #define CAL 8
+#define LAM 9
+#define VAR 10
 
 #define I 0 // 64-bit integer
 #define F 1 // 64-bit floating point
@@ -23,6 +27,11 @@
 #define D 4 // close-expression
 #define C 5 // call function
 #define N 6 // create function (follow with symbol)
+#define L 7 // initialize lambda-expr creation (follow with integer signifying
+            // number of arguments, and expression as body.
+#define V 8 // variables that refer to a possible outside lambda expression.
+            // lambda-exprs go up twice (lambda signifier, arg-amt, body).
+            // acts as normal expression; close using D.
 
 // example using pseudo-bytecode: EC0I2I3D = (+ 2 3) where 0 is the id for '+'.
 
@@ -58,6 +67,8 @@ Lit tok(FILE *in) { Lit l; int c = fgetc(in); printf("%i\n",c); switch(c) {
             l.type = SYM; break; }
   case E: l.x.i = 0; l.type = EXP; break; case D: l.x.i = 0; l.type = FXP; break;
   case C: l.x.i = 0; l.type = CAL; break; case N: l.x.i = 0; l.type = NFN; break;
+  case V: fread(&l.x.i,sizeof(int64_t),1,in); l.type = VAR; break;
+  case L: l.x.i = 0; l.type = LAM; break;
   case EOF: l.x.i = 0; l.type = END; } return l; }
 
 void ureader(FILE *in, Elem *s, int d) { for(int i=0;i<d;i++) { printf("."); }
@@ -70,6 +81,8 @@ void ureader(FILE *in, Elem *s, int d) { for(int i=0;i<d;i++) { printf("."); }
       if(fsz==0) { funs = malloc(sizeof(Fun)); fsz++; }
       else { funs = realloc(funs,(++fsz)*sizeof(Fun)); }
       funs[fsz-1] = (Fun) { l.x.s, s }; appeg(l,s); } }
+    else if(l.type == LAM) { nlstptr(s); l = tok(in); s->x = l;
+      s->x.type = LAM; s->up = malloc(sizeof(Elem)); ureader(in,s->up,d+1); }
     else { appeg(l,s); } } }
 
 int main(int argc, char **argv) { FILE *f; f = fopen("test.ul","rb");
