@@ -29,8 +29,8 @@ func rp(i : Int, q : [String]) -> [String] { return Array(q[0..<q.count-i]); }
 //   too "complex" when expressed using the conditional ternary operator.
 func funize(s : String) -> ((Double,Double) -> Double) { switch(s) { case "+": return (+); 
   case "-": return (-); case "*": return (*); case "/": return (/); default: return (+); } }
-func call(nzx : [String], stk : [String]) -> Stk {
-  return parseExpr(nzx,ep:stk); }
+func call(nzx : [String], stk : [String], lnz : [[String]]) -> Stk {
+  return parseExpr(nzx,ep:stk,lnz:lnz); }
 
 // goes through list of tokens and parses them accordingly.
 
@@ -40,14 +40,14 @@ func call(nzx : [String], stk : [String]) -> Stk {
 //   Array<Array<String>>)')
 // not-so-helpful error message that occurs in the all-operators case.
 // error fixed.
-func parseExpr(e : [String],ep : [String]) -> Stk { return (e.reduce((Stk(mode:0,stk:ep),[] as [[String]]),combine:{ 
+func parseExpr(e : [String],ep : [String],lnz : [[String]]) -> Stk { return (e.reduce((Stk(mode:0,stk:ep),lnz),combine:{ 
   (nz:(Stk,[[String]]),s:String) -> (Stk,[[String]]) in let n = nz.0; switch(n.mode,s) {
   case (0,"["): return (Stk(mode:1,stk:n.stk+[s]),nz.1);
   case (1,"}"): let q = popb(n.stk);
                 return (Stk(mode:0,stk:q.0+[String(nz.1.count)]),nz.1+[q.1]);
   case (0,"~"): return (Stk(mode:n.mode,stk:Array(n.stk[0..<n.stk.count-1])),nz.1);
   case (0,"!"): return 
-    (parseExpr(nz.1[Int(n.stk.last!)!],ep:Array(n.stk[0..<n.stk.count-1])),nz.1);
+    (parseExpr(nz.1[Int(n.stk.last!)!],ep:Array(n.stk[0..<n.stk.count-1]),lnz:[]),nz.1);
   case (0,"+"), (0,"-"), (0,"*"), (0,"/"): 
     let x : String = String((funize(s))(Double(pop(1,q:n.stk))!,Double(n.stk.last!)!));
     return (Stk(mode:0,stk:rp(2,q:n.stk)+[x]),nz.1);
@@ -63,18 +63,22 @@ func parseExpr(e : [String],ep : [String]) -> Stk { return (e.reduce((Stk(mode:0
                 return (Stk(mode:0,stk:rp(1,q:n.stk)+e),nz.1);
   case (0,"?"): let q = nz.1[Int(n.stk.last!)!]; let e = nz.1[Int(pop(1,q:n.stk))!];
                 let z = pop(2,q:n.stk); 
-                if z == "f" { return (call(q,stk:Array(n.stk[0..<n.stk.count-3])),nz.1); }
-                else { return (call(e,stk:Array(n.stk[0..<n.stk.count-3])),nz.1); }
-  //case (0,"\\"): let q = nz.1[Int(n.stk.last!)!]; 
+                if z == "f" { 
+                  return (call(q,stk:Array(n.stk[0..<n.stk.count-3]),lnz:[]),nz.1); }
+                else { return (call(e,stk:Array(n.stk[0..<n.stk.count-3]),lnz:[]),nz.1); }
+  case (0,"\\"): let q = nz.1[Int(n.stk.last!)!];
+                 let e : Stk = call(q,stk:rp(1,q:n.stk),lnz:nz.1);
+                 if rp(1,q:n.stk).isEmpty { return (Stk(mode:0,stk:n.stk),nz.1); }
+                 else { return (parseExpr(["\\"],ep:e.stk+[n.stk.last!],lnz:nz.1),nz.1); }
   case (0,_): if funs.filter({s == $0.name}).isEmpty {
       return (Stk(mode:n.mode,stk:n.stk+[s]),nz.1); }
     else { let f : Fun = funs[funs.indexOf({$0.name == s})!];
-           return (parseExpr(f.expr,ep:n.stk),nz.1); }
+           return (parseExpr(f.expr,ep:n.stk,lnz:[]),nz.1); }
   default: return (Stk(mode:n.mode,stk:n.stk+[s]),nz.1); } })).0 }
 
 func parse(s : String) -> Stk { 
   let a = s.characters.split(" ").map({String($0)});
-  return parseExpr(a,ep:[]); }
+  return parseExpr(a,ep:[],lnz:[]); }
 
 print("> ",terminator:"");
 parse(readLine()!).stk.map({ print($0); });
