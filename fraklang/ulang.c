@@ -19,6 +19,7 @@
 #define CAL 8
 #define LAM 9
 #define VAR 10
+#define PRI 11
 
 #define I 0 // 64-bit integer
 #define F 1 // 64-bit floating point
@@ -76,7 +77,8 @@ void ureader(FILE *in, Elem *s, int d) { for(int i=0;i<d;i++) { printf("."); }
     if(l.type == EXP) { nlstptr(s); l = tok(in); s->x = l;
       s->up = malloc(sizeof(Elem)); ureader(in,s->up,d+1); }
     else if(l.type == CAL) { l = tok(in); if(l.type == SYM) {
-      Lit q; q.x.c = findf(l.x.s); q.type = FUN; appeg(q,s); } }
+      if(!strcmp(l.x.s,"+")) { Lit q; q.x.s = "+"; q.type = PRI; appeg(q,s); }
+      else { Lit q; q.x.c = findf(l.x.s); q.type = FUN; appeg(q,s); } } }
     else if(l.type == NFN) { l = tok(in); if(l.type == SYM) {
       if(fsz==0) { funs = malloc(sizeof(Fun)); fsz++; }
       else { funs = realloc(funs,(++fsz)*sizeof(Fun)); }
@@ -85,6 +87,15 @@ void ureader(FILE *in, Elem *s, int d) { for(int i=0;i<d;i++) { printf("."); }
       s->x.type = LAM; s->up = malloc(sizeof(Elem)); ureader(in,s->up,d+1); }
     else { appeg(l,s); } } }
 
-int main(int argc, char **argv) { FILE *f; f = fopen("test.ul","rb");
+void uparse(Elem *);
+
+Lit app_prim(Elem *args, char *x) { uparse(args);
+  if(!strcmp(x,"+")) { Lit l; l.type = INT;
+    l.x.i = args->x.x.i+args->next->x.x.i; return l; } 
+  Lit l; l.type = INT; l.x.i = 0; return l; }
+void uparse(Elem *s) { while(s->next) { switch(s->x.type) {
+  case PRI: s->x = app_prim(s->up,s->x.x.s); break; } s = s->next; } }
+
+int main(int argc, char **argv) { FILE *f; f = fopen("test2.ul","rb");
   stk = top = malloc(sizeof(Elem)); top->x.type = NIL;
   ureader(f,top,0); fclose(f); return 0; }
