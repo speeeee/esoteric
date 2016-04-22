@@ -26,13 +26,14 @@
 #define S 2 // symbol: 64-bit integer (n) + n bytes
 #define E 3 // open-expression
 #define D 4 // close-expression
-#define C 5 // call function
+#define C 5 // call primitive function
 #define N 6 // create function (follow with symbol)
 #define L 7 // initialize lambda-expr creation (follow with integer signifying
             // number of arguments, and expression as body.
 #define V 8 // variables that refer to a possible outside lambda expression.
             // lambda-exprs go up twice (lambda signifier, arg-amt, body).
             // acts as normal expression; close using D.
+#define Q 9 // call user-defined function: 64-bibt integer (n) + n args.
 
 // example using pseudo-bytecode: EC0I2I3D = (+ 2 3) where 0 is the id for '+'.
 
@@ -85,7 +86,7 @@ void prim(Elem *s) { Lit l; l.type = INT;
   l.x.i = s->next->x.x.i+s->next->next->x.x.i; s->x = l;
   s->next = s->next->next->next; }
 
-// completely flat and RPN to remedy this: I1I2I2C0
+// completely flat: C0I1I2
 void ureader2(FILE *in, Elem *s) {
   Lit l; while((l=tok(in)).type!=END) {
     if(l.type == CAL) { l = tok(in); if(l.type == SYM) {
