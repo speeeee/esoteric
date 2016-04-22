@@ -43,7 +43,8 @@ struct Lit { union { int64_t i; double f; char *s; Fun c; } x;
              unsigned int type; };
 struct Elem { Lit x; struct Elem *next; struct Elem *prev; };
 
-Fun *funs; int fsz = 0;
+//Fun *funs; int fsz = 0;
+Fun funs[] = { "+", NULL }; int fsz = 1;
 
 Elem *top; Elem *stk;
 
@@ -62,13 +63,16 @@ void appeg(Lit l) { nlstptrg(); stk->x = l; }
 Lit liti(int64_t i) { Lit l; l.x.i = i; l.type = INT; return l; }
 Lit litsy(char *x) { Lit l; l.x.s = x; l.type = SYM; return l; }
 
+char *getstr(int i, FILE *f) { char *l = malloc((i+1)*sizeof(char));
+  for(int z=0;z<i;z++) { l[z] = fgetc(f); } l[i] = '\0'; return l; }
+
 Fun findf(char *x) { int i; for(i=0;i<fsz&&strcmp(x,funs[i].name);i++);
   return funs[i]; }
 
 Lit tok(FILE *in) { Lit l; int c = fgetc(in); printf("%i\n",c); switch(c) {
   case I: fread(&l.x.i,sizeof(int64_t),1,in); l.type = INT; break;
   case F: fread(&l.x.f,sizeof(double),1,in); l.type = FLT; break;
-  case S: { int e; fread(&e,sizeof(int64_t),1,in); fread(&l.x.s,1,e,in);
+  case S: { int e; fread(&e,sizeof(int64_t),1,in); l.x.s = getstr(e,in);
             l.type = SYM; break; }
   //case E: l.x.i = 0; l.type = EXP; break; case D: l.x.i = 0; l.type = FXP; break;
   case C: l.x.i = 0; l.type = CAL; break; case N: l.x.i = 0; l.type = NFN; break;
@@ -76,12 +80,22 @@ Lit tok(FILE *in) { Lit l; int c = fgetc(in); printf("%i\n",c); switch(c) {
   //case L: l.x.i = 0; l.type = LAM; break;
   case EOF: l.x.i = 0; l.type = END; } return l; }
 
+// warning: currently contains memory leak
+void prim(Elem *s) { Lit l; l.type = INT;
+  l.x.i = s->next->x.x.i+s->next->next->x.x.i; s->x = l;
+  s->next = s->next->next->next; }
+
 // completely flat and RPN to remedy this: I1I2I2C0
 void ureader2(FILE *in, Elem *s) {
   Lit l; while((l=tok(in)).type!=END) {
-    appeg(l); } }
+    if(l.type == CAL) { l = tok(in); if(l.type == SYM) {
+      l.type = FUN; l.x.c = findf(l.x.s); appeg(l); } }
+    else { appeg(l); } } }
 
 void uparse(Elem *);
+void uparse(Elem *s) { while(s) {
+  if(s->x.type == FUN) { if(!strcmp("+",s->x.x.c.name)) { prim(s); } }
+  s = s->next; } }
 
 void prn_lit(Lit l) { switch(l.type) { case INT: printf("%lli",l.x.i); break;
   case FLT: printf("%g",l.x.f); break; case SYM: printf("%s",l.x.s); break;
@@ -89,6 +103,6 @@ void prn_lit(Lit l) { switch(l.type) { case INT: printf("%lli",l.x.i); break;
 void prn_lst(Elem *s) { 
   while(s) { prn_lit(s->x); printf(" "); s = s->next; } }
 
-int main(int argc, char **argv) { FILE *f; f = fopen("test.ul","rb");
+int main(int argc, char **argv) { FILE *f; f = fopen("test2.ul","rb");
   stk = top = malloc(sizeof(Elem)); top->x.type = NIL; top->next = NULL;
-  ureader2(f,top); fclose(f); prn_lst(top); return 0; }
+  ureader2(f,top); fclose(f); stk = top; uparse(stk); prn_lst(top); return 0; }
