@@ -38,14 +38,14 @@
 // example using pseudo-bytecode: EC0I2I3D = (+ 2 3) where 0 is the id for '+'.
 
 typedef struct Elem Elem;
-typedef struct { char *name; Elem *body; } Fun;
+typedef struct { char *name; int id; Elem *body; } Fun;
 typedef struct Lit Lit;
 struct Lit { union { int64_t i; double f; char *s; Fun c; } x;
              unsigned int type; };
 struct Elem { Lit x; struct Elem *next; struct Elem *prev; };
 
 //Fun *funs; int fsz = 0;
-Fun funs[] = { "+", NULL }; int fsz = 1;
+Fun funs[] = { "+", 0, NULL }; int fsz = 1;
 
 Elem *top; Elem *stk;
 
@@ -84,9 +84,11 @@ Lit tok(FILE *in) { Lit l; int c = fgetc(in); printf("%i\n",c); switch(c) {
 void uparse(Elem *, int);
 
 // warning: currently contains memory leak
-void prim(Elem *s) { Lit l; l.type = INT; uparse(s->next,2);
-  l.x.i = s->next->x.x.i+s->next->next->x.x.i; s->x = l;
-  s->next = s->next->next->next; }
+int prim(Elem *s) { switch(s->x.x.c.id) { 
+  case 0: { Lit l; l.type = INT; uparse(s->next,2);
+            l.x.i = s->next->x.x.i+s->next->next->x.x.i; s->x = l;
+            s->next = s->next->next->next; return 1; }
+  default: return 0; } }
 
 // completely flat: C0I1I2
 void ureader2(FILE *in, Elem *s) {
@@ -96,7 +98,7 @@ void ureader2(FILE *in, Elem *s) {
     else { appeg(l); } } }
 
 void uparse(Elem *s, int a) { for(int i=0;(i<a||a==-1)&&s;i++) { //while(s) {
-  if(s->x.type == FUN) { if(!strcmp("+",s->x.x.c.name)) { prim(s); } }
+  if(s->x.type == FUN) { prim(s); }
   s = s->next; } }
 
 void prn_lit(Lit l) { switch(l.type) { case INT: printf("%lli",l.x.i); break;
