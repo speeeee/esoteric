@@ -81,8 +81,10 @@ Lit tok(FILE *in) { Lit l; int c = fgetc(in); printf("%i\n",c); switch(c) {
   //case L: l.x.i = 0; l.type = LAM; break;
   case EOF: l.x.i = 0; l.type = END; } return l; }
 
+void uparse(Elem *, int);
+
 // warning: currently contains memory leak
-void prim(Elem *s) { Lit l; l.type = INT;
+void prim(Elem *s) { Lit l; l.type = INT; uparse(s->next,2);
   l.x.i = s->next->x.x.i+s->next->next->x.x.i; s->x = l;
   s->next = s->next->next->next; }
 
@@ -93,8 +95,7 @@ void ureader2(FILE *in, Elem *s) {
       l.type = FUN; l.x.c = findf(l.x.s); appeg(l); } }
     else { appeg(l); } } }
 
-void uparse(Elem *);
-void uparse(Elem *s) { while(s) {
+void uparse(Elem *s, int a) { for(int i=0;(i<a||a==-1)&&s;i++) { //while(s) {
   if(s->x.type == FUN) { if(!strcmp("+",s->x.x.c.name)) { prim(s); } }
   s = s->next; } }
 
@@ -106,4 +107,4 @@ void prn_lst(Elem *s) {
 
 int main(int argc, char **argv) { FILE *f; f = fopen("test2.ul","rb");
   stk = top = malloc(sizeof(Elem)); top->x.type = NIL; top->next = NULL;
-  ureader2(f,top); fclose(f); stk = top; uparse(stk); prn_lst(top); return 0; }
+  ureader2(f,top); fclose(f); stk = top; uparse(stk,-1); prn_lst(top); return 0; }
