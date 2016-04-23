@@ -83,11 +83,11 @@ Lit tok(FILE *in) { Lit l; int c = fgetc(in); printf("%i\n",c); switch(c) {
 
 void uparse(Elem *, int);
 
-// warning: currently contains memory leak
 int prim(Elem *s) { switch(s->x.x.c.id) { 
   case 0: { Lit l; l.type = INT; uparse(s->next,2);
             l.x.i = s->next->x.x.i+s->next->next->x.x.i; s->x = l;
-            s->next = s->next->next->next; return 1; }
+            Elem *e = s->next; s->next = s->next->next->next; 
+            free(e->next); free(e); return 1; }
   default: return 0; } }
 
 // completely flat: C0I1I2
