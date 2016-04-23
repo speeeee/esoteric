@@ -45,7 +45,8 @@ struct Lit { union { int64_t i; double f; char *s; Fun c; } x;
 struct Elem { Lit x; struct Elem *next; struct Elem *prev; };
 
 //Fun *funs; int fsz = 0;
-Fun funs[] = { "+", 0, NULL }; int fsz = 1;
+Fun funs[] = { { "+", 0, NULL }, { "-", 1, NULL }, { "*", 2, NULL },
+               { "/", 0, NULL } }; int fsz = 4;
 
 Elem *top; Elem *stk;
 
@@ -84,10 +85,16 @@ Lit tok(FILE *in) { Lit l; int c = fgetc(in); printf("%i\n",c); switch(c) {
 void uparse(Elem *, int);
 
 int prim(Elem *s) { switch(s->x.x.c.id) { 
-  case 0: { Lit l; l.type = INT; uparse(s->next,2);
-            l.x.i = s->next->x.x.i+s->next->next->x.x.i; s->x = l;
-            Elem *e = s->next; s->next = s->next->next->next; 
-            free(e->next); free(e); return 1; }
+  case 0: case 1: case 2: case 3: { 
+    Lit l; l.type = INT; uparse(s->next,2);
+    Elem *e = s->next; switch(s->x.x.c.id) { 
+      case 0: l.x.i = e->x.x.i+e->next->x.x.i; break;
+      case 1: l.x.i = e->x.x.i-e->next->x.x.i; break;
+      case 2: l.x.i = e->x.x.i*e->next->x.x.i; break;
+      case 3: l.x.i = e->x.x.i/e->next->x.x.i; }
+    //l.x.i = s->next->x.x.i+s->next->next->x.x.i; s->x = l;
+    s->x = l; s->next = s->next->next->next; 
+    free(e->next); free(e); return 1; }
   default: return 0; } }
 
 // completely flat: C0I1I2
