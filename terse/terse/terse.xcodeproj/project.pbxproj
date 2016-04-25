@@ -1,0 +1,524 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		6328B1471CCD3A0A00275CAD /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6328B1461CCD3A0A00275CAD /* AppDelegate.swift */; };
+		6328B1491CCD3A0B00275CAD /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6328B1481CCD3A0B00275CAD /* ViewController.swift */; };
+		6328B14C1CCD3A0B00275CAD /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 6328B14A1CCD3A0B00275CAD /* Main.storyboard */; };
+		6328B14E1CCD3A0B00275CAD /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6328B14D1CCD3A0B00275CAD /* Assets.xcassets */; };
+		6328B1511CCD3A0B00275CAD /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 6328B14F1CCD3A0B00275CAD /* LaunchScreen.storyboard */; };
+		6328B15C1CCD3A0B00275CAD /* terseTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6328B15B1CCD3A0B00275CAD /* terseTests.swift */; };
+		6328B1671CCD3A0B00275CAD /* terseUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6328B1661CCD3A0B00275CAD /* terseUITests.swift */; };
+		6328B1751CCD443C00275CAD /* TerseTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6328B1741CCD443C00275CAD /* TerseTableViewController.swift */; settings = {ASSET_TAGS = (); }; };
+		6328B1771CCD45C000275CAD /* TerseTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6328B1761CCD45C000275CAD /* TerseTableViewCell.swift */; settings = {ASSET_TAGS = (); }; };
+		6328B1791CCD48B800275CAD /* TCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6328B1781CCD48B800275CAD /* TCell.swift */; settings = {ASSET_TAGS = (); }; };
+		6328B17D1CCD4A0A00275CAD /* TerseView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6328B17C1CCD4A0A00275CAD /* TerseView.swift */; settings = {ASSET_TAGS = (); }; };
+		6328B17F1CCD942400275CAD /* TerseDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6328B17E1CCD942400275CAD /* TerseDetailViewController.swift */; settings = {ASSET_TAGS = (); }; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		6328B1581CCD3A0B00275CAD /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 6328B13B1CCD3A0A00275CAD /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 6328B1421CCD3A0A00275CAD;
+			remoteInfo = terse;
+		};
+		6328B1631CCD3A0B00275CAD /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 6328B13B1CCD3A0A00275CAD /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 6328B1421CCD3A0A00275CAD;
+			remoteInfo = terse;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		6328B1431CCD3A0A00275CAD /* terse.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = terse.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		6328B1461CCD3A0A00275CAD /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		6328B1481CCD3A0B00275CAD /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		6328B14B1CCD3A0B00275CAD /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		6328B14D1CCD3A0B00275CAD /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		6328B1501CCD3A0B00275CAD /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		6328B1521CCD3A0B00275CAD /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		6328B1571CCD3A0B00275CAD /* terseTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = terseTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		6328B15B1CCD3A0B00275CAD /* terseTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = terseTests.swift; sourceTree = "<group>"; };
+		6328B15D1CCD3A0B00275CAD /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		6328B1621CCD3A0B00275CAD /* terseUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = terseUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		6328B1661CCD3A0B00275CAD /* terseUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = terseUITests.swift; sourceTree = "<group>"; };
+		6328B1681CCD3A0B00275CAD /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		6328B1741CCD443C00275CAD /* TerseTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TerseTableViewController.swift; sourceTree = "<group>"; };
+		6328B1761CCD45C000275CAD /* TerseTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TerseTableViewCell.swift; sourceTree = "<group>"; };
+		6328B1781CCD48B800275CAD /* TCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TCell.swift; sourceTree = "<group>"; };
+		6328B17C1CCD4A0A00275CAD /* TerseView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = TerseView.swift; path = ../TerseView.swift; sourceTree = "<group>"; };
+		6328B17E1CCD942400275CAD /* TerseDetailViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TerseDetailViewController.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		6328B1401CCD3A0A00275CAD /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		6328B1541CCD3A0B00275CAD /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		6328B15F1CCD3A0B00275CAD /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		6328B13A1CCD3A0A00275CAD = {
+			isa = PBXGroup;
+			children = (
+				6328B1451CCD3A0A00275CAD /* terse */,
+				6328B15A1CCD3A0B00275CAD /* terseTests */,
+				6328B1651CCD3A0B00275CAD /* terseUITests */,
+				6328B1441CCD3A0A00275CAD /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		6328B1441CCD3A0A00275CAD /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				6328B1431CCD3A0A00275CAD /* terse.app */,
+				6328B1571CCD3A0B00275CAD /* terseTests.xctest */,
+				6328B1621CCD3A0B00275CAD /* terseUITests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		6328B1451CCD3A0A00275CAD /* terse */ = {
+			isa = PBXGroup;
+			children = (
+				6328B17C1CCD4A0A00275CAD /* TerseView.swift */,
+				6328B1461CCD3A0A00275CAD /* AppDelegate.swift */,
+				6328B1481CCD3A0B00275CAD /* ViewController.swift */,
+				6328B14A1CCD3A0B00275CAD /* Main.storyboard */,
+				6328B17E1CCD942400275CAD /* TerseDetailViewController.swift */,
+				6328B1761CCD45C000275CAD /* TerseTableViewCell.swift */,
+				6328B1781CCD48B800275CAD /* TCell.swift */,
+				6328B1741CCD443C00275CAD /* TerseTableViewController.swift */,
+				6328B14D1CCD3A0B00275CAD /* Assets.xcassets */,
+				6328B14F1CCD3A0B00275CAD /* LaunchScreen.storyboard */,
+				6328B1521CCD3A0B00275CAD /* Info.plist */,
+			);
+			path = terse;
+			sourceTree = "<group>";
+		};
+		6328B15A1CCD3A0B00275CAD /* terseTests */ = {
+			isa = PBXGroup;
+			children = (
+				6328B15B1CCD3A0B00275CAD /* terseTests.swift */,
+				6328B15D1CCD3A0B00275CAD /* Info.plist */,
+			);
+			path = terseTests;
+			sourceTree = "<group>";
+		};
+		6328B1651CCD3A0B00275CAD /* terseUITests */ = {
+			isa = PBXGroup;
+			children = (
+				6328B1661CCD3A0B00275CAD /* terseUITests.swift */,
+				6328B1681CCD3A0B00275CAD /* Info.plist */,
+			);
+			path = terseUITests;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		6328B1421CCD3A0A00275CAD /* terse */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 6328B16B1CCD3A0B00275CAD /* Build configuration list for PBXNativeTarget "terse" */;
+			buildPhases = (
+				6328B13F1CCD3A0A00275CAD /* Sources */,
+				6328B1401CCD3A0A00275CAD /* Frameworks */,
+				6328B1411CCD3A0A00275CAD /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = terse;
+			productName = terse;
+			productReference = 6328B1431CCD3A0A00275CAD /* terse.app */;
+			productType = "com.apple.product-type.application";
+		};
+		6328B1561CCD3A0B00275CAD /* terseTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 6328B16E1CCD3A0B00275CAD /* Build configuration list for PBXNativeTarget "terseTests" */;
+			buildPhases = (
+				6328B1531CCD3A0B00275CAD /* Sources */,
+				6328B1541CCD3A0B00275CAD /* Frameworks */,
+				6328B1551CCD3A0B00275CAD /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				6328B1591CCD3A0B00275CAD /* PBXTargetDependency */,
+			);
+			name = terseTests;
+			productName = terseTests;
+			productReference = 6328B1571CCD3A0B00275CAD /* terseTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		6328B1611CCD3A0B00275CAD /* terseUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 6328B1711CCD3A0B00275CAD /* Build configuration list for PBXNativeTarget "terseUITests" */;
+			buildPhases = (
+				6328B15E1CCD3A0B00275CAD /* Sources */,
+				6328B15F1CCD3A0B00275CAD /* Frameworks */,
+				6328B1601CCD3A0B00275CAD /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				6328B1641CCD3A0B00275CAD /* PBXTargetDependency */,
+			);
+			name = terseUITests;
+			productName = terseUITests;
+			productReference = 6328B1621CCD3A0B00275CAD /* terseUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		6328B13B1CCD3A0A00275CAD /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0700;
+				ORGANIZATIONNAME = "Spencer Sallay";
+				TargetAttributes = {
+					6328B1421CCD3A0A00275CAD = {
+						CreatedOnToolsVersion = 7.0;
+					};
+					6328B1561CCD3A0B00275CAD = {
+						CreatedOnToolsVersion = 7.0;
+						TestTargetID = 6328B1421CCD3A0A00275CAD;
+					};
+					6328B1611CCD3A0B00275CAD = {
+						CreatedOnToolsVersion = 7.0;
+						TestTargetID = 6328B1421CCD3A0A00275CAD;
+					};
+				};
+			};
+			buildConfigurationList = 6328B13E1CCD3A0A00275CAD /* Build configuration list for PBXProject "terse" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 6328B13A1CCD3A0A00275CAD;
+			productRefGroup = 6328B1441CCD3A0A00275CAD /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				6328B1421CCD3A0A00275CAD /* terse */,
+				6328B1561CCD3A0B00275CAD /* terseTests */,
+				6328B1611CCD3A0B00275CAD /* terseUITests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		6328B1411CCD3A0A00275CAD /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				6328B1511CCD3A0B00275CAD /* LaunchScreen.storyboard in Resources */,
+				6328B14E1CCD3A0B00275CAD /* Assets.xcassets in Resources */,
+				6328B14C1CCD3A0B00275CAD /* Main.storyboard in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		6328B1551CCD3A0B00275CAD /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		6328B1601CCD3A0B00275CAD /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		6328B13F1CCD3A0A00275CAD /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				6328B17D1CCD4A0A00275CAD /* TerseView.swift in Sources */,
+				6328B1751CCD443C00275CAD /* TerseTableViewController.swift in Sources */,
+				6328B1771CCD45C000275CAD /* TerseTableViewCell.swift in Sources */,
+				6328B17F1CCD942400275CAD /* TerseDetailViewController.swift in Sources */,
+				6328B1791CCD48B800275CAD /* TCell.swift in Sources */,
+				6328B1491CCD3A0B00275CAD /* ViewController.swift in Sources */,
+				6328B1471CCD3A0A00275CAD /* AppDelegate.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		6328B1531CCD3A0B00275CAD /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				6328B15C1CCD3A0B00275CAD /* terseTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		6328B15E1CCD3A0B00275CAD /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				6328B1671CCD3A0B00275CAD /* terseUITests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		6328B1591CCD3A0B00275CAD /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 6328B1421CCD3A0A00275CAD /* terse */;
+			targetProxy = 6328B1581CCD3A0B00275CAD /* PBXContainerItemProxy */;
+		};
+		6328B1641CCD3A0B00275CAD /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 6328B1421CCD3A0A00275CAD /* terse */;
+			targetProxy = 6328B1631CCD3A0B00275CAD /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+		6328B14A1CCD3A0B00275CAD /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				6328B14B1CCD3A0B00275CAD /* Base */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
+		6328B14F1CCD3A0B00275CAD /* LaunchScreen.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				6328B1501CCD3A0B00275CAD /* Base */,
+			);
+			name = LaunchScreen.storyboard;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		6328B1691CCD3A0B00275CAD /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		6328B16A1CCD3A0B00275CAD /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = iphoneos;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		6328B16C1CCD3A0B00275CAD /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				INFOPLIST_FILE = terse/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "Spencer-Sallay.terse";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		6328B16D1CCD3A0B00275CAD /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				INFOPLIST_FILE = terse/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "Spencer-Sallay.terse";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
+		6328B16F1CCD3A0B00275CAD /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				INFOPLIST_FILE = terseTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "Spencer-Sallay.terseTests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/terse.app/terse";
+			};
+			name = Debug;
+		};
+		6328B1701CCD3A0B00275CAD /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				INFOPLIST_FILE = terseTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "Spencer-Sallay.terseTests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/terse.app/terse";
+			};
+			name = Release;
+		};
+		6328B1721CCD3A0B00275CAD /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				INFOPLIST_FILE = terseUITests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "Spencer-Sallay.terseUITests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_TARGET_NAME = terse;
+				USES_XCTRUNNER = YES;
+			};
+			name = Debug;
+		};
+		6328B1731CCD3A0B00275CAD /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				INFOPLIST_FILE = terseUITests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "Spencer-Sallay.terseUITests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_TARGET_NAME = terse;
+				USES_XCTRUNNER = YES;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		6328B13E1CCD3A0A00275CAD /* Build configuration list for PBXProject "terse" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				6328B1691CCD3A0B00275CAD /* Debug */,
+				6328B16A1CCD3A0B00275CAD /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		6328B16B1CCD3A0B00275CAD /* Build configuration list for PBXNativeTarget "terse" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				6328B16C1CCD3A0B00275CAD /* Debug */,
+				6328B16D1CCD3A0B00275CAD /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
+		6328B16E1CCD3A0B00275CAD /* Build configuration list for PBXNativeTarget "terseTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				6328B16F1CCD3A0B00275CAD /* Debug */,
+				6328B1701CCD3A0B00275CAD /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
+		6328B1711CCD3A0B00275CAD /* Build configuration list for PBXNativeTarget "terseUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				6328B1721CCD3A0B00275CAD /* Debug */,
+				6328B1731CCD3A0B00275CAD /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 6328B13B1CCD3A0A00275CAD /* Project object */;
+}
