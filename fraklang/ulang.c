@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <ctype.h>
 #include <string.h>
+#include <math.h>
 
 #define NIL 12
 #define SYM 0
@@ -46,7 +47,9 @@ struct Elem { Lit x; struct Elem *next; struct Elem *prev; };
 
 //Fun *funs; int fsz = 0;
 Fun funs[] = { { "+", 0, NULL }, { "-", 1, NULL }, { "*", 2, NULL },
-               { "/", 0, NULL } }; int fsz = 4;
+               { "/", 3, NULL }, { "+.", 4, NULL }, { "-.", 5, NULL},
+               { "*.", 6, NULL }, { "/.", 7, NULL }, { "pow", 8, NULL },
+               { "log", 9, NULL } }; int fsz = 4;
 
 Elem *top; Elem *stk;
 
@@ -94,6 +97,17 @@ int prim(Elem *s) { switch(s->x.x.c.id) {
       case 3: l.x.i = e->x.x.i/e->next->x.x.i; }
     //l.x.i = s->next->x.x.i+s->next->next->x.x.i; s->x = l;
     s->x = l; s->next = s->next->next->next; 
+    free(e->next); free(e); return 1; }
+  case 4: case 5: case 6: case 7: case 8: case 9: {
+    Lit l; l.type = FLT; uparse(s->next,2);
+    Elem *e = s->next; switch(s->x.x.c.id) {
+      case 4: l.x.f = e->x.x.f+e->next->x.x.f; break;
+      case 5: l.x.f = e->x.x.f-e->next->x.x.f; break;
+      case 6: l.x.f = e->x.x.f*e->next->x.x.f; break;
+      case 7: l.x.f = e->x.x.f/e->next->x.x.f; break;
+      case 8: l.x.f = pow(e->x.x.f,e->next->x.x.f); break;
+      case 9: l.x.f = log(e->next->x.x.f)/log(e->x.x.f); }
+    s->x = l; s->next = s->next->next->next;
     free(e->next); free(e); return 1; }
   default: return 0; } }
 
