@@ -21,12 +21,12 @@
 #define LAM 9
 #define VAR 10
 #define PRI 11
+#define DON 12
+#define ADR 13
 
 #define I 0 // 64-bit integer
 #define F 1 // 64-bit floating point
 #define S 2 // symbol: 64-bit integer (n) + n bytes
-#define E 3 // open-expression
-#define D 4 // close-expression
 #define C 5 // call primitive function
 #define N 6 // create function (follow with symbol)
 #define L 7 // initialize lambda-expr creation (follow with integer signifying
@@ -35,6 +35,7 @@
             // lambda-exprs go up twice (lambda signifier, arg-amt, body).
             // acts as normal expression; close using D.
 #define Q 9 // call user-defined function: 64-bibt integer (n) + n args.
+#define D 10 // character for ending function bodies.
 
 // example using pseudo-bytecode: EC0I2I3D = (+ 2 3) where 0 is the id for '+'.
 
@@ -49,7 +50,8 @@ struct Elem { Lit x; struct Elem *next; struct Elem *prev; };
 Fun funs[] = { { "+", 0, NULL }, { "-", 1, NULL }, { "*", 2, NULL },
                { "/", 3, NULL }, { "+.", 4, NULL }, { "-.", 5, NULL},
                { "*.", 6, NULL }, { "/.", 7, NULL }, { "pow", 8, NULL },
-               { "log", 9, NULL } }; int fsz = 4;
+               { "log", 9, NULL }, { "λ", 10, NULL }, { "->", 11, NULL } }; 
+int fsz = 12;
 
 Elem *top; Elem *stk;
 
@@ -83,7 +85,17 @@ Lit tok(FILE *in) { Lit l; int c = fgetc(in); printf("%i\n",c); switch(c) {
   case C: l.x.i = 0; l.type = CAL; break; case N: l.x.i = 0; l.type = NFN; break;
   //case V: fread(&l.x.i,sizeof(int64_t),1,in); l.type = VAR; break;
   //case L: l.x.i = 0; l.type = LAM; break;
+  case D: l.x.i = 0; l.type = DON; break; 
+  case V: fread(&l.x.i,sizeof(int64_t),1,in); l.type = ADR; break;
   case EOF: l.x.i = 0; l.type = END; } return l; }
+
+Elem *fetch(Elem *se, int64_t n) { Elem *s = se;
+  for(int i=0;i<n;i++) { s = s->next; } return s; }
+void funcpy(Elem *b, Elem *e) {
+  e->x = b->x; while(b->next->x.type!=DON) { b = b->next;
+    e->next = malloc(sizeof(Elem)); e = e->next; e->x = b->x; } e->next = NULL; }
+void replace(Elem *s, Elem *el) { Elem *e = el;
+  while(e) { if(e->x.type==ADR) { e->x = fetch(s,e->x.x.i)->x; } } }
 
 void uparse(Elem *, int);
 
@@ -111,6 +123,12 @@ int prim(Elem *s) { switch(s->x.x.c.id) {
     free(e->next); free(e); return 1; }
   default: return 0; } }
 
+void fun(Elem *s) { Elem *b = s->x.x.c.body->next; Elem *args = s->next;
+  int argsz = b->x.x.i; uparse(s->next,argsz); Elem *e = malloc(sizeof(Elem));
+  funcpy(b->next,e); replace(s->next,e); uparse(e,-1); s->x = e->x; 
+  Elem *q = fetch(s->next,argsz); // memory leak here; to be fixed.
+  s->next = q; }
+
 // completely flat: C0I1I2
 void ureader2(FILE *in, Elem *s) {
   Lit l; while((l=tok(in)).type!=END) {
@@ -119,7 +137,7 @@ void ureader2(FILE *in, Elem *s) {
     else { appeg(l); } } }
 
 void uparse(Elem *s, int a) { for(int i=0;(i<a||a==-1)&&s;i++) { //while(s) {
-  if(s->x.type == FUN) { prim(s); }
+  if(s->x.type == FUN) { if(!prim(s)) { fun(s); } }
   s = s->next; } }
 
 void prn_lit(Lit l) { switch(l.type) { case INT: printf("%lli",l.x.i); break;
