@@ -4,7 +4,7 @@
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="8151.3"/>
     </dependencies>
     <scenes>
-        <!--Terse Table View Controller-->
+        <!--Programs-->
         <scene sceneID="U3p-BI-gnG">
             <objects>
                 <tableViewController id="fP1-ES-led" customClass="TerseTableViewController" customModule="terse" customModuleProvider="target" sceneMemberID="viewController">
@@ -12,9 +12,10 @@
                         <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <color key="separatorColor" red="0.62217881939999997" green="0.26561753399999999" blue="0.465149531" alpha="1" colorSpace="calibratedRGB"/>
                         <prototypes>
                             <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" reuseIdentifier="TerseCell" id="WG4-S9-iD2" customClass="TerseTableViewCell" customModule="terse" customModuleProvider="target">
-                                <rect key="frame" x="0.0" y="92" width="600" height="44"/>
+                                <rect key="frame" x="0.0" y="28" width="600" height="44"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="WG4-S9-iD2" id="OKT-Mh-oVy">
                                     <rect key="frame" x="0.0" y="0.0" width="600" height="43"/>
@@ -36,7 +37,7 @@
                                 </tableViewCellContentView>
                                 <connections>
                                     <outlet property="tTitle" destination="NvB-RI-j6m" id="nOt-HM-s1V"/>
-                                    <segue destination="iuq-0n-467" kind="showDetail" identifier="toDetail" id="94b-SC-EoS"/>
+                                    <segue destination="iuq-0n-467" kind="showDetail" identifier="editPrgmSegue" id="94b-SC-EoS"/>
                                 </connections>
                             </tableViewCell>
                         </prototypes>
@@ -45,6 +46,7 @@
                             <outlet property="delegate" destination="fP1-ES-led" id="orn-Xl-DMh"/>
                         </connections>
                     </tableView>
+                    <navigationItem key="navigationItem" title="Programs" id="83q-iN-lVm"/>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="kc3-w2-qkD" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
@@ -66,29 +68,46 @@
                                 <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
                                 <subviews>
                                     <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="left" contentVerticalAlignment="center" text="Title" borderStyle="roundedRect" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="h4D-wm-byb">
-                                        <rect key="frame" x="8" y="8" width="584" height="30"/>
+                                        <rect key="frame" x="8" y="58" width="584" height="30"/>
                                         <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                         <textInputTraits key="textInputTraits"/>
                                     </textField>
                                     <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" fixedFrame="YES" textAlignment="natural" translatesAutoresizingMaskIntoConstraints="NO" id="utI-UF-L1F">
-                                        <rect key="frame" x="8" y="46" width="584" height="244"/>
+                                        <rect key="frame" x="8" y="91" width="584" height="199"/>
+                                        <color key="backgroundColor" red="0.91728157047461689" green="0.91906815380103879" blue="1" alpha="1" colorSpace="calibratedRGB"/>
                                         <string key="text">Lorem ipsum dolor sit er elit lamet, consectetaur cillium adipisicing pecu, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Nam liber te conscient to factor tum poen legum odioque civiuda.</string>
                                         <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                         <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
                                     </textView>
-                                    <view contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="vPh-Qb-Kkn">
+                                    <view contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="vPh-Qb-Kkn" customClass="TerseView" customModule="terse" customModuleProvider="target">
                                         <rect key="frame" x="8" y="298" width="584" height="294"/>
                                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                     </view>
+                                    <navigationBar contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="e2a-hq-Odd">
+                                        <rect key="frame" x="0.0" y="0.0" width="600" height="44"/>
+                                        <color key="backgroundColor" red="0.46741358521177201" green="0.67646519121970516" blue="0.89303188131313127" alpha="1" colorSpace="calibratedRGB"/>
+                                        <items>
+                                            <navigationItem title="Program" id="76C-9h-B2A">
+                                                <barButtonItem key="leftBarButtonItem" title="Back" id="Z0k-Ia-iNA">
+                                                    <connections>
+                                                        <segue destination="fP1-ES-led" kind="show" id="5nt-Kr-TX8"/>
+                                                    </connections>
+                                                </barButtonItem>
+                                            </navigationItem>
+                                        </items>
+                                    </navigationBar>
                                 </subviews>
                                 <color key="backgroundColor" red="0.88198613442034457" green="0.91704478810635293" blue="1" alpha="1" colorSpace="calibratedRGB"/>
                             </view>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                     </view>
+                    <toolbarItems/>
+                    <simulatedToolbarMetrics key="simulatedBottomBarMetrics"/>
                     <connections>
                         <outlet property="tText" destination="utI-UF-L1F" id="r2m-HM-4fd"/>
                         <outlet property="tTitle" destination="h4D-wm-byb" id="uYo-pf-bKj"/>
+                        <outlet property="tView" destination="vPh-Qb-Kkn" id="amX-od-qlW"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="c6f-Ag-cCF" userLabel="First Responder" sceneMemberID="firstResponder"/>
@@ -104,7 +123,7 @@
                         <autoresizingMask key="autoresizingMask"/>
                     </navigationBar>
                     <connections>
-                        <segue destination="fP1-ES-led" kind="show" id="Lut-Bb-d4M"/>
+                        <segue destination="fP1-ES-led" kind="relationship" relationship="rootViewController" id="o1F-bV-cbn"/>
                     </connections>
                 </navigationController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="kSi-Oc-Uel" userLabel="First Responder" sceneMemberID="firstResponder"/>
@@ -112,4 +131,7 @@
             <point key="canvasLocation" x="-398" y="486"/>
         </scene>
     </scenes>
+    <inferredMetricsTieBreakers>
+        <segue reference="5nt-Kr-TX8"/>
+    </inferredMetricsTieBreakers>
 </document>

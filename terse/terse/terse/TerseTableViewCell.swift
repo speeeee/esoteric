@@ -12,7 +12,7 @@ class TerseTableViewCell: UITableViewCell {
     weak var tc : TCell!
     
     @IBOutlet weak var tTitle: UILabel!
-    @IBOutlet weak var tText: UILabel!
+    //@IBOutlet weak var tText: UILabel!
     
     override func awakeFromNib() {
         super.awakeFromNib()
@@ -28,6 +28,6 @@ class TerseTableViewCell: UITableViewCell {
     func setupCell(tc : TCell) {
         self.tc = tc
         tTitle.text = tc.title
-        tText.text = tc.text
+        //tText.text = tc.text
     }
 }
