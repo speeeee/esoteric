@@ -123,11 +123,20 @@ int prim(Elem *s) { switch(s->x.x.c.id) {
     free(e->next); free(e); return 1; }
   default: return 0; } }
 
-void fun(Elem *s) { Elem *b = s->x.x.c.body->next; Elem *args = s->next;
+/*void fun(Elem *s) { Elem *b = s->x.x.c.body->next; Elem *args = s->next;
   int argsz = b->x.x.i; uparse(s->next,argsz); Elem *e = malloc(sizeof(Elem));
   funcpy(b->next,e); replace(s->next,e); uparse(e,-1); s->x = e->x; 
   Elem *q = fetch(s->next,argsz); // memory leak here; to be fixed.
-  s->next = q; }
+  s->next = q; }*/
+void ins_bdy(Elem *se, int bsz, Elem *b) { Elem *s = se;
+  //Elem *e = malloc(sizeof(Elem)); Elem *t = e;
+  s->x = b->x; for(int i=0;i<bsz-1;i++) { b = b->next; 
+    Elem *e = malloc(sizeof(Elem)); e->x = b->x; e->next = s->next;
+    s->next = e; s = s->next; } }
+
+// function composition
+void fun(Elem *s) { Elem *b = s->x.x.c.body; int bsz = b->next->x.x.i;
+  ins_bdy(s,bsz,b->next->next); uparse(s,1); }
 
 // completely flat: C0I1I2
 void ureader2(FILE *in, Elem *s) {
