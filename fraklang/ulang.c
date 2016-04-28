@@ -37,6 +37,8 @@
 #define Q 9 // call user-defined function: 64-bibt integer (n) + n args.
 #define D 10 // character for ending function bodies.
 
+#define PRIMC 12
+
 // example using pseudo-bytecode: EC0I2I3D = (+ 2 3) where 0 is the id for '+'.
 
 typedef struct Elem Elem;
@@ -51,7 +53,8 @@ Fun funs[] = { { "+", 0, NULL }, { "-", 1, NULL }, { "*", 2, NULL },
                { "/", 3, NULL }, { "+.", 4, NULL }, { "-.", 5, NULL},
                { "*.", 6, NULL }, { "/.", 7, NULL }, { "pow", 8, NULL },
                { "log", 9, NULL }, { "λ", 10, NULL }, { "->", 11, NULL } }; 
-int fsz = 12;
+int fsz = PRIMC;
+Fun *ufuns; int ufsz = 0;
 
 Elem *top; Elem *stk;
 
@@ -86,7 +89,6 @@ Lit tok(FILE *in) { Lit l; int c = fgetc(in); printf("%i\n",c); switch(c) {
   //case V: fread(&l.x.i,sizeof(int64_t),1,in); l.type = VAR; break;
   //case L: l.x.i = 0; l.type = LAM; break;
   case D: l.x.i = 0; l.type = DON; break; 
-  case V: fread(&l.x.i,sizeof(int64_t),1,in); l.type = ADR; break;
   case EOF: l.x.i = 0; l.type = END; } return l; }
 
 Elem *fetch(Elem *se, int64_t n) { Elem *s = se;
@@ -137,12 +139,16 @@ void ins_bdy(Elem *se, int bsz, Elem *b) { Elem *s = se;
 // function composition
 void fun(Elem *s) { Elem *b = s->x.x.c.body; int bsz = b->next->x.x.i;
   ins_bdy(s,bsz,b->next->next); uparse(s,1); }
+void addf(Fun x) { if(ufuns[ufsz].id==-1) { ufuns[ufsz] = x; }
+  else { ufuns = realloc(ufuns,(++ufsz+1)*sizeof(Fun)); ufuns[ufsz] = x; } }
 
 // completely flat: C0I1I2
 void ureader2(FILE *in, Elem *s) {
   Lit l; while((l=tok(in)).type!=END) {
     if(l.type == CAL) { l = tok(in); if(l.type == SYM) {
       l.type = FUN; l.x.c = findf(l.x.s); appeg(l); } }
+    else if(l.type == NFN) { l = tok(in); if(l.type == SYM) {
+      appeg(l); Fun x = { l.x.s, ufsz+PRIMC, s }; addf(x); } }
     else { appeg(l); } } }
 
 void uparse(Elem *s, int a) { for(int i=0;(i<a||a==-1)&&s;i++) { //while(s) {
@@ -156,5 +162,6 @@ void prn_lst(Elem *s) {
   while(s) { prn_lit(s->x); printf(" "); s = s->next; } }
 
 int main(int argc, char **argv) { FILE *f; f = fopen("test2.ul","rb");
+  ufuns = malloc(sizeof(Fun)); ufuns[0].id = -1;
   stk = top = malloc(sizeof(Elem)); top->x.type = NIL; top->next = NULL;
   ureader2(f,top); fclose(f); stk = top; uparse(stk,-1); prn_lst(top); return 0; }
