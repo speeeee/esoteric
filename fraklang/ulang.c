@@ -77,7 +77,8 @@ char *getstr(int i, FILE *f) { char *l = malloc((i+1)*sizeof(char));
   for(int z=0;z<i;z++) { l[z] = fgetc(f); } l[i] = '\0'; return l; }
 
 Fun findf(char *x) { int i; for(i=0;i<fsz&&strcmp(x,funs[i].name);i++);
-  return funs[i]; }
+  if(i==PRIMC) { for(i=0;i<ufsz&&strcmp(x,ufuns[i].name);i++);
+    return ufuns[i]; } else { return funs[i]; } }
 
 Lit tok(FILE *in) { Lit l; int c = fgetc(in); printf("%i\n",c); switch(c) {
   case I: fread(&l.x.i,sizeof(int64_t),1,in); l.type = INT; break;
