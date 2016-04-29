@@ -15,7 +15,7 @@
                         <color key="separatorColor" red="0.62217881939999997" green="0.26561753399999999" blue="0.465149531" alpha="1" colorSpace="calibratedRGB"/>
                         <prototypes>
                             <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" reuseIdentifier="TerseCell" id="WG4-S9-iD2" customClass="TerseTableViewCell" customModule="terse" customModuleProvider="target">
-                                <rect key="frame" x="0.0" y="28" width="600" height="44"/>
+                                <rect key="frame" x="0.0" y="92" width="600" height="44"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="WG4-S9-iD2" id="OKT-Mh-oVy">
                                     <rect key="frame" x="0.0" y="0.0" width="600" height="43"/>
@@ -46,7 +46,9 @@
                             <outlet property="delegate" destination="fP1-ES-led" id="orn-Xl-DMh"/>
                         </connections>
                     </tableView>
-                    <navigationItem key="navigationItem" title="Programs" id="83q-iN-lVm"/>
+                    <navigationItem key="navigationItem" title="Programs" id="83q-iN-lVm">
+                        <barButtonItem key="rightBarButtonItem" title="Item" id="ubq-8L-OZJ"/>
+                    </navigationItem>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="kc3-w2-qkD" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
@@ -83,14 +85,13 @@
                                         <rect key="frame" x="8" y="298" width="584" height="294"/>
                                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                     </view>
-                                    <navigationBar contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="e2a-hq-Odd">
+                                    <navigationBar contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="oel-O3-XYF">
                                         <rect key="frame" x="0.0" y="0.0" width="600" height="44"/>
-                                        <color key="backgroundColor" red="0.46741358521177201" green="0.67646519121970516" blue="0.89303188131313127" alpha="1" colorSpace="calibratedRGB"/>
                                         <items>
-                                            <navigationItem title="Program" id="76C-9h-B2A">
-                                                <barButtonItem key="leftBarButtonItem" title="Back" id="Z0k-Ia-iNA">
+                                            <navigationItem title="Program" id="Zov-72-4XJ">
+                                                <barButtonItem key="leftBarButtonItem" title="Save" id="px2-IU-TVF">
                                                     <connections>
-                                                        <segue destination="fP1-ES-led" kind="show" id="5nt-Kr-TX8"/>
+                                                        <segue destination="o7g-mN-Vrg" kind="unwind" unwindAction="saveNoteDetail:" id="QyD-Ht-Vvj"/>
                                                     </connections>
                                                 </barButtonItem>
                                             </navigationItem>
@@ -111,6 +112,7 @@
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="c6f-Ag-cCF" userLabel="First Responder" sceneMemberID="firstResponder"/>
+                <exit id="o7g-mN-Vrg" userLabel="Exit" sceneMemberID="exit"/>
             </objects>
             <point key="canvasLocation" x="980" y="483"/>
         </scene>
@@ -131,7 +133,4 @@
             <point key="canvasLocation" x="-398" y="486"/>
         </scene>
     </scenes>
-    <inferredMetricsTieBreakers>
-        <segue reference="5nt-Kr-TX8"/>
-    </inferredMetricsTieBreakers>
 </document>
