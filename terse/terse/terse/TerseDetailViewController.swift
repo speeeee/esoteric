@@ -37,7 +37,7 @@ class TerseDetailViewController: UIViewController {
     // MARK: - Navigation
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
         tc.title = tTitle.text!
-        tc.text = tTitle.text!
+        tc.text = tText.text!
         //noteView.setNeedsDisplay()
         tc.view = tView
         tc.view.setNeedsDisplay()
