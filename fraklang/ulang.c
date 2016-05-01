@@ -94,11 +94,11 @@ Lit tok(FILE *in) { Lit l; int c = fgetc(in); printf("%i\n",c); switch(c) {
 
 Elem *fetch(Elem *se, int64_t n) { Elem *s = se;
   for(int i=0;i<n;i++) { s = s->next; } return s; }
-void funcpy(Elem *b, Elem *e) {
+/*void funcpy(Elem *b, Elem *e) {
   e->x = b->x; while(b->next->x.type!=DON) { b = b->next;
     e->next = malloc(sizeof(Elem)); e = e->next; e->x = b->x; } e->next = NULL; }
 void replace(Elem *s, Elem *el) { Elem *e = el;
-  while(e) { if(e->x.type==ADR) { e->x = fetch(s,e->x.x.i)->x; } } }
+  while(e) { if(e->x.type==ADR) { e->x = fetch(s,e->x.x.i)->x; } } }*/
 
 void uparse(Elem *, int);
 
@@ -148,12 +148,13 @@ void ureader2(FILE *in, Elem *s) {
   Lit l; while((l=tok(in)).type!=END) {
     if(l.type == CAL) { l = tok(in); if(l.type == SYM) {
       l.type = FUN; l.x.c = findf(l.x.s); appeg(l); } }
-    else if(l.type == NFN) { l = tok(in); if(l.type == SYM) {
+    else if(l.type == NFN) { appeg(l); l = tok(in); if(l.type == SYM) {
       appeg(l); Fun x = { l.x.s, ufsz+PRIMC, s }; addf(x); } }
     else { appeg(l); } } }
 
 void uparse(Elem *s, int a) { for(int i=0;(i<a||a==-1)&&s;i++) { //while(s) {
   if(s->x.type == FUN) { if(!prim(s)) { fun(s); } }
+  if(s->x.type == NFN) { s = s->next->next; s = fetch(s,s->x.x.i); }
   s = s->next; } }
 
 void prn_lit(Lit l) { switch(l.type) { case INT: printf("%lli",l.x.i); break;
@@ -162,7 +163,7 @@ void prn_lit(Lit l) { switch(l.type) { case INT: printf("%lli",l.x.i); break;
 void prn_lst(Elem *s) { 
   while(s) { prn_lit(s->x); printf(" "); s = s->next; } }
 
-int main(int argc, char **argv) { FILE *f; f = fopen("test2.ul","rb");
+int main(int argc, char **argv) { FILE *f; f = fopen("test.ul","rb");
   ufuns = malloc(sizeof(Fun)); ufuns[0].id = -1;
   stk = top = malloc(sizeof(Elem)); top->x.type = NIL; top->next = NULL;
   ureader2(f,top); fclose(f); stk = top; uparse(stk,-1); prn_lst(top); return 0; }
