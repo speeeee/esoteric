@@ -149,7 +149,7 @@ void ureader2(FILE *in, Elem *s) {
     if(l.type == CAL) { l = tok(in); if(l.type == SYM) {
       l.type = FUN; l.x.c = findf(l.x.s); appeg(l); } }
     else if(l.type == NFN) { appeg(l); l = tok(in); if(l.type == SYM) {
-      appeg(l); Fun x = { l.x.s, ufsz+PRIMC, s }; addf(x); } }
+      appeg(l); Fun x = { l.x.s, ufsz+PRIMC, s->next }; addf(x); } }
     else { appeg(l); } } }
 
 void uparse(Elem *s, int a) { for(int i=0;(i<a||a==-1)&&s;i++) { //while(s) {
