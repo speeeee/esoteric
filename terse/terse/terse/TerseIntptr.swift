@@ -12,6 +12,8 @@
 //    : try "1 2 [ + } ! ."
 //    : try ": pm + - } 1 2 3 pm ."
 
+import UIKit
+
 struct Fun { var name : String; var expr : [String]; }
 struct Stk { var mode : Int; var stk : [String]; }
 
@@ -81,7 +83,7 @@ func parse(s : String) -> Stk {
   return parseExpr(a,ep:[],lnz:[]); }
 
 func ncmd(n : Int, name : Name, c : [String]) -> Cmd {
-    return Cmd(name:name,args:Array(c[c.count-n...c.count-1]).map({Float($0)!}))
+    return Cmd(name:name,args:Array(c[c.count-n...c.count-1]).map({CGFloat($0)!}))
 }
 
 let prims : [String] = [",","r","l","c","p"]
