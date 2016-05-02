@@ -20,7 +20,9 @@ class TerseDetailViewController: UIViewController {
         
         tTitle.text = tc.title
         tText.text = tc.text
-        //noteView = note.view
+        tView = tc.view
+        let temp = parse(tc.text)
+        tView.cmds = mkCmds(temp.stk)
         /*let temp = note.text.characters.split{$0 == " "}.map(String.init)
         noteView.cmds = temp.reduce([[0.0,0.0,0.0,0.0]], combine: {(x:[[Float]],y:String) -> [[Float]] in x.last!.count%4==0 ? x + [[(y as NSString).floatValue]] : x[0..<x.count-1] + [(x.last!+[(y as NSString).floatValue])];})
         print(noteView.cmds)*/

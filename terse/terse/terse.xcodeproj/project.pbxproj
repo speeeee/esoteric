@@ -19,6 +19,7 @@
 		6328B1791CCD48B800275CAD /* TCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6328B1781CCD48B800275CAD /* TCell.swift */; settings = {ASSET_TAGS = (); }; };
 		6328B17D1CCD4A0A00275CAD /* TerseView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6328B17C1CCD4A0A00275CAD /* TerseView.swift */; settings = {ASSET_TAGS = (); }; };
 		6328B17F1CCD942400275CAD /* TerseDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6328B17E1CCD942400275CAD /* TerseDetailViewController.swift */; settings = {ASSET_TAGS = (); }; };
+		63909EB21CD6D94D002FCE47 /* TerseIntptr.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63909EB11CD6D94D002FCE47 /* TerseIntptr.swift */; settings = {ASSET_TAGS = (); }; };
 		639B31701CD106AF001A7BD3 /* terseStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 639B316F1CD106AF001A7BD3 /* terseStore.swift */; settings = {ASSET_TAGS = (); }; };
 /* End PBXBuildFile section */
 
@@ -58,6 +59,7 @@
 		6328B1781CCD48B800275CAD /* TCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TCell.swift; sourceTree = "<group>"; };
 		6328B17C1CCD4A0A00275CAD /* TerseView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = TerseView.swift; path = ../TerseView.swift; sourceTree = "<group>"; };
 		6328B17E1CCD942400275CAD /* TerseDetailViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TerseDetailViewController.swift; sourceTree = "<group>"; };
+		63909EB11CD6D94D002FCE47 /* TerseIntptr.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TerseIntptr.swift; sourceTree = "<group>"; };
 		639B316F1CD106AF001A7BD3 /* terseStore.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = terseStore.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -110,6 +112,7 @@
 			isa = PBXGroup;
 			children = (
 				6328B17C1CCD4A0A00275CAD /* TerseView.swift */,
+				63909EB11CD6D94D002FCE47 /* TerseIntptr.swift */,
 				6328B1461CCD3A0A00275CAD /* AppDelegate.swift */,
 				6328B1481CCD3A0B00275CAD /* ViewController.swift */,
 				6328B14A1CCD3A0B00275CAD /* Main.storyboard */,
@@ -281,6 +284,7 @@
 				6328B1791CCD48B800275CAD /* TCell.swift in Sources */,
 				6328B1491CCD3A0B00275CAD /* ViewController.swift in Sources */,
 				6328B1471CCD3A0A00275CAD /* AppDelegate.swift in Sources */,
+				63909EB21CD6D94D002FCE47 /* TerseIntptr.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

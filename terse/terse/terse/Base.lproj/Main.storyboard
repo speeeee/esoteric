@@ -47,7 +47,7 @@
                         </connections>
                     </tableView>
                     <navigationItem key="navigationItem" title="Programs" id="83q-iN-lVm">
-                        <barButtonItem key="rightBarButtonItem" title="Item" id="ubq-8L-OZJ"/>
+                        <barButtonItem key="rightBarButtonItem" title="No" id="ubq-8L-OZJ"/>
                     </navigationItem>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="kc3-w2-qkD" userLabel="First Responder" sceneMemberID="firstResponder"/>
