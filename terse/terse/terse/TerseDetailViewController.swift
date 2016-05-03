@@ -20,7 +20,7 @@ class TerseDetailViewController: UIViewController {
         
         tTitle.text = tc.title
         tText.text = tc.text
-        tView = tc.view
+        //tView = tc.view
         let temp = parse(tc.text)
         tView.cmds = mkCmds(temp.stk)
         /*let temp = note.text.characters.split{$0 == " "}.map(String.init)
@@ -43,7 +43,7 @@ class TerseDetailViewController: UIViewController {
         //noteView.setNeedsDisplay()
         tc.view = tView
         tc.view.setNeedsDisplay()
-        //print("cmds"); print(note.view.cmds)
+        print("cmds"); print(tc.view.cmds)
         //note.date = NSDate()
     }
     

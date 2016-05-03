@@ -83,7 +83,7 @@ func parse(s : String) -> Stk {
   return parseExpr(a,ep:[],lnz:[]); }
 
 func ncmd(n : Int, name : Name, c : [String]) -> Cmd {
-    return Cmd(name:name,args:Array(c[c.count-n...c.count-1]).map({CGFloat($0)!}))
+    return Cmd(name:name,args:Array(c[c.count-n...c.count-1]).map{(x:String) -> Float in Float(x)!}.map{(x:Float) in CGFloat(x)})
 }
 
 let prims : [String] = [",","r","l","c","p"]
