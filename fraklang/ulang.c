@@ -37,7 +37,7 @@
 #define Q 9 // call user-defined function: 64-bibt integer (n) + n args.
 #define D 10 // character for ending function bodies.
 
-#define PRIMC 12
+#define PRIMC 13
 
 // example using pseudo-bytecode: EC0I2I3D = (+ 2 3) where 0 is the id for '+'.
 
@@ -52,7 +52,8 @@ struct Elem { Lit x; struct Elem *next; struct Elem *prev; };
 Fun funs[] = { { "+", 0, NULL }, { "-", 1, NULL }, { "*", 2, NULL },
                { "/", 3, NULL }, { "+.", 4, NULL }, { "-.", 5, NULL},
                { "*.", 6, NULL }, { "/.", 7, NULL }, { "pow", 8, NULL },
-               { "log", 9, NULL }, { "λ", 10, NULL }, { "->", 11, NULL } }; 
+               { "log", 9, NULL }, { "λ", 10, NULL }, { "->", 11, NULL },
+               { "if", 12, NULL } }; 
 int fsz = PRIMC;
 Fun *ufuns; int ufsz = 0;
 
@@ -124,6 +125,10 @@ int prim(Elem *s) { switch(s->x.x.c.id) {
       case 9: l.x.f = log(e->next->x.x.f)/log(e->x.x.f); }
     s->x = l; s->next = s->next->next->next;
     free(e->next); free(e); return 1; }
+  case 12: { if(!s->next->x.x.i) { Elem *e = s->next->next->next;
+      uparse(e,1); s->x = e->x; s->next = e->next; /* memory leak here! */ }
+    else { Elem *e = fetch(s->next->next->next,s->next->next->x.x.i);
+      s->x = e->x; s->next = e->next; /* memory leak here! */ } return 1; }
   default: return 0; } }
 
 /*void fun(Elem *s) { Elem *b = s->x.x.c.body->next; Elem *args = s->next;
@@ -154,7 +159,7 @@ void ureader2(FILE *in, Elem *s) {
 
 void uparse(Elem *s, int a) { for(int i=0;(i<a||a==-1)&&s;i++) { //while(s) {
   if(s->x.type == FUN) { if(!prim(s)) { fun(s); } }
-  if(s->x.type == NFN) { s = s->next->next; s = fetch(s,s->x.x.i); }
+  else if(s->x.type == NFN) { s = s->next->next; s = fetch(s,s->x.x.i); }
   s = s->next; } }
 
 void prn_lit(Lit l) { switch(l.type) { case INT: printf("%lli",l.x.i); break;
