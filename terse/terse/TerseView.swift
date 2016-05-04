@@ -20,8 +20,8 @@ class TerseView: UIView {
         cmds.forEach{x in switch(x.name) {
             case .Rect: CGContextAddRect(context,CGRectMake(x.args[0],x.args[1],x.args[2],x.args[3]))
             //case .Line: CGContextAddLines(context,x.args,2)
-            //case .RGBA: CGContextSetFillColorWithColor(context,UIColor(red:x.args[0],green:x.args[1],blue:x.args[2],alpha:x.args[3]))
-                //CGContextSetRGBStrokeColor(context, 0.0, 0.0, 0.0, 0.5)
+            case .RGBA: CGContextSetFillColorWithColor(context,UIColor(red:x.args[0],green:x.args[1],blue:x.args[2],alpha:x.args[3]).CGColor)
+                CGContextSetRGBStrokeColor(context, 0.0, 0.0, 0.0, 0.5)
             default: CGContextAddRect(context,CGRectMake(0,1,2,3)) } }
         //CGContextAddRect(context, CGRectMake(10.0, 150.0, 60.0, 120.0))
         CGContextFillPath(context)
