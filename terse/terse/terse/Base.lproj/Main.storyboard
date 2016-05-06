@@ -4,54 +4,6 @@
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="8151.3"/>
     </dependencies>
     <scenes>
-        <!--Table View Controller-->
-        <scene sceneID="jyG-TE-A4F">
-            <objects>
-                <tableViewController id="hUV-vX-zef" sceneMemberID="viewController">
-                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="static" style="plain" separatorStyle="default" rowHeight="44" sectionHeaderHeight="28" sectionFooterHeight="28" id="t6f-3c-nvw">
-                        <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                        <sections>
-                            <tableViewSection id="rNc-a2-RfQ">
-                                <cells>
-                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" id="NYa-q0-LYZ">
-                                        <rect key="frame" x="0.0" y="0.0" width="600" height="44"/>
-                                        <autoresizingMask key="autoresizingMask"/>
-                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="NYa-q0-LYZ" id="zDZ-xF-Aty">
-                                            <rect key="frame" x="0.0" y="0.0" width="600" height="43"/>
-                                            <autoresizingMask key="autoresizingMask"/>
-                                        </tableViewCellContentView>
-                                    </tableViewCell>
-                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" id="EkF-DW-IV5">
-                                        <rect key="frame" x="0.0" y="44" width="600" height="44"/>
-                                        <autoresizingMask key="autoresizingMask"/>
-                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="EkF-DW-IV5" id="tzW-zX-CkH">
-                                            <rect key="frame" x="0.0" y="0.0" width="600" height="43"/>
-                                            <autoresizingMask key="autoresizingMask"/>
-                                        </tableViewCellContentView>
-                                    </tableViewCell>
-                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" id="9cE-K8-aAX">
-                                        <rect key="frame" x="0.0" y="88" width="600" height="44"/>
-                                        <autoresizingMask key="autoresizingMask"/>
-                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="9cE-K8-aAX" id="54B-tM-V6i">
-                                            <rect key="frame" x="0.0" y="0.0" width="600" height="43"/>
-                                            <autoresizingMask key="autoresizingMask"/>
-                                        </tableViewCellContentView>
-                                    </tableViewCell>
-                                </cells>
-                            </tableViewSection>
-                        </sections>
-                        <connections>
-                            <outlet property="dataSource" destination="hUV-vX-zef" id="Oo9-uj-JaN"/>
-                            <outlet property="delegate" destination="hUV-vX-zef" id="eqj-u5-ZVc"/>
-                        </connections>
-                    </tableView>
-                </tableViewController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="jX9-hI-Txj" userLabel="First Responder" sceneMemberID="firstResponder"/>
-            </objects>
-            <point key="canvasLocation" x="-253" y="-164"/>
-        </scene>
         <!--Programs-->
         <scene sceneID="U3p-BI-gnG">
             <objects>
@@ -95,7 +47,16 @@
                         </connections>
                     </tableView>
                     <navigationItem key="navigationItem" title="Programs" id="83q-iN-lVm">
-                        <barButtonItem key="rightBarButtonItem" title="No" id="ubq-8L-OZJ"/>
+                        <barButtonItem key="leftBarButtonItem" title="Help" id="eV1-hK-RyK">
+                            <connections>
+                                <segue destination="2e2-gA-Rmw" kind="show" id="Y7h-L1-KHu"/>
+                            </connections>
+                        </barButtonItem>
+                        <barButtonItem key="rightBarButtonItem" systemItem="add" id="ubq-8L-OZJ">
+                            <connections>
+                                <segue destination="iuq-0n-467" kind="show" id="JLg-uq-6hq"/>
+                            </connections>
+                        </barButtonItem>
                     </navigationItem>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="kc3-w2-qkD" userLabel="First Responder" sceneMemberID="firstResponder"/>
@@ -118,25 +79,27 @@
                                 <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
                                 <subviews>
                                     <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="left" contentVerticalAlignment="center" text="Title" borderStyle="roundedRect" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="h4D-wm-byb">
-                                        <rect key="frame" x="8" y="58" width="584" height="30"/>
+                                        <rect key="frame" x="8" y="70" width="584" height="30"/>
                                         <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                         <textInputTraits key="textInputTraits"/>
                                     </textField>
                                     <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" fixedFrame="YES" textAlignment="natural" translatesAutoresizingMaskIntoConstraints="NO" id="utI-UF-L1F">
-                                        <rect key="frame" x="8" y="91" width="584" height="199"/>
+                                        <rect key="frame" x="8" y="99" width="584" height="199"/>
                                         <color key="backgroundColor" red="0.91728157047461689" green="0.91906815380103879" blue="1" alpha="1" colorSpace="calibratedRGB"/>
                                         <string key="text">Lorem ipsum dolor sit er elit lamet, consectetaur cillium adipisicing pecu, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Nam liber te conscient to factor tum poen legum odioque civiuda.</string>
                                         <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                         <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
                                     </textView>
-                                    <view contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="vPh-Qb-Kkn" customClass="TerseView" customModule="terse" customModuleProvider="target">
-                                        <rect key="frame" x="8" y="298" width="584" height="294"/>
-                                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                                    </view>
                                     <navigationBar contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="oel-O3-XYF">
                                         <rect key="frame" x="0.0" y="0.0" width="600" height="44"/>
                                         <items>
-                                            <navigationItem title="Program" id="Zov-72-4XJ">
+                                            <navigationItem title="Program" id="Zov-72-4XJ"/>
+                                        </items>
+                                    </navigationBar>
+                                    <navigationBar contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Kpl-B4-mzg">
+                                        <rect key="frame" x="8" y="501" width="584" height="44"/>
+                                        <items>
+                                            <navigationItem id="6XL-NW-WWt">
                                                 <barButtonItem key="leftBarButtonItem" title="Save" id="px2-IU-TVF">
                                                     <connections>
                                                         <segue destination="o7g-mN-Vrg" kind="unwind" unwindAction="saveNoteDetail:" id="QyD-Ht-Vvj"/>
@@ -145,6 +108,10 @@
                                             </navigationItem>
                                         </items>
                                     </navigationBar>
+                                    <view contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="vPh-Qb-Kkn" customClass="TerseView" customModule="terse" customModuleProvider="target">
+                                        <rect key="frame" x="8" y="226" width="584" height="275"/>
+                                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                    </view>
                                 </subviews>
                                 <color key="backgroundColor" red="0.88198613442034457" green="0.91704478810635293" blue="1" alpha="1" colorSpace="calibratedRGB"/>
                             </view>
@@ -164,6 +131,163 @@
             </objects>
             <point key="canvasLocation" x="980" y="483"/>
         </scene>
+        <!--Language-->
+        <scene sceneID="9U7-Ai-axJ">
+            <objects>
+                <viewController id="Iut-dg-mVE" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="UYN-m8-b7S"/>
+                        <viewControllerLayoutGuide type="bottom" id="49u-9a-EKV"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="YH8-bS-gzz">
+                        <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" fixedFrame="YES" bounces="NO" pagingEnabled="YES" editable="NO" textAlignment="natural" translatesAutoresizingMaskIntoConstraints="NO" id="DOQ-cT-09V">
+                                <rect key="frame" x="0.0" y="64" width="600" height="1169"/>
+                                <mutableString key="text">This document acts as a complete1 reference and tutorial for terse. While it is highly recommended that the user read the tutorial, there is no expectation to read the entire reference. However, at the end of this tutorial, there will be a list of words (function) that are recommended to be read about in the reference.As mentioned before, terse is a stack-based, concatenative language. Ignoring the ”concatenative” part for now, a stack-based language is essentially a language where all actions performed are done so on an stack structure (also known as a LIFO-queue). A stack is a very simple structure in that it has two operations: push and pop. Pushing something onto the stack will put what is to be pushed onto the stack for later use. Popping something from the stack will take the top element of the stack, remove it, and do something with it. The something that it does will be explained later.terse works like most high level stack-based languages as it uses a concate- native style of programming to represent interactions with the stack. For example, the expression 1 2 3 represents the pushing of three numbers,1, 2, and 3, to the stack. In general, any whitespace character is used to sepa- rate tokens, while any token is represented by a numeric value or a symbol.Being able to only push to the stack is a fairly limited feature. Most stack- based languages implement functions as things that pop items from the stack for use and push what is returned from the function. An example of this us- ing the function, +, is as follows:``` 1 2 3 + + ```This example is a direct representation of the infix counterpart: (2 + 3) + 1. Another thing to note is that because of how each token is read sequentially, it is possible to chain functions emulating function composition. This is one of the main advantages of stack-based languages; for example, to represent the composition (f ◦ g ◦ h)(x) in a stack-based setting as opposed to most traditional function application languages: x h g f and f(g(h(x))). This greatly reduces the amount of typing necessary, while arguably not compro- mising the clarity of it. Of course, this does have a change to lead to some ambiguity when reading code. Consider the expression, 1 2 3 a b. Assum- ing that a and b are functions, the actual amount of arguments each function takes is slightly ambiguous. Because of this, the programmer should make sure to clear those ambiguities if readability is a necessity (for example, as- suming that a takes two arguments and returns one, and b also takes two arguments and returns 0, it could be rewritten as 1 2 a 3 b).Finally, all functions’ inputs and outputs from now on will be represented by their stack signature. For example, the stack signature for + is ( a b -- c ).Before covering functions, it should be explained what quotes are. Quotes are terse’s (and a few other stack languages, Joy being the first to implement them) representation of first-class functions. First-class functions in other languages are functions that act as literals, meaning that they can be used like numbers, strings2, etc. This document will not go very in-depth on what first-class functions can do, but they are very imporant to understanding the language. The following is an example of a quote being called:``` 2 [ 1 + } ! ```The actual quote itself is the expression between the [ and the }. Within the quote is the expression, 1 +. However, this expression is not yet called, and is instead pushed to the stack. The function, !, calls the quote on top of the stack, which means that whatever is in the expression is essentially pushed directly to the stack, making the expression 2 1 +. This is then evaluated to 3, as it would normally. Quotes, as mentioned before, can be used like any- thing else on the stack, meaning it can be subject to things like conditional expressions, giving it a lot of potential use.This relates to functions as all functions are in terse are essentially just named quotes. The following is an example of a function that takes the av- erage of two numbers, avg:``` : avg + 2 / } ```The first token read, :, is special in that it changes the mode of the reading. It actually does the same thing as [ does, as [ is technically another mode- changing function itself. Because of this, } acts as the closing of that mode. However, instead of pushing this to the stack, it instead stores it in a list of other functions, where the name of the function is avg and its body is 2 + /. One thing to note is the absence of any argument declaration. Instead, all that are there are the name and body of the function. The reason for this is because the actual stack signature of the function can be derived from the body fairly easily. For example, the stack signature of this is ( a b -- c ). There is only one time, however, where it is impossible to derive the signa- ture, and that is for recursive functions. Since they call themselves within themselves, it is impossible to tell what the actual signature is. This is not an issue by default in terse though, as the interpreter does not actually bother coming up with the stack signature.</mutableString>
+                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
+                            </textView>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                    </view>
+                    <navigationItem key="navigationItem" title="Language" id="Z4u-nF-Sry">
+                        <barButtonItem key="leftBarButtonItem" title="Back" id="SrG-ty-476">
+                            <connections>
+                                <segue destination="g2d-11-KnE" kind="unwind" unwindAction="justDontDoAnything:" id="aob-zW-aiO"/>
+                            </connections>
+                        </barButtonItem>
+                    </navigationItem>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="Gdk-Gp-6jQ" userLabel="First Responder" sceneMemberID="firstResponder"/>
+                <exit id="g2d-11-KnE" userLabel="Exit" sceneMemberID="exit"/>
+            </objects>
+            <point key="canvasLocation" x="369" y="-905"/>
+        </scene>
+        <!--Documentation-->
+        <scene sceneID="ob2-1Y-nZ3">
+            <objects>
+                <tableViewController id="2e2-gA-Rmw" sceneMemberID="viewController">
+                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="static" style="plain" separatorStyle="default" rowHeight="44" sectionHeaderHeight="28" sectionFooterHeight="28" id="iE4-Bf-br4">
+                        <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <sections>
+                            <tableViewSection id="rz0-ya-wvl">
+                                <cells>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" id="FUU-iI-bcq">
+                                        <rect key="frame" x="0.0" y="64" width="600" height="44"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="FUU-iI-bcq" id="xqf-kH-Luu">
+                                            <rect key="frame" x="0.0" y="0.0" width="600" height="43"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Primer" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="yXb-kA-0R4">
+                                                    <rect key="frame" x="15" y="11" width="51" height="21"/>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                    <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                            </subviews>
+                                        </tableViewCellContentView>
+                                        <connections>
+                                            <segue destination="Swc-rT-a7C" kind="show" id="whS-cM-Loi"/>
+                                        </connections>
+                                    </tableViewCell>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" id="G6n-Ep-RmM">
+                                        <rect key="frame" x="0.0" y="108" width="600" height="44"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="G6n-Ep-RmM" id="5j5-NU-otJ">
+                                            <rect key="frame" x="0.0" y="0.0" width="600" height="43"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Language" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="HAn-o2-KjJ">
+                                                    <rect key="frame" x="15" y="11" width="76" height="21"/>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                    <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                            </subviews>
+                                        </tableViewCellContentView>
+                                        <connections>
+                                            <segue destination="Iut-dg-mVE" kind="show" id="4qF-xl-VIH"/>
+                                        </connections>
+                                    </tableViewCell>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" id="mDS-Gz-OnG">
+                                        <rect key="frame" x="0.0" y="152" width="600" height="44"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="mDS-Gz-OnG" id="ibt-8S-jWe">
+                                            <rect key="frame" x="0.0" y="0.0" width="600" height="43"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                        </tableViewCellContentView>
+                                    </tableViewCell>
+                                </cells>
+                            </tableViewSection>
+                        </sections>
+                        <connections>
+                            <outlet property="dataSource" destination="2e2-gA-Rmw" id="Uqm-R6-tFB"/>
+                            <outlet property="delegate" destination="2e2-gA-Rmw" id="Nf7-Qe-ulx"/>
+                        </connections>
+                    </tableView>
+                    <navigationItem key="navigationItem" title="Documentation" id="umG-Fc-cgN">
+                        <barButtonItem key="backBarButtonItem" title="Back" id="tFl-cp-joY"/>
+                        <barButtonItem key="leftBarButtonItem" title="Back" id="ccR-jq-z0j">
+                            <connections>
+                                <segue destination="T8y-kA-nG9" kind="unwind" unwindAction="justDontDoAnything:" id="dUe-e8-DtC"/>
+                            </connections>
+                        </barButtonItem>
+                    </navigationItem>
+                </tableViewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="bax-2a-jCs" userLabel="First Responder" sceneMemberID="firstResponder"/>
+                <exit id="T8y-kA-nG9" userLabel="Exit" sceneMemberID="exit"/>
+            </objects>
+            <point key="canvasLocation" x="258" y="-217"/>
+        </scene>
+        <!--Primer-->
+        <scene sceneID="iyJ-7y-so5">
+            <objects>
+                <viewController id="Swc-rT-a7C" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="Fx7-u4-Yqy"/>
+                        <viewControllerLayoutGuide type="bottom" id="Vs2-cv-JGl"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="T3g-aN-EYj">
+                        <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" fixedFrame="YES" editable="NO" textAlignment="natural" translatesAutoresizingMaskIntoConstraints="NO" id="RYT-th-ULT">
+                                <rect key="frame" x="0.0" y="72" width="600" height="528"/>
+                                <mutableString key="text">This is a quick primer on what terse is and how it works.  More specifically, this primer will be a quick way to learn the language and quickly get started using it as a graphics tool.  Luckily, the language itself is very simple, and the in-depth documentation of the language itself is fairly short.  Examples of code will be enclosed in three backquotes: ```.
+
+The following will create a red rectangle:
+``` 10 150 10 10 r ```
+As seen, the function that produces the rectangle is 'r', and its arguments preceed it, those arguments being x-position, y-position, width, and height, respectively.
+
+The following will instead create a green rectangle:
+``` 0 1 0 1 c 10 150 10 10 r ```
+'c' is a function which takes four values, representing floating point RGBA values (each within the range [0,1]).
+
+So far, these are the main two fundamental items used to create what is desired.  Of course, this is failry limited as it is, and inefficient to use when creating things.  The rest of the documentation will cover the language itself, and will end with examples that apply the language to the graphical situation.</mutableString>
+                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
+                            </textView>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                    </view>
+                    <navigationItem key="navigationItem" title="Primer" id="jcF-aQ-Pwp">
+                        <barButtonItem key="leftBarButtonItem" title="Back" id="yIz-80-JQO">
+                            <connections>
+                                <segue destination="xSa-ct-vW4" kind="unwind" unwindAction="justDontDoAnything:" id="08a-Tu-hwC"/>
+                            </connections>
+                        </barButtonItem>
+                    </navigationItem>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="A43-fC-p5q" userLabel="First Responder" sceneMemberID="firstResponder"/>
+                <exit id="xSa-ct-vW4" userLabel="Exit" sceneMemberID="exit"/>
+            </objects>
+            <point key="canvasLocation" x="903" y="-217"/>
+        </scene>
         <!--Navigation Controller-->
         <scene sceneID="XEe-NB-KKZ">
             <objects>
@@ -180,22 +304,8 @@
             </objects>
             <point key="canvasLocation" x="-398" y="486"/>
         </scene>
-        <!--View Controller-->
-        <scene sceneID="emL-kH-wG2">
-            <objects>
-                <viewController id="pAB-ow-ruU" sceneMemberID="viewController">
-                    <layoutGuides>
-                        <viewControllerLayoutGuide type="top" id="HYG-fN-vZj"/>
-                        <viewControllerLayoutGuide type="bottom" id="CXx-JW-4GN"/>
-                    </layoutGuides>
-                    <view key="view" contentMode="scaleToFill" id="zAZ-Yt-gaC">
-                        <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                    </view>
-                </viewController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="S9q-1b-07Y" userLabel="First Responder" sceneMemberID="firstResponder"/>
-            </objects>
-        </scene>
     </scenes>
+    <inferredMetricsTieBreakers>
+        <segue reference="94b-SC-EoS"/>
+    </inferredMetricsTieBreakers>
 </document>

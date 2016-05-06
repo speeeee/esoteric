@@ -79,7 +79,7 @@ func parseExpr(e : [String],ep : [String],lnz : [[String]]) -> Stk { return (e.r
   default: return (Stk(mode:n.mode,stk:n.stk+[s]),nz.1); } })).0 }
 
 func parse(s : String) -> Stk { 
-  let a = s.characters.split(" ").map({String($0)});
+  let a = s.componentsSeparatedByCharactersInSet(NSCharacterSet (charactersInString: "\n ")).map({String($0)});
   return parseExpr(a,ep:[],lnz:[]); }
 
 func ncmd(n : Int, name : Name, c : [String]) -> Cmd {

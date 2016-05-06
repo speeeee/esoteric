@@ -97,4 +97,5 @@ class TerseTableViewController: UITableViewController {
             tableView.reloadData()
         }
     }
+    @IBAction func justDontDoAnything(segue: UIStoryboardSegue) { 2; } // It's fine, I swear.
 }
