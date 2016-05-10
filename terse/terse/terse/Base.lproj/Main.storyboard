@@ -2,6 +2,7 @@
 <document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="8187.4" systemVersion="14E46" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="DPO-kP-QbJ">
     <dependencies>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="8151.3"/>
+        <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
     </dependencies>
     <scenes>
         <!--Programs-->
@@ -79,12 +80,12 @@
                                 <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
                                 <subviews>
                                     <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="left" contentVerticalAlignment="center" text="Title" borderStyle="roundedRect" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="h4D-wm-byb">
-                                        <rect key="frame" x="8" y="70" width="584" height="30"/>
+                                        <rect key="frame" x="8" y="70" width="350" height="30"/>
                                         <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                         <textInputTraits key="textInputTraits"/>
                                     </textField>
                                     <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" fixedFrame="YES" textAlignment="natural" translatesAutoresizingMaskIntoConstraints="NO" id="utI-UF-L1F">
-                                        <rect key="frame" x="8" y="99" width="584" height="199"/>
+                                        <rect key="frame" x="8" y="99" width="350" height="199"/>
                                         <color key="backgroundColor" red="0.91728157047461689" green="0.91906815380103879" blue="1" alpha="1" colorSpace="calibratedRGB"/>
                                         <string key="text">Lorem ipsum dolor sit er elit lamet, consectetaur cillium adipisicing pecu, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Nam liber te conscient to factor tum poen legum odioque civiuda.</string>
                                         <fontDescription key="fontDescription" type="system" pointSize="14"/>
@@ -109,7 +110,7 @@
                                         </items>
                                     </navigationBar>
                                     <view contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="vPh-Qb-Kkn" customClass="TerseView" customModule="terse" customModuleProvider="target">
-                                        <rect key="frame" x="8" y="226" width="584" height="275"/>
+                                        <rect key="frame" x="8" y="226" width="350" height="275"/>
                                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                     </view>
                                 </subviews>
@@ -143,14 +144,188 @@
                         <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" fixedFrame="YES" bounces="NO" pagingEnabled="YES" editable="NO" textAlignment="natural" translatesAutoresizingMaskIntoConstraints="NO" id="DOQ-cT-09V">
-                                <rect key="frame" x="0.0" y="64" width="600" height="1169"/>
-                                <mutableString key="text">This document acts as a complete1 reference and tutorial for terse. While it is highly recommended that the user read the tutorial, there is no expectation to read the entire reference. However, at the end of this tutorial, there will be a list of words (function) that are recommended to be read about in the reference.As mentioned before, terse is a stack-based, concatenative language. Ignoring the ”concatenative” part for now, a stack-based language is essentially a language where all actions performed are done so on an stack structure (also known as a LIFO-queue). A stack is a very simple structure in that it has two operations: push and pop. Pushing something onto the stack will put what is to be pushed onto the stack for later use. Popping something from the stack will take the top element of the stack, remove it, and do something with it. The something that it does will be explained later.terse works like most high level stack-based languages as it uses a concate- native style of programming to represent interactions with the stack. For example, the expression 1 2 3 represents the pushing of three numbers,1, 2, and 3, to the stack. In general, any whitespace character is used to sepa- rate tokens, while any token is represented by a numeric value or a symbol.Being able to only push to the stack is a fairly limited feature. Most stack- based languages implement functions as things that pop items from the stack for use and push what is returned from the function. An example of this us- ing the function, +, is as follows:``` 1 2 3 + + ```This example is a direct representation of the infix counterpart: (2 + 3) + 1. Another thing to note is that because of how each token is read sequentially, it is possible to chain functions emulating function composition. This is one of the main advantages of stack-based languages; for example, to represent the composition (f ◦ g ◦ h)(x) in a stack-based setting as opposed to most traditional function application languages: x h g f and f(g(h(x))). This greatly reduces the amount of typing necessary, while arguably not compro- mising the clarity of it. Of course, this does have a change to lead to some ambiguity when reading code. Consider the expression, 1 2 3 a b. Assum- ing that a and b are functions, the actual amount of arguments each function takes is slightly ambiguous. Because of this, the programmer should make sure to clear those ambiguities if readability is a necessity (for example, as- suming that a takes two arguments and returns one, and b also takes two arguments and returns 0, it could be rewritten as 1 2 a 3 b).Finally, all functions’ inputs and outputs from now on will be represented by their stack signature. For example, the stack signature for + is ( a b -- c ).Before covering functions, it should be explained what quotes are. Quotes are terse’s (and a few other stack languages, Joy being the first to implement them) representation of first-class functions. First-class functions in other languages are functions that act as literals, meaning that they can be used like numbers, strings2, etc. This document will not go very in-depth on what first-class functions can do, but they are very imporant to understanding the language. The following is an example of a quote being called:``` 2 [ 1 + } ! ```The actual quote itself is the expression between the [ and the }. Within the quote is the expression, 1 +. However, this expression is not yet called, and is instead pushed to the stack. The function, !, calls the quote on top of the stack, which means that whatever is in the expression is essentially pushed directly to the stack, making the expression 2 1 +. This is then evaluated to 3, as it would normally. Quotes, as mentioned before, can be used like any- thing else on the stack, meaning it can be subject to things like conditional expressions, giving it a lot of potential use.This relates to functions as all functions are in terse are essentially just named quotes. The following is an example of a function that takes the av- erage of two numbers, avg:``` : avg + 2 / } ```The first token read, :, is special in that it changes the mode of the reading. It actually does the same thing as [ does, as [ is technically another mode- changing function itself. Because of this, } acts as the closing of that mode. However, instead of pushing this to the stack, it instead stores it in a list of other functions, where the name of the function is avg and its body is 2 + /. One thing to note is the absence of any argument declaration. Instead, all that are there are the name and body of the function. The reason for this is because the actual stack signature of the function can be derived from the body fairly easily. For example, the stack signature of this is ( a b -- c ). There is only one time, however, where it is impossible to derive the signa- ture, and that is for recursive functions. Since they call themselves within themselves, it is impossible to tell what the actual signature is. This is not an issue by default in terse though, as the interpreter does not actually bother coming up with the stack signature.</mutableString>
-                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
-                                <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
-                            </textView>
+                            <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" ambiguous="YES" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="xbY-Je-QbG">
+                                <rect key="frame" x="0.0" y="64" width="600" height="536"/>
+                                <subviews>
+                                    <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" ambiguous="YES" misplaced="YES" bounces="NO" editable="NO" usesAttributedText="YES" translatesAutoresizingMaskIntoConstraints="NO" id="DOQ-cT-09V">
+                                        <rect key="frame" x="0.0" y="0.0" width="350" height="536"/>
+                                        <attributedString key="attributedText">
+                                            <fragment>
+                                                <string key="content">This document acts as a complete1 reference and tutorial for terse. While it is highly recommended that the user read the tutorial, there is no expectation to read the entire reference. However, at the end of this tutorial, there will be a list of words (function) that are recommended to be read about in the reference.
+</string>
+                                                <attributes>
+                                                    <font key="NSFont" size="14" name="HelveticaNeue"/>
+                                                </attributes>
+                                            </fragment>
+                                            <fragment>
+                                                <string key="content" base64-UTF8="YES">
+Cg
+</string>
+                                                <attributes>
+                                                    <font key="NSFont" size="14" name="HelveticaNeue"/>
+                                                    <paragraphStyle key="NSParagraphStyle" alignment="natural" lineBreakMode="wordWrapping" baseWritingDirection="natural"/>
+                                                </attributes>
+                                            </fragment>
+                                            <fragment content="Stack-based languages">
+                                                <attributes>
+                                                    <font key="NSFont" size="14" name="HelveticaNeue-Bold"/>
+                                                    <paragraphStyle key="NSParagraphStyle" alignment="natural" lineBreakMode="wordWrapping" baseWritingDirection="natural"/>
+                                                </attributes>
+                                            </fragment>
+                                            <fragment>
+                                                <string key="content" base64-UTF8="YES">
+Cg
+</string>
+                                                <attributes>
+                                                    <font key="NSFont" size="14" name="HelveticaNeue"/>
+                                                    <paragraphStyle key="NSParagraphStyle" alignment="natural" lineBreakMode="wordWrapping" baseWritingDirection="natural"/>
+                                                </attributes>
+                                            </fragment>
+                                            <fragment>
+                                                <string key="content">
+As mentioned before, terse is a stack-based, concatenative language. Ignoring the ”concatenative” part for now, a stack-based language is essentially a language where all actions performed are done so on an stack structure (also known as a LIFO-queue). A stack is a very simple structure in that it has two operations: push and pop. Pushing something onto the stack will put what is to be pushed onto the stack for later use. Popping something from the stack will take the top element of the stack, remove it, and do something with it. The something that it does will be explained later.
+</string>
+                                                <attributes>
+                                                    <font key="NSFont" size="14" name="HelveticaNeue"/>
+                                                </attributes>
+                                            </fragment>
+                                            <fragment>
+                                                <string key="content" base64-UTF8="YES">
+Cg
+</string>
+                                                <attributes>
+                                                    <font key="NSFont" size="14" name="HelveticaNeue"/>
+                                                    <paragraphStyle key="NSParagraphStyle" alignment="natural" lineBreakMode="wordWrapping" baseWritingDirection="natural"/>
+                                                </attributes>
+                                            </fragment>
+                                            <fragment>
+                                                <string key="content">terse as a stack language
+</string>
+                                                <attributes>
+                                                    <font key="NSFont" size="14" name="HelveticaNeue-Bold"/>
+                                                    <paragraphStyle key="NSParagraphStyle" alignment="natural" lineBreakMode="wordWrapping" baseWritingDirection="natural"/>
+                                                </attributes>
+                                            </fragment>
+                                            <fragment>
+                                                <string key="content">
+terse works like most high level stack-based languages as it uses a concate- native style of programming to represent interactions with the stack. For example, the expression 1 2 3 represents the pushing of three numbers,1, 2, and 3, to the stack. In general, any whitespace character is used to sepa- rate tokens, while any token is represented by a numeric value or a symbol.
+</string>
+                                                <attributes>
+                                                    <font key="NSFont" size="14" name="HelveticaNeue"/>
+                                                </attributes>
+                                            </fragment>
+                                            <fragment>
+                                                <string key="content" base64-UTF8="YES">
+Cg
+</string>
+                                                <attributes>
+                                                    <font key="NSFont" size="14" name="HelveticaNeue"/>
+                                                    <paragraphStyle key="NSParagraphStyle" alignment="natural" lineBreakMode="wordWrapping" baseWritingDirection="natural"/>
+                                                </attributes>
+                                            </fragment>
+                                            <fragment content="Calling functions">
+                                                <attributes>
+                                                    <font key="NSFont" size="14" name="HelveticaNeue-Bold"/>
+                                                    <paragraphStyle key="NSParagraphStyle" alignment="natural" lineBreakMode="wordWrapping" baseWritingDirection="natural"/>
+                                                </attributes>
+                                            </fragment>
+                                            <fragment>
+                                                <string key="content" base64-UTF8="YES">
+Cg
+</string>
+                                                <attributes>
+                                                    <font key="NSFont" size="14" name="HelveticaNeue"/>
+                                                    <paragraphStyle key="NSParagraphStyle" alignment="natural" lineBreakMode="wordWrapping" baseWritingDirection="natural"/>
+                                                </attributes>
+                                            </fragment>
+                                            <fragment>
+                                                <string key="content">
+Being able to only push to the stack is a fairly limited feature. Most stack- based languages implement functions as things that pop items from the stack for use and push what is returned from the function. An example of this us- ing the function, +, is as follows:
+``` 1 2 3 + + ```
+This example is a direct representation of the infix counterpart: (2 + 3) + 1. Another thing to note is that because of how each token is read sequentially, it is possible to chain functions emulating function composition. This is one of the main advantages of stack-based languages; for example, to represent the composition (f </string>
+                                                <attributes>
+                                                    <font key="NSFont" size="14" name="HelveticaNeue"/>
+                                                </attributes>
+                                            </fragment>
+                                            <fragment content="◦">
+                                                <attributes>
+                                                    <font key="NSFont" size="14" name="LucidaGrande"/>
+                                                </attributes>
+                                            </fragment>
+                                            <fragment content=" g ">
+                                                <attributes>
+                                                    <font key="NSFont" size="14" name="HelveticaNeue"/>
+                                                </attributes>
+                                            </fragment>
+                                            <fragment content="◦">
+                                                <attributes>
+                                                    <font key="NSFont" size="14" name="LucidaGrande"/>
+                                                </attributes>
+                                            </fragment>
+                                            <fragment>
+                                                <string key="content"> h)(x) in a stack-based setting as opposed to most traditional function application languages: x h g f and f(g(h(x))). This greatly reduces the amount of typing necessary, while arguably not compro- mising the clarity of it. Of course, this does have a change to lead to some ambiguity when reading code. Consider the expression, 1 2 3 a b. Assum- ing that a and b are functions, the actual amount of arguments each function takes is slightly ambiguous. Because of this, the programmer should make sure to clear those ambiguities if readability is a necessity (for example, as- suming that a takes two arguments and returns one, and b also takes two arguments and returns 0, it could be rewritten as 1 2 a 3 b).
+Finally, all functions’ inputs and outputs from now on will be represented by their stack signature. For example, the stack signature for + is ( a b -- c ).
+</string>
+                                                <attributes>
+                                                    <font key="NSFont" size="14" name="HelveticaNeue"/>
+                                                </attributes>
+                                            </fragment>
+                                            <fragment>
+                                                <string key="content" base64-UTF8="YES">
+Cg
+</string>
+                                                <attributes>
+                                                    <font key="NSFont" size="14" name="HelveticaNeue"/>
+                                                    <paragraphStyle key="NSParagraphStyle" alignment="natural" lineBreakMode="wordWrapping" baseWritingDirection="natural"/>
+                                                </attributes>
+                                            </fragment>
+                                            <fragment content="Using quotes">
+                                                <attributes>
+                                                    <font key="NSFont" size="14" name="HelveticaNeue-Bold"/>
+                                                    <paragraphStyle key="NSParagraphStyle" alignment="natural" lineBreakMode="wordWrapping" baseWritingDirection="natural"/>
+                                                </attributes>
+                                            </fragment>
+                                            <fragment>
+                                                <string key="content" base64-UTF8="YES">
+Cg
+</string>
+                                                <attributes>
+                                                    <font key="NSFont" size="14" name="HelveticaNeue"/>
+                                                    <paragraphStyle key="NSParagraphStyle" alignment="natural" lineBreakMode="wordWrapping" baseWritingDirection="natural"/>
+                                                </attributes>
+                                            </fragment>
+                                            <fragment>
+                                                <string key="content">
+Before covering functions, it should be explained what quotes are. Quotes are terse’s (and a few other stack languages, Joy being the first to implement them) representation of first-class functions. First-class functions in other languages are functions that act as literals, meaning that they can be used like numbers, strings2, etc. This document will not go very in-depth on what first-class functions can do, but they are very imporant to understanding the language. The following is an example of a quote being called:
+``` 2 [ 1 + } ! ```
+The actual quote itself is the expression between the [ and the }. Within the quote is the expression, 1 +. However, this expression is not yet called, and is instead pushed to the stack. The function, !, calls the quote on top of the stack, which means that whatever is in the expression is essentially pushed directly to the stack, making the expression 2 1 +. This is then evaluated to 3, as it would normally. Quotes, as mentioned before, can be used like any- thing else on the stack, meaning it can be subject to things like conditional expressions, giving it a lot of potential use.
+This relates to functions as all functions are in terse are essentially just named quotes. The following is an example of a function that takes the av- erage of two numbers, avg:
+``` : avg + 2 / } ```
+The first token read, :, is special in that it changes the mode of the reading. It actually does the same thing as [ does, as [ is technically another mode- changing function itself. Because of this, } acts as the closing of that mode. However, instead of pushing this to the stack, it instead stores it in a list of other functions, where the name of the function is avg and its body is 2 + /. One thing to note is the absence of any argument declaration. Instead, all that are there are the name and body of the function. The reason for this is because the actual stack signature of the function can be derived from the body fairly easily. For example, the stack signature of this is ( a b -- c ). There is only one time, however, where it is impossible to derive the signa- ture, and that is for recursive functions. Since they call themselves within themselves, it is impossible to tell what the actual signature is. This is not an issue by default in terse though, as the interpreter does not actually bother coming up with the stack signature.
+
+
+
+
+</string>
+                                                <attributes>
+                                                    <font key="NSFont" size="14" name="HelveticaNeue"/>
+                                                </attributes>
+                                            </fragment>
+                                        </attributedString>
+                                        <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
+                                    </textView>
+                                </subviews>
+                                <constraints>
+                                    <constraint firstAttribute="trailing" secondItem="DOQ-cT-09V" secondAttribute="trailing" id="62I-Rt-m70"/>
+                                    <constraint firstAttribute="trailing" secondItem="DOQ-cT-09V" secondAttribute="trailing" constant="8" id="iBb-Ea-QNb"/>
+                                </constraints>
+                            </scrollView>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstItem="xbY-Je-QbG" firstAttribute="leading" secondItem="YH8-bS-gzz" secondAttribute="leadingMargin" constant="-20" id="69X-Nf-FSr"/>
+                            <constraint firstAttribute="trailingMargin" secondItem="xbY-Je-QbG" secondAttribute="trailing" constant="-20" id="XC7-TP-hQH"/>
+                        </constraints>
                     </view>
                     <navigationItem key="navigationItem" title="Language" id="Z4u-nF-Sry">
                         <barButtonItem key="leftBarButtonItem" title="Back" id="SrG-ty-476">
@@ -257,8 +432,8 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" fixedFrame="YES" editable="NO" textAlignment="natural" translatesAutoresizingMaskIntoConstraints="NO" id="RYT-th-ULT">
-                                <rect key="frame" x="0.0" y="72" width="600" height="528"/>
-                                <mutableString key="text">This is a quick primer on what terse is and how it works.  More specifically, this primer will be a quick way to learn the language and quickly get started using it as a graphics tool.  Luckily, the language itself is very simple, and the in-depth documentation of the language itself is fairly short.  Examples of code will be enclosed in three backquotes: ```.
+                                <rect key="frame" x="0.0" y="72" width="350" height="528"/>
+                                <string key="text">This is a quick primer on what terse is and how it works.  More specifically, this primer will be a quick way to learn the language and quickly get started using it as a graphics tool.  Luckily, the language itself is very simple, and the in-depth documentation of the language itself is fairly short.  Examples of code will be enclosed in three backquotes: ```.
 
 The following will create a red rectangle:
 ``` 10 150 10 10 r ```
@@ -268,7 +443,7 @@ The following will instead create a green rectangle:
 ``` 0 1 0 1 c 10 150 10 10 r ```
 'c' is a function which takes four values, representing floating point RGBA values (each within the range [0,1]).
 
-So far, these are the main two fundamental items used to create what is desired.  Of course, this is failry limited as it is, and inefficient to use when creating things.  The rest of the documentation will cover the language itself, and will end with examples that apply the language to the graphical situation.</mutableString>
+So far, these are the main two fundamental items used to create what is desired.  Of course, this is failry limited as it is, and inefficient to use when creating things.  The rest of the documentation will cover the language itself, and will end with examples that apply the language to the graphical situation.</string>
                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                 <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
                             </textView>
