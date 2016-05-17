@@ -25,7 +25,7 @@ func popb(q : [String]) -> ([String],[String]) {
   var i = 0; for i=q.count-1;!(q[i]=="[");i-- { continue; }
   return (Array(q[0..<i]),Array(q[i+1..<q.count])); }
 // pops from stack; essentially backwards indexing.
-func pop(i : Int, q : [String]) -> String { guard q.count > 0 else { return ""; }
+func pop(i : Int, q : [String]) -> String { guard q.count > i else { return ""; }
     return q[q.count-1-i]; }
 // removes elements from stack.
 func rp(i : Int, q : [String]) -> [String] { guard q.count > i else { return []; }
@@ -54,7 +54,7 @@ func parseExpr(e : [String],ep : [String],lnz : [[String]]) -> Stk { return (e.r
   case (0,"!"): return 
     (parseExpr(nz.1[Int(n.stk.last!)!],ep:/*Array(n.stk[0..<n.stk.count-1])*/rp(1,q:n.stk),lnz:[]),nz.1);
   case (0,"+"), (0,"-"), (0,"*"), (0,"/"): 
-    let x : String = String((funize(s))(Double(pop(1,q:n.stk))!,Double(n.stk.last!)!));
+    let x : String = String((funize(s))(Double(pop(1,q:n.stk))!,Double(pop(0,q:n.stk))!));
     return (Stk(mode:0,stk:rp(2,q:n.stk)+[x]),nz.1);
   case (0,"="): let q = Double(n.stk.last!); let e = Double(pop(1,q:n.stk));
                 return (Stk(mode:0,stk:rp(2,q:n.stk)+(q==e ? [n.stk.last!] : ["f"])),nz.1);
