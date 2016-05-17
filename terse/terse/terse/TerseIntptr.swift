@@ -20,15 +20,16 @@ struct Stk { var mode : Int; var stk : [String]; }
 var funs : [Fun] = []
 
 // crashes if "[" does not show.
-func popb(q : [String]) -> ([String],[String]) { var i = 0; 
-  for i=q.count-1;!(q[i]=="[");i-- { continue; }
+func popb(q : [String]) -> ([String],[String]) {
+  guard !(q.filter({"[" == $0}).isEmpty) else { return ([],[]); }
+  var i = 0; for i=q.count-1;!(q[i]=="[");i-- { continue; }
   return (Array(q[0..<i]),Array(q[i+1..<q.count])); }
 // pops from stack; essentially backwards indexing.
-func pop(i : Int, q : [String]) -> String { guard q.count > 0 {
-    return q[q.count-1-i]; } }
+func pop(i : Int, q : [String]) -> String { guard q.count > 0 else { return ""; }
+    return q[q.count-1-i]; }
 // removes elements from stack.
-func rp(i : Int, q : [String]) -> [String] { guard q.count > i {
-    return Array(q[0..<q.count-i]); } }
+func rp(i : Int, q : [String]) -> [String] { guard q.count > i else { return []; }
+    return Array(q[0..<q.count-i]); }
 // unnecessary function, but for some reason Swift deems the contained expression as
 //   too "complex" when expressed using the conditional ternary operator.
 func funize(s : String) -> ((Double,Double) -> Double) { switch(s) { case "+": return (+); 
@@ -49,7 +50,7 @@ func parseExpr(e : [String],ep : [String],lnz : [[String]]) -> Stk { return (e.r
   case (0,"["): return (Stk(mode:1,stk:n.stk+[s]),nz.1);
   case (1,"}"): let q = popb(n.stk);
                 return (Stk(mode:0,stk:q.0+[String(nz.1.count)]),nz.1+[q.1]);
-  case (0,"~"): return (Stk(mode:n.mode,stk:/*Array(n.stk[0..<n.stk.count-1]))*/rp(1,q:n.stk),nz.1);
+  case (0,"~"): return (Stk(mode:n.mode,stk:/*Array(n.stk[0..<n.stk.count-1]))*/rp(1,q:n.stk)),nz.1);
   case (0,"!"): return 
     (parseExpr(nz.1[Int(n.stk.last!)!],ep:/*Array(n.stk[0..<n.stk.count-1])*/rp(1,q:n.stk),lnz:[]),nz.1);
   case (0,"+"), (0,"-"), (0,"*"), (0,"/"): 
