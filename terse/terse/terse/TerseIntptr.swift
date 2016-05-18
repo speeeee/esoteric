@@ -25,7 +25,7 @@ func popb(q : [String]) -> ([String],[String]) {
   var i = 0; for i=q.count-1;!(q[i]=="[");i-- { continue; }
   return (Array(q[0..<i]),Array(q[i+1..<q.count])); }
 // pops from stack; essentially backwards indexing.
-func pop(i : Int, q : [String]) -> String { guard q.count > i else { return ""; }
+func pop(i : Int, q : [String]) -> String { guard q.count > i else { return "0"; }
     return q[q.count-1-i]; }
 // removes elements from stack.
 func rp(i : Int, q : [String]) -> [String] { guard q.count > i else { return []; }

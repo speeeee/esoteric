@@ -53,7 +53,7 @@ class terseStore{
             terses = [];
             terses.append(TCell(title: "Test1", text: "1 2 + ."));
             terses.append(TCell(title: "Test2", text: "0 0 1 1 r"));
-            terses.append(TCell(title: "Test3", text: "1 0.5 0.5 c 0 1 1 r"));
+            terses.append(TCell(title: "Test3", text: "1 0.5 0.5 1 c 0 0 10 10 r"));
         }
         //sort()
     }
