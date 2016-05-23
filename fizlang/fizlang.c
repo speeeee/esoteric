@@ -23,6 +23,11 @@
 //typedef struct { int32_t v; int32_t type; /*Action act;*/ } Cell;
 //typedef struct { int32_t x; int32_t y; Cell *cls; } Tile;
 
+/* setup: language/nation name
+          alphabet y/n
+          |-- alphabet len
+          pool default: nselect (other option: manual) */
+
 typedef struct { GLfloat x; GLfloat y; GLfloat w; GLfloat h; } Rect;
 typedef struct { Rect dim; Rect *but; } Window;
 
