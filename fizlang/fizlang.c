@@ -5,6 +5,7 @@
 #include <string.h>
 #include <math.h>
 #include <time.h>
+#include <png.h>
 
 #include <OpenGL/GL.h>
 #include <GLFW/glfw3.h>
@@ -14,8 +15,11 @@
 #define BASE_HEIGHT 255
 #define SEA_LEVEL 127
 
+#define LNGS 5
+
 #define MTITLE 0
 #define MSETUP 1
+#define MGAME 2
 
 //int seed; int map[SZ][SZ];
 
@@ -26,10 +30,17 @@
 /* setup: language/nation name
           alphabet y/n
           |-- alphabet len
-          pool default: nselect (other option: manual) */
+          pool default: nselect (other option: manual) 
+          creation default: derivative (other option: unique) */
 
 typedef struct { GLfloat x; GLfloat y; GLfloat w; GLfloat h; } Rect;
 typedef struct { Rect dim; Rect *but; } Window;
+
+// 2-by-2 array of each comparison for each language for each statistic.
+
+int32_t acc[LNGS][LNGS] = { 0 }; int32_t std[LNGS][LNGS] = { 0 };
+int32_t rig[LNGS][LNGS] = { 0 }; int32_t rea[LNGS][LNGS] = { 0 };
+int32_t dis[LNGS][LNGS] = { 0 };
 
 void error_callback(int error, const char* description) {
     fputs(description, stderr); }
@@ -79,7 +90,7 @@ void ds_map(int sz,int bmap[sz][sz], int bh, int l, int r, int t, int b) {
     ds_map(sz,bmap,nbh,l,x_cnt,t,y_cnt); ds_map(sz,bmap,nbh,x_cnt,r,t,y_cnt);
     ds_map(sz,bmap,nbh,l,x_cnt,y_cnt,b); ds_map(sz,bmap,nbh,x_cnt,r,y_cnt,b); } }
 
-void paint(GLFWwindow *win) { 
+void paint(GLFWwindow *win, int mode) { 
   glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); glLoadIdentity();
   glClearColor(0.4,0.4,0.55,1.0);
   //glTranslatef(-c.x/10,-c.y/10,0); //printf("%f, %f, %f\n",c.z,c.x,c.y); 
@@ -89,16 +100,19 @@ void paint(GLFWwindow *win) {
 int pressed(GLFWwindow *win,int x) { return glfwGetKey(win,x)!=GLFW_RELEASE; }
 int mpressed(GLFWwindow *win, int x) { return glfwGetMouseButton(win,x); }
 // making drawing tool
-int bhover(GLFWwindow *win, Rect b) { Glfloat x, y;
+int bhover(GLFWwindow *win, Rect b) { double x, y;
   glfwGetCursorPos(win,&x,&y); return x>b.x&&x<b.x+b.w&&y>b.y&&y<b.y+b.h; }
 int bclick(GLFWwindow *win, Rect b) { 
   return mpressed(win,GLFW_MOUSE_BUTTON_LEFT)&&bhover(win,b); }
 
 int parse_input(GLFWwindow *win, int mode) { Rect ng = { 30, 30, 100, 30 };
-  if(mpressed(win,ng)) { return MSETUP; } returm mode; }
+  switch(mode) { case MTITLE:
+    if(bclick(win,ng)) { return MSETUP; } break;
+  case MSIM: break;
+  default: return mode; } }
   
 int main(void) { //cam c = { 0, 0, 0 };
-  GLFWwindow* window; int seed = time(NULL); srand(seed); int mode = MTITLE;
+  GLFWwindow* window; int seed = time(NULL); srand(seed); int mode = MSIM;
   /*map[0][0] = BASE_HEIGHT/2; map[SZ-1][0] = BASE_HEIGHT/2;
   map[SZ-1][SZ-1] = BASE_HEIGHT/2; map[0][SZ-1] = BASE_HEIGHT/2;
   ds_map(SZ,map,BASE_HEIGHT_A,0,SZ-1,SZ-1,0);*/
@@ -112,7 +126,7 @@ int main(void) { //cam c = { 0, 0, 0 };
   glfwSwapInterval(1);
   glfwSetKeyCallback(window, key_callback); setup(window);
   glfwSetFramebufferSizeCallback(window, rsz);
-  while (!glfwWindowShouldClose(window)) { paint(window);
+  while (!glfwWindowShouldClose(window)) { paint(window,mode);
     mode = parse_input(window,mode); glfwSwapBuffers(window); glfwPollEvents(); }
   glfwDestroyWindow(window);
   glfwTerminate();
