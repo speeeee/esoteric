@@ -28,6 +28,16 @@ A "language" based somewhat off of golf.
 ## finppn
 Will be reintroduced in new repo.
 
+## CExperiments
+
+Disorganized experimental things written in C.
+
+# Soon to be added
+
+## deepl
+
+Machine learning experiments.
+
 # On hiatus
 
 ## LM
@@ -39,3 +49,5 @@ A somewhat serious stack-based language targetting C++.  ulang acts as a success
 
 ## %%%%%
 Project will continue more frequently once a more concrete idea of what it will be exists.  There will still be commits, but they are less about the language and more about the graphical side.
+
+Last updated 1 June 2016
