@@ -3,6 +3,8 @@
 (define ø0 0)
 (define ø1 0)
 
+; this file should be ignored.
+
 ; hø(x) = ø0 + ø1x1
 ; J(ø) = 1/2(hø(x)-y)^2
 
@@ -14,7 +16,6 @@
 (define bset '((100 0) (200 0) (300 0) (400 0) (500 0) (600 1) (700 1) (800 1)
                         (900 1) (1000 1))) ;(395 1) (390 0) (240 0)))
 ; m = 13
-; create a logistic classification.
 
 ;(define (hø x) (+ ø0 (* ø1 x)))
 (define (z x) (+ ø0 (* ø1 x)))
