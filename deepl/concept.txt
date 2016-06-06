@@ -1,0 +1,7 @@
+{line {(50 -50)} {dup {+ 1 {save 0 {dup {+ 1 {load 0} 0}}}}}
+
+This code will draw a vertical line segment from y = -50 to y = 50.  The line will appear
+  to be moving at a constant velocity to the right.
+
+This is so far a conceptual design and not even close to final.  This is also intended to 
+  be graphical.
